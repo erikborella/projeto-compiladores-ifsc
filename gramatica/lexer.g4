@@ -57,3 +57,6 @@ NUM_DEC : [0-9]+'.'[0-9]+;
 
 ID: [a-zA-Z_][a-zA-Z_0-9]* ;
 WS: [ \t\n\r\f]+ -> skip ;
+
+COMENTARIO_LINHA: '//' ~[\r\n]* -> skip ;
+COMENTARIO_BLOCO: '/*' .*? '*/' -> skip ;
