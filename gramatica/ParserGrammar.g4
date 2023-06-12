@@ -58,9 +58,7 @@ bloco
     ;
 
 listavariaveis 
-    : tipo id listaid 
-    ;
-     listavariaveis 
+    : tipo id listaid ; listavariaveis 
     | /* epsilon */ 
     ;
 
@@ -75,9 +73,7 @@ comandos
     ;
 
 comando 
-    : comando_linha 
-    ;
-
+    : comando_linha ;
     | comando_bloco 
     ;
 
@@ -142,11 +138,7 @@ enquanto
     ;
 
 para 
-    : for ( para_atribuicoes 
-    ;
-     para_expressao 
-    ;
-     para_atribuicoes ) bloco 
+    : for ( para_atribuicoes ; para_expressao ; para_atribuicoes ) bloco 
     ;
 
 atribuicao 
@@ -199,9 +191,7 @@ expr_ou
     ;
 
 expr_ou2 
-    : 
-    |
-    | expr_e expr_ou2 
+    : || expr_e expr_ou2 
     | /* epsilon */ 
     ;
 
