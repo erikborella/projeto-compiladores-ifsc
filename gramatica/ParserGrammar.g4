@@ -15,12 +15,12 @@ listafuncoes
     ;
 
 decfuncao 
-    : tiporetorno id ( parametros ) bloco 
+    : tiporetorno ID PARENTESE_ABRE parametros PARENTESE_FECHA bloco 
     ;
 
 tiporetorno 
     : tipo 
-    | void 
+    | TIPO_VOID 
     ;
 
 tipo 
@@ -28,42 +28,42 @@ tipo
     ;
 
 tipobase 
-    : char 
-    | float 
-    | int 
-    | boolean 
+    : TIPO_CHAR 
+    | TIPO_FLOAT 
+    | TIPO_INT 
+    | TIPO_BOOLEAN 
     ;
 
 dimensao 
-    : [ num_int ] dimensao 
+    : COLCHETE_ABRE NUM_INT COLCHETE_FECHA dimensao 
     | /* epsilon */ 
     ;
 
 parametros 
-    : tipo id listaparametros 
+    : tipo ID listaparametros 
     | /* epsilon */ 
     ;
 
 listaparametros 
-    : , tipo id listaparametros 
+    : VIRGULA tipo ID listaparametros 
     | /* epsilon */ 
     ;
 
 principal 
-    : main ( ) bloco 
+    : MAIN PARENTESE_ABRE PARENTESE_FECHA bloco 
     ;
 
 bloco 
-    : { listavariaveis comandos } 
+    : CHAVE_ABRE listavariaveis comandos CHAVE_FECHA
     ;
 
 listavariaveis 
-    : tipo id listaid ; listavariaveis 
+    : tipo ID listaid PONTO_VIRGULA listavariaveis 
     | /* epsilon */ 
     ;
 
 listaid 
-    : , id listaid 
+    : VIRGULA ID listaid 
     | /* epsilon */ 
     ;
 
@@ -73,7 +73,7 @@ comandos
     ;
 
 comando 
-    : comando_linha ;
+    : comando_linha PONTO_VIRGULA
     | comando_bloco 
     ;
 
@@ -92,57 +92,57 @@ comando_bloco
     ;
 
 leitura 
-    : scanf ( termoleitura novotermoleitura ) 
+    : SCANF PARENTESE_ABRE termoleitura novotermoleitura PARENTESE_FECHA
     ;
 
 termoleitura 
-    : id dimensao2 
+    : ID dimensao2 
     ;
 
 novotermoleitura 
-    : , termoleitura novotermoleitura 
+    : VIRGULA termoleitura novotermoleitura 
     | /* epsilon */ 
     ;
 
 dimensao2 
-    : [ expr_aditiva ] dimensao2 
+    : COLCHETE_ABRE expr_aditiva COLCHETE_FECHA dimensao2 
     | /* epsilon */ 
     ;
 
 escrita 
-    : println ( termoescrita novotermoescrita ) 
+    : PRINTLN PARENTESE_ABRE termoescrita novotermoescrita PARENTESE_FECHA 
     ;
 
 termoescrita 
-    : id dimensao2 
+    : ID dimensao2 
     | constante 
-    | texto 
+    | TEXTO 
     ;
 
 novotermoescrita 
-    : , termoescrita novotermoescrita 
+    : VIRGULA termoescrita novotermoescrita 
     | /* epsilon */ 
     ;
 
 selecao 
-    : if ( expressao ) bloco senão 
+    : IF PARENTESE_ABRE expressao PARENTESE_FECHA bloco senão 
     ;
 
 senão 
-    : else bloco 
+    : ELSE bloco 
     | /* epsilon */ 
     ;
 
 enquanto 
-    : while ( expressao ) bloco 
+    : WHILE PARENTESE_ABRE expressao PARENTESE_FECHA bloco 
     ;
 
 para 
-    : for ( para_atribuicoes ; para_expressao ; para_atribuicoes ) bloco 
+    : FOR PARENTESE_ABRE para_atribuicoes PONTO_VIRGULA para_expressao PONTO_VIRGULA para_atribuicoes PARENTESE_FECHA bloco 
     ;
 
 atribuicao 
-    : id = complemento 
+    : ID OP_ATRIBUICAO complemento 
     ;
 
 para_atribuicoes 
@@ -151,7 +151,7 @@ para_atribuicoes
     ;
 
 lista_atribuicao 
-    : , atribuicao lista_atribuicao 
+    : VIRGULA atribuicao lista_atribuicao 
     | /* epsilon */ 
     ;
 
@@ -165,7 +165,7 @@ complemento
     ;
 
 funcao 
-    : func id ( argumentos ) 
+    : FUNC ID PARENTESE_ABRE argumentos PARENTESE_FECHA 
     ;
 
 argumentos 
@@ -174,12 +174,12 @@ argumentos
     ;
 
 novo_argumento 
-    : , expressao novo_argumento 
+    : VIRGULA expressao novo_argumento 
     | /* epsilon */ 
     ;
 
 retorno 
-    : return expressao 
+    : RETURN expressao 
     ;
 
 expressao 
@@ -191,7 +191,7 @@ expr_ou
     ;
 
 expr_ou2 
-    : || expr_e expr_ou2 
+    : OP_OU expr_e expr_ou2 
     | /* epsilon */ 
     ;
 
@@ -200,7 +200,7 @@ expr_e
     ;
 
 expr_e2 
-    : && expr_relacional expr_e2 
+    : OP_E expr_relacional expr_e2 
     | /* epsilon */ 
     ;
 
