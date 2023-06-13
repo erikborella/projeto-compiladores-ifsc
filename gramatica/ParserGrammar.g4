@@ -1,21 +1,12 @@
 parser grammar ParserGrammar;
 options { tokenVocab=LexerGrammar; }
 
-teste 
-    : sinal constante
-    ;
- 
 programa 
-    : listafuncoes principal 
-    ;
-
-listafuncoes 
-    : decfuncao listafuncoes 
-    | /* epsilon */ 
+    : (decfuncao)* principal 
     ;
 
 decfuncao 
-    : tiporetorno ID PARENTESE_ABRE parametros PARENTESE_FECHA bloco 
+    : tiporetorno ID PARENTESE_ABRE (parametros)? PARENTESE_FECHA bloco 
     ;
 
 tiporetorno 
@@ -24,7 +15,7 @@ tiporetorno
     ;
 
 tipo 
-    : tipobase dimensao 
+    : tipobase (dimensao)*
     ;
 
 tipobase 
@@ -35,18 +26,11 @@ tipobase
     ;
 
 dimensao 
-    : COLCHETE_ABRE NUM_INT COLCHETE_FECHA dimensao 
-    | /* epsilon */ 
+    : COLCHETE_ABRE NUM_INT COLCHETE_FECHA 
     ;
 
 parametros 
-    : tipo ID listaparametros 
-    | /* epsilon */ 
-    ;
-
-listaparametros 
-    : VIRGULA tipo ID listaparametros 
-    | /* epsilon */ 
+    : tipo ID (VIRGULA tipo ID)*
     ;
 
 principal 
@@ -54,22 +38,11 @@ principal
     ;
 
 bloco 
-    : CHAVE_ABRE listavariaveis comandos CHAVE_FECHA
+    : CHAVE_ABRE (decvariavel)* (comando)* CHAVE_FECHA
     ;
 
-listavariaveis 
-    : tipo ID listaid PONTO_VIRGULA listavariaveis 
-    | /* epsilon */ 
-    ;
-
-listaid 
-    : VIRGULA ID listaid 
-    | /* epsilon */ 
-    ;
-
-comandos 
-    : comando comandos 
-    | /* epsilon */ 
+decvariavel
+    : tipo ID (VIRGULA ID)* PONTO_VIRGULA
     ;
 
 comando 
@@ -82,55 +55,43 @@ comando_linha
     | escrita 
     | atribuicao 
     | funcao  
+    | retorno
     ;
 
 comando_bloco 
     : selecao 
     | enquanto 
-    | para 
-    | retorno 
+    | para
     ;
 
 leitura 
-    : SCANF PARENTESE_ABRE termoleitura novotermoleitura PARENTESE_FECHA
+    : SCANF PARENTESE_ABRE termoleitura (VIRGULA termoleitura)* PARENTESE_FECHA
     ;
 
 termoleitura 
-    : ID dimensao2 
-    ;
-
-novotermoleitura 
-    : VIRGULA termoleitura novotermoleitura 
-    | /* epsilon */ 
+    : ID (dimensao2)*
     ;
 
 dimensao2 
-    : COLCHETE_ABRE expr_aditiva COLCHETE_FECHA dimensao2 
-    | /* epsilon */ 
+    : COLCHETE_ABRE expr_aditiva COLCHETE_FECHA 
     ;
 
 escrita 
-    : PRINTLN PARENTESE_ABRE termoescrita novotermoescrita PARENTESE_FECHA 
+    : PRINTLN PARENTESE_ABRE termoescrita (VIRGULA termoescrita)* PARENTESE_FECHA 
     ;
 
 termoescrita 
-    : ID dimensao2 
+    : ID (dimensao2)* 
     | constante 
     | TEXTO 
     ;
 
-novotermoescrita 
-    : VIRGULA termoescrita novotermoescrita 
-    | /* epsilon */ 
-    ;
-
 selecao 
-    : IF PARENTESE_ABRE expressao PARENTESE_FECHA bloco senão 
+    : IF PARENTESE_ABRE expressao PARENTESE_FECHA bloco (senao)? 
     ;
 
-senão 
+senao 
     : ELSE bloco 
-    | /* epsilon */ 
     ;
 
 enquanto 
@@ -138,7 +99,7 @@ enquanto
     ;
 
 para 
-    : FOR PARENTESE_ABRE para_atribuicoes PONTO_VIRGULA para_expressao PONTO_VIRGULA para_atribuicoes PARENTESE_FECHA bloco 
+    : FOR PARENTESE_ABRE (para_atribuicoes)? PONTO_VIRGULA (expressao)? PONTO_VIRGULA (para_atribuicoes)? PARENTESE_FECHA bloco 
     ;
 
 atribuicao 
@@ -146,18 +107,7 @@ atribuicao
     ;
 
 para_atribuicoes 
-    : atribuicao lista_atribuicao 
-    | /* epsilon */ 
-    ;
-
-lista_atribuicao 
-    : VIRGULA atribuicao lista_atribuicao 
-    | /* epsilon */ 
-    ;
-
-para_expressao 
-    : expressao 
-    | /* epsilon */ 
+    : atribuicao (VIRGULA atribuicao)* 
     ;
 
 complemento 
@@ -165,17 +115,11 @@ complemento
     ;
 
 funcao 
-    : FUNC ID PARENTESE_ABRE argumentos PARENTESE_FECHA 
+    : FUNC ID PARENTESE_ABRE (argumentos)? PARENTESE_FECHA 
     ;
 
 argumentos 
-    : expressao novo_argumento 
-    | /* epsilon */ 
-    ;
-
-novo_argumento 
-    : VIRGULA expressao novo_argumento 
-    | /* epsilon */ 
+    : expressao (VIRGULA expressao)* 
     ;
 
 retorno 
@@ -187,30 +131,15 @@ expressao
     ;
 
 expr_ou 
-    : expr_e expr_ou2 
-    ;
-
-expr_ou2 
-    : OP_OU expr_e expr_ou2 
-    | /* epsilon */ 
+    : expr_e (OP_OU expr_e)* 
     ;
 
 expr_e 
-    : expr_relacional expr_e2 
-    ;
-
-expr_e2 
-    : OP_E expr_relacional expr_e2 
-    | /* epsilon */ 
+    : expr_relacional (OP_E expr_relacional)*
     ;
 
 expr_relacional 
-    : expr_aditiva expr_relacional2 
-    ;
-
-expr_relacional2 
-    : op_relacional expr_aditiva 
-    | /* epsilon */ 
+    : expr_aditiva (op_relacional expr_aditiva)* 
     ;
 
 op_relacional 
@@ -222,14 +151,8 @@ op_relacional
     | OP_MENOR_IGUAL
     ;
 
-
 expr_aditiva
-    : expr_multiplicativa expr_aditiva2
-    ;
-
-expr_aditiva2
-    : op_aditivo expr_multiplicativa expr_aditiva2
-    | /* epsilon */
+    : expr_multiplicativa (op_aditivo expr_multiplicativa)*
     ;
 
 op_aditivo
@@ -238,12 +161,7 @@ op_aditivo
     ;
 
 expr_multiplicativa
-    : fator expr_multiplicativa2
-    ;
-
-expr_multiplicativa2
-    : op_multiplicativo fator expr_multiplicativa2
-    | /* epsilon */
+    : fator (op_multiplicativo fator)*
     ;
 
 op_multiplicativo
@@ -253,14 +171,14 @@ op_multiplicativo
     ;
 
 fator
-    : sinal termo
+    : (sinal)? termo
     | TEXTO
     | OP_NEGACAO fator
     | PARENTESE_ABRE expressao PARENTESE_FECHA
     ;
 
 termo
-    : ID dimensao2
+    : ID (dimensao2)*
     | constante
     | funcao
     ;
@@ -268,7 +186,6 @@ termo
 sinal
     : SINAL_MAIS
     | SINAL_MENOS
-    | /* epsilon */
     ;
 
 constante
