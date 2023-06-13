@@ -26,7 +26,7 @@ tipobase
     ;
 
 dimensao 
-    : COLCHETE_ABRE NUM_INT COLCHETE_FECHA 
+    : COLCHETE_ABRE (NUM_INT)? COLCHETE_FECHA 
     ;
 
 parametros 

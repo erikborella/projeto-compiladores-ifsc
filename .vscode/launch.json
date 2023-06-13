@@ -7,7 +7,7 @@
             "request": "launch",
             "input": "input.txt",
             "grammar": "gramatica/ParserGrammar.g4",
-            "startRule": "teste",
+            "startRule": "programa",
             "printParseTree": true,
             "visualParseTree": true
         }
