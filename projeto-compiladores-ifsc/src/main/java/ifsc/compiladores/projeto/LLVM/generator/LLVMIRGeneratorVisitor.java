@@ -2,12 +2,11 @@ package ifsc.compiladores.projeto.LLVM.generator;
 
 import ifsc.compiladores.projeto.LLVM.Fragment;
 import ifsc.compiladores.projeto.LLVM.FragmentBlock;
-import ifsc.compiladores.projeto.LLVM.FragmentTest;
-import ifsc.compiladores.projeto.LLVM.definitions.types.Function;
+import ifsc.compiladores.projeto.LLVM.definitions.Function;
 import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammarBaseVisitor;
-import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.Token;
 
 public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     @Override
@@ -44,25 +43,14 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
     @Override
     public Type visitTipo(ParserGrammar.TipoContext ctx) {
-        ParserGrammar.TipobaseContext tipobaseContext = ctx.tipobase();
+        Token tipobaseToken = ctx.tipobase().getStart();
 
-        if (tipobaseContext.TIPO_INT() != null) {
-            return Type.INT;
-        }
-
-        if (tipobaseContext.TIPO_BOOLEAN() != null) {
-            return Type.BOOLEAN;
-        }
-
-        if (tipobaseContext.TIPO_FLOAT() != null) {
-            return Type.FLOAT;
-        }
-
-        if (tipobaseContext.TIPO_CHAR() != null) {
-            return Type.CHAR;
-        }
-
-        //Unreachable code
-        return null;
+        return switch (tipobaseToken.getType()) {
+            case ParserGrammar.TIPO_INT -> Type.INT;
+            case ParserGrammar.TIPO_BOOLEAN -> Type.BOOLEAN;
+            case ParserGrammar.TIPO_FLOAT -> Type.FLOAT;
+            case ParserGrammar.TIPO_CHAR -> Type.CHAR;
+            default -> throw new IllegalStateException("Invalid type");
+        };
     }
 }
