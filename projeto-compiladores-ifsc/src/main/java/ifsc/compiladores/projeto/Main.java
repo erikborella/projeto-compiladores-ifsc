@@ -3,8 +3,11 @@ package ifsc.compiladores.projeto;
 import java.util.Scanner;
 import java.util.concurrent.Callable;
 
+import ifsc.compiladores.projeto.LLVM.Fragment;
+import ifsc.compiladores.projeto.LLVM.generator.LLVMIRGeneratorVisitor;
 import ifsc.compiladores.projeto.gramatica.LexerGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
+import ifsc.compiladores.projeto.gramatica.ParserGrammar.ProgramaContext;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -29,9 +32,13 @@ public class Main implements Callable<Integer> {
             CommonTokenStream tokenStream = new CommonTokenStream(lexer);
             ParserGrammar parser = new ParserGrammar(tokenStream);
 
-            ParseTree tree = parser.programa();
+            ProgramaContext programaContext = parser.programa();
 
-            System.out.println(tree.toStringTree(parser));
+            LLVMIRGeneratorVisitor visitor = new LLVMIRGeneratorVisitor();
+
+            Fragment program = visitor.visitPrograma(programaContext);
+
+            System.out.println(program.getText());
 
         } while (!input.equals("exit"));
         return 0;
