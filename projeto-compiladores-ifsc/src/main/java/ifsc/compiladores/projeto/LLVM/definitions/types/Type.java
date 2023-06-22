@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 public class Type implements Fragment {
 
-    private BaseType baseType;
-    private ArrayList<Integer> dimensions;
+    private final BaseType baseType;
+    private final ArrayList<Integer> dimensions;
 
     public Type(BaseType baseType) {
         this.baseType = baseType;
@@ -15,11 +15,15 @@ public class Type implements Fragment {
     }
 
     public BaseType getBaseType() {
-        return baseType;
+        return this.baseType;
     }
 
     public ArrayList<Integer> getDimensions() {
-        return dimensions;
+        return this.dimensions;
+    }
+
+    public boolean isArrayType() {
+        return !this.dimensions.isEmpty();
     }
 
     @Override
@@ -28,8 +32,15 @@ public class Type implements Fragment {
 
         builder.append(this.baseType.getText());
 
-        for (int dimension : this.dimensions) {
-            builder.append('*');
+        for (int i = this.dimensions.size() - 1; i >= 0; i--) {
+            int dimension = this.dimensions.get(i);
+
+            // Insert "[dimension x" at the start
+            String arrayDefinition = String.format("[%d x ", dimension);
+            builder.insert(0, arrayDefinition);
+
+            // Then close the ']' at the end
+            builder.append(']');
         }
 
         return builder.toString();

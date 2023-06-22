@@ -15,8 +15,10 @@ public class Function implements Fragment {
 
     @Override
     public String getText() {
+        String typeDefinition = type.getText() + (type.isArrayType() ? '*' : "");
+
         return String.format("define %s @%s() {\n}",
-                type.getText(),
-                name);
+                typeDefinition,
+                this.name);
     }
 }
