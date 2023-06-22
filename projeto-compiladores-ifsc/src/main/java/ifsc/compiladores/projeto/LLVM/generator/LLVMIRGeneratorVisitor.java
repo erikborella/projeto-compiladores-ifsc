@@ -9,6 +9,8 @@ import ifsc.compiladores.projeto.gramatica.ParserGrammarBaseVisitor;
 import org.antlr.v4.runtime.Token;
 
 public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
+
+
     @Override
     public Fragment visitPrograma(ParserGrammar.ProgramaContext ctx) {
         FragmentBlock program = new FragmentBlock();
@@ -16,6 +18,8 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         for (ParserGrammar.DecfuncaoContext decfuncaoContext : ctx.decfuncao()) {
             program.add(visitDecfuncao(decfuncaoContext));
         }
+
+        program.add(visitPrincipal(ctx.principal()));
 
         return program;
     }
@@ -28,6 +32,16 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         Function function = new Function(type, name);
 
         return function;
+    }
+
+    @Override
+    public Fragment visitPrincipal(ParserGrammar.PrincipalContext ctx) {
+        Type type = Type.INT;
+        String name = "main";
+
+        Function mainFunction = new Function(type, name);
+
+        return mainFunction;
     }
 
     @Override
