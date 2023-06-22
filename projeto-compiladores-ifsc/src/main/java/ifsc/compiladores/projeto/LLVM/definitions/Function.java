@@ -1,6 +1,7 @@
 package ifsc.compiladores.projeto.LLVM.definitions;
 
 import ifsc.compiladores.projeto.LLVM.Fragment;
+import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
 import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
 
 public class Function implements Fragment {

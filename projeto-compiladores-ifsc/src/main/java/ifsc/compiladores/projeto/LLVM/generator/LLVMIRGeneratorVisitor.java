@@ -3,13 +3,13 @@ package ifsc.compiladores.projeto.LLVM.generator;
 import ifsc.compiladores.projeto.LLVM.Fragment;
 import ifsc.compiladores.projeto.LLVM.FragmentBlock;
 import ifsc.compiladores.projeto.LLVM.definitions.Function;
+import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
 import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammarBaseVisitor;
 import org.antlr.v4.runtime.Token;
 
 public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
-
 
     @Override
     public Fragment visitPrograma(ParserGrammar.ProgramaContext ctx) {
@@ -25,7 +25,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     }
 
     @Override
-    public Fragment visitDecfuncao(ParserGrammar.DecfuncaoContext ctx) {
+    public Function visitDecfuncao(ParserGrammar.DecfuncaoContext ctx) {
         Type type = visitTiporetorno(ctx.tiporetorno());
         String name = ctx.ID().getText();
 
@@ -35,8 +35,8 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     }
 
     @Override
-    public Fragment visitPrincipal(ParserGrammar.PrincipalContext ctx) {
-        Type type = Type.INT;
+    public Function visitPrincipal(ParserGrammar.PrincipalContext ctx) {
+        Type type = new Type(BaseType.INT);
         String name = "main";
 
         Function mainFunction = new Function(type, name);
@@ -49,7 +49,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         boolean isVoidType = ctx.TIPO_VOID() != null;
 
         if (isVoidType) {
-            return Type.VOID;
+            return new Type(BaseType.VOID);
         }
 
         return visitTipo(ctx.tipo());
@@ -57,13 +57,24 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
     @Override
     public Type visitTipo(ParserGrammar.TipoContext ctx) {
-        Token tipobaseToken = ctx.tipobase().getStart();
+        BaseType baseType = visitTipobase(ctx.tipobase());
+        Type type = new Type(baseType);
 
-        return switch (tipobaseToken.getType()) {
-            case ParserGrammar.TIPO_INT -> Type.INT;
-            case ParserGrammar.TIPO_BOOLEAN -> Type.BOOLEAN;
-            case ParserGrammar.TIPO_FLOAT -> Type.FLOAT;
-            case ParserGrammar.TIPO_CHAR -> Type.CHAR;
+        for (ParserGrammar.DimensaoContext dimensaoContext : ctx.dimensao()) {
+            int dimension = Integer.parseInt(dimensaoContext.NUM_INT().getText());
+            type.getDimensions().add(dimension);
+        }
+
+        return type;
+    }
+
+    @Override
+    public BaseType visitTipobase(ParserGrammar.TipobaseContext ctx) {
+        return switch (ctx.getStart().getType()) {
+            case ParserGrammar.TIPO_INT -> BaseType.INT;
+            case ParserGrammar.TIPO_BOOLEAN -> BaseType.BOOLEAN;
+            case ParserGrammar.TIPO_FLOAT -> BaseType.FLOAT;
+            case ParserGrammar.TIPO_CHAR -> BaseType.CHAR;
             default -> throw new IllegalStateException("Invalid type");
         };
     }

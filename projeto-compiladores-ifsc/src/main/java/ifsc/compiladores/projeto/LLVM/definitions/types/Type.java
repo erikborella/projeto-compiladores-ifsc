@@ -2,20 +2,36 @@ package ifsc.compiladores.projeto.LLVM.definitions.types;
 
 import ifsc.compiladores.projeto.LLVM.Fragment;
 
-public enum Type implements Fragment {
-    VOID("void"),
-    BOOLEAN("i1"),
-    CHAR("i8"),
-    INT("i32"),
-    FLOAT("float");
-    private final String irDefinition;
+import java.util.ArrayList;
 
-    Type(String irDefinition) {
-        this.irDefinition = irDefinition;
+public class Type implements Fragment {
+
+    private BaseType baseType;
+    private ArrayList<Integer> dimensions;
+
+    public Type(BaseType baseType) {
+        this.baseType = baseType;
+        this.dimensions = new ArrayList<>();
+    }
+
+    public BaseType getBaseType() {
+        return baseType;
+    }
+
+    public ArrayList<Integer> getDimensions() {
+        return dimensions;
     }
 
     @Override
     public String getText() {
-        return this.irDefinition;
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(this.baseType.getText());
+
+        for (int dimension : this.dimensions) {
+            builder.append('*');
+        }
+
+        return builder.toString();
     }
 }
