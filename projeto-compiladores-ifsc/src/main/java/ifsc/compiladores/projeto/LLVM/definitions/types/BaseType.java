@@ -7,7 +7,7 @@ public enum BaseType implements Fragment {
     BOOLEAN("i1"),
     CHAR("i8"),
     INT("i32"),
-    FLOAT("float");
+    FLOAT("double");
     private final String irDefinition;
 
     BaseType(String irDefinition) {
