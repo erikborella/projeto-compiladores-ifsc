@@ -1,6 +1,6 @@
 package ifsc.compiladores.projeto.LLVM.scopeManager;
 
-import ifsc.compiladores.projeto.LLVM.definitions.Function;
+import ifsc.compiladores.projeto.LLVM.definitions.functions.Function;
 
 import java.util.HashMap;
 import java.util.Stack;

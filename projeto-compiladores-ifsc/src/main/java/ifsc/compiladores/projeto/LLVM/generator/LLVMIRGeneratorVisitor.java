@@ -2,13 +2,16 @@ package ifsc.compiladores.projeto.LLVM.generator;
 
 import ifsc.compiladores.projeto.LLVM.Fragment;
 import ifsc.compiladores.projeto.LLVM.FragmentBlock;
-import ifsc.compiladores.projeto.LLVM.definitions.Function;
+import ifsc.compiladores.projeto.LLVM.definitions.functions.Function;
+import ifsc.compiladores.projeto.LLVM.definitions.functions.Parameter;
 import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
 import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
 import ifsc.compiladores.projeto.LLVM.scopeManager.ScopeManager;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammarBaseVisitor;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.TerminalNode;
+
+import java.util.ArrayList;
 
 public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
@@ -42,9 +45,27 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             throw new IllegalStateException(String.format("Já existe uma função com o nome %s declarada.", name));
         }
 
+        ArrayList<Parameter> parameters = getParameters(ctx.parametros());
+        function.getParameters().addAll(parameters);
+
         this.scopeManager.declareFunction(function);
 
         return function;
+    }
+
+    private ArrayList<Parameter> getParameters(ParserGrammar.ParametrosContext ctx) {
+        ArrayList<Parameter> parameters = new ArrayList<>();
+
+        for (int i = 0; i < ctx.ID().size(); i++) {
+            Type type = visitTipo(ctx.tipo(i));
+            String name = ctx.ID(i).getText();
+
+            Parameter parameter = new Parameter(type, name);
+
+            parameters.add(parameter);
+        }
+
+        return parameters;
     }
 
     @Override

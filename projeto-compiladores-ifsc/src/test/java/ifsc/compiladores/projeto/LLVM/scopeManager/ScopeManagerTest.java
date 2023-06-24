@@ -1,6 +1,6 @@
 package ifsc.compiladores.projeto.LLVM.scopeManager;
 
-import ifsc.compiladores.projeto.LLVM.definitions.Function;
+import ifsc.compiladores.projeto.LLVM.definitions.functions.Function;
 import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
 import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
 import org.junit.jupiter.api.BeforeEach;
