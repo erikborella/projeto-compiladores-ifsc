@@ -5,11 +5,18 @@ import ifsc.compiladores.projeto.LLVM.FragmentBlock;
 import ifsc.compiladores.projeto.LLVM.definitions.Function;
 import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
 import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
+import ifsc.compiladores.projeto.LLVM.scopeManager.ScopeManager;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammarBaseVisitor;
 import org.antlr.v4.runtime.Token;
 
 public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
+
+    private final ScopeManager scopeManager;
+
+    public LLVMIRGeneratorVisitor() {
+        this.scopeManager = new ScopeManager();
+    }
 
     @Override
     public Fragment visitPrograma(ParserGrammar.ProgramaContext ctx) {
@@ -31,6 +38,12 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
         Function function = new Function(type, name);
 
+        if (this.scopeManager.isFunctionDeclared(name)) {
+            throw new IllegalStateException(String.format("Já existe uma função com o nome %s declarada.", name));
+        }
+
+        this.scopeManager.declareFunction(function);
+
         return function;
     }
 
@@ -42,6 +55,11 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         Function mainFunction = new Function(type, name);
 
         return mainFunction;
+    }
+
+    @Override
+    public Fragment visitParametros(ParserGrammar.ParametrosContext ctx) {
+        return super.visitParametros(ctx);
     }
 
     @Override

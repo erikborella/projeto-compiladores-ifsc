@@ -13,6 +13,14 @@ public class Function implements Fragment {
         this.name = name;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
     @Override
     public String getText() {
         String typeDefinition = type.getText() + (type.isArrayType() ? '*' : "");
