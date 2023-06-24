@@ -1,14 +1,14 @@
-package ifsc.compiladores.projeto.LLVM.definitions;
+package ifsc.compiladores.projeto.LLVM.definitions.functions;
 
 import ifsc.compiladores.projeto.LLVM.Fragment;
-import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
 import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
 
-public class Function implements Fragment {
+public class Parameter implements Fragment {
+
     private final Type type;
     private final String name;
 
-    public Function(Type type, String name) {
+    public Parameter(Type type, String name) {
         this.type = type;
         this.name = name;
     }
@@ -17,7 +17,7 @@ public class Function implements Fragment {
     public String getText() {
         String typeDefinition = type.getText() + (type.isArrayType() ? '*' : "");
 
-        return String.format("define %s @%s() {\n}",
+        return String.format("%s %%%s",
                 typeDefinition,
                 this.name);
     }
