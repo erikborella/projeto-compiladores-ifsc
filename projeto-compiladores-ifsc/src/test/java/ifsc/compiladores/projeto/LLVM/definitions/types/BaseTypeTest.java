@@ -11,10 +11,10 @@ class BaseTypeTest {
         BaseType baseTypeVoid = BaseType.VOID;
 
         // Act
-        String emitValues = baseTypeVoid.getText();
+        String emitValue = baseTypeVoid.getText();
 
         // Assert
-        assertEquals("void", emitValues);
+        assertEquals("void", emitValue);
     }
 
     @Test
@@ -23,10 +23,10 @@ class BaseTypeTest {
         BaseType baseTypeBoolean = BaseType.BOOLEAN;
 
         // Act
-        String emitValues = baseTypeBoolean.getText();
+        String emitValue = baseTypeBoolean.getText();
 
         // Assert
-        assertEquals("i1", emitValues);
+        assertEquals("i1", emitValue);
     }
 
     @Test
@@ -35,10 +35,10 @@ class BaseTypeTest {
         BaseType baseTypeChar = BaseType.CHAR;
 
         // Act
-        String emitValues = baseTypeChar.getText();
+        String emitValue = baseTypeChar.getText();
 
         // Assert
-        assertEquals("i8", emitValues);
+        assertEquals("i8", emitValue);
     }
 
     @Test
@@ -47,10 +47,10 @@ class BaseTypeTest {
         BaseType baseTypeInt = BaseType.INT;
 
         // Act
-        String emitValues = baseTypeInt.getText();
+        String emitValue = baseTypeInt.getText();
 
         // Assert
-        assertEquals("i32", emitValues);
+        assertEquals("i32", emitValue);
     }
 
     @Test
@@ -59,9 +59,9 @@ class BaseTypeTest {
         BaseType baseTypeFloat = BaseType.FLOAT;
 
         // Act
-        String emitValues = baseTypeFloat.getText();
+        String emitValue = baseTypeFloat.getText();
 
         // Assert
-        assertEquals("double", emitValues);
+        assertEquals("double", emitValue);
     }
 }
