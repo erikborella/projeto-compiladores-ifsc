@@ -14,10 +14,6 @@ public class Type implements Fragment {
         this.dimensions = new ArrayList<>();
     }
 
-    public BaseType getBaseType() {
-        return this.baseType;
-    }
-
     public ArrayList<Integer> getDimensions() {
         return this.dimensions;
     }
