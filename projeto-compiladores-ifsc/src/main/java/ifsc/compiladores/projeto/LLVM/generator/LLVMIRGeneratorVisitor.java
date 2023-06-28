@@ -2,6 +2,7 @@ package ifsc.compiladores.projeto.LLVM.generator;
 
 import ifsc.compiladores.projeto.LLVM.Fragment;
 import ifsc.compiladores.projeto.LLVM.FragmentBlock;
+import ifsc.compiladores.projeto.LLVM.definitions.Variable;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Function;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Parameter;
 import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
@@ -62,7 +63,8 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             Type type = visitTipo(ctx.tipo(i));
             String name = ctx.ID(i).getText();
 
-            Parameter parameter = new Parameter(type, name);
+            Variable variable = new Variable(type, name);
+            Parameter parameter = new Parameter(variable);
 
             parameters.add(parameter);
         }
