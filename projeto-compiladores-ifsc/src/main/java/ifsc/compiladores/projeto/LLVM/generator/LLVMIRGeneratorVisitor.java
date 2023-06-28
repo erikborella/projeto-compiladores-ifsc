@@ -45,8 +45,10 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             throw new IllegalStateException(String.format("Já existe uma função com o nome %s declarada.", name));
         }
 
-        ArrayList<Parameter> parameters = getParameters(ctx.parametros());
-        function.getParameters().addAll(parameters);
+        if (ctx.parametros() != null) {
+            ArrayList<Parameter> parameters = getParameters(ctx.parametros());
+            function.getParameters().addAll(parameters);
+        }
 
         this.scopeManager.declareFunction(function);
 
