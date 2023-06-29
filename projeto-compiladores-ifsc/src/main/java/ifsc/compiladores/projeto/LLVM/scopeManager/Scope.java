@@ -1,16 +1,24 @@
 package ifsc.compiladores.projeto.LLVM.scopeManager;
 
-public class Scope {
-    private Scope parent = null;
+import ifsc.compiladores.projeto.LLVM.definitions.Variable;
 
-    public Scope() {
-    }
+import java.util.HashMap;
+
+public class Scope {
+
+    private final Scope parent;
+    private final HashMap<String, Variable> declaredVariables;
 
     public Scope(Scope parent) {
+        this.declaredVariables = new HashMap<>();
         this.parent = parent;
     }
 
     public Scope getParent() {
         return parent;
+    }
+
+    public HashMap<String, Variable> getDeclaredVariables() {
+        return declaredVariables;
     }
 }

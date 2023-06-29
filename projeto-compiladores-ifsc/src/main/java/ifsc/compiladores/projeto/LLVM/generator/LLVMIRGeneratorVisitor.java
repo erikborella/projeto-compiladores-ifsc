@@ -46,12 +46,16 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             throw new IllegalStateException(String.format("Já existe uma função com o nome %s declarada.", name));
         }
 
+        this.scopeManager.declareFunction(function);
+
+        this.scopeManager.startScope();
+
         if (ctx.parametros() != null) {
             ArrayList<Parameter> parameters = getParameters(ctx.parametros());
             function.getParameters().addAll(parameters);
         }
 
-        this.scopeManager.declareFunction(function);
+        this.scopeManager.finishScope();
 
         return function;
     }
@@ -64,6 +68,13 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             String name = ctx.ID(i).getText();
 
             Variable variable = new Variable(type, name);
+
+            if (this.scopeManager.isVariableDeclared(name)) {
+                throw new IllegalStateException(String.format("Já existe um parametro com o nome %s declarado.", name));
+            }
+
+            this.scopeManager.declareVariable(variable);
+
             Parameter parameter = new Parameter(variable);
 
             parameters.add(parameter);
@@ -80,11 +91,6 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         Function mainFunction = new Function(type, name);
 
         return mainFunction;
-    }
-
-    @Override
-    public Fragment visitParametros(ParserGrammar.ParametrosContext ctx) {
-        return super.visitParametros(ctx);
     }
 
     @Override

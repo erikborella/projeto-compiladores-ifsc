@@ -1,5 +1,6 @@
 package ifsc.compiladores.projeto.LLVM.scopeManager;
 
+import ifsc.compiladores.projeto.LLVM.definitions.Variable;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Function;
 
 import java.util.HashMap;
@@ -36,7 +37,26 @@ public class ScopeManager {
         this.scopeStack.pop();
     }
 
-    // TODO: declareVariable and isVariableDeclared
+    public void declareVariable(Variable variable) {
+        Scope currentScope = this.getCurrentScope();
+
+        currentScope.getDeclaredVariables().put(variable.name(), variable);
+    }
+
+    public boolean isVariableDeclared(String variableName) {
+        Scope scope = this.getCurrentScope();
+
+        while (scope != null) {
+            HashMap<String, Variable> declaredVariables = scope.getDeclaredVariables();
+
+            if (declaredVariables.containsKey(variableName))
+                return true;
+
+            scope = scope.getParent();
+        }
+
+        return false;
+    }
 
     public HashMap<String, Function> getDeclaredFunctions() {
         return declaredFunctions;

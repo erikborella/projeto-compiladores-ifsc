@@ -17,7 +17,7 @@ public class Parameter implements Fragment {
         Type type = this.variable.type();
         String typeDefinition = type.getText() + (type.isArrayType() ? '*' : "");
 
-        return String.format("%s %%%s",
+        return String.format("%s %%%s.param",
                 typeDefinition,
                 this.variable.name());
     }
