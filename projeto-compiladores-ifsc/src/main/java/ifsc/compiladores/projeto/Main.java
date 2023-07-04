@@ -86,6 +86,13 @@ public class Main implements Callable<Integer> {
         frame.add(panel);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
+
+        // Centralizar o JFrame na tela
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int centerX = (screenSize.width - frame.getWidth()) / 2;
+        int centerY = (screenSize.height - frame.getHeight()) / 2;
+        frame.setLocation(centerX, centerY);
+
         frame.setVisible(true);
     }
 
