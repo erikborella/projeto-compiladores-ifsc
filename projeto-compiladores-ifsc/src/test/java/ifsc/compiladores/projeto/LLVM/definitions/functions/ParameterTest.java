@@ -30,7 +30,6 @@ class ParameterTest {
         BaseType baseType = BaseType.INT;
         Type typeWithOneDimension = new Type(baseType);
         typeWithOneDimension.getDimensions().add(5);
-
         Variable variable = new Variable(typeWithOneDimension, "myArray");
         Parameter parameter = new Parameter(variable);
 
@@ -39,8 +38,5 @@ class ParameterTest {
 
         // Assert
         assertEquals("[5 x i32]* %myArray.param", emitValue);
-
     }
-
-
 }
