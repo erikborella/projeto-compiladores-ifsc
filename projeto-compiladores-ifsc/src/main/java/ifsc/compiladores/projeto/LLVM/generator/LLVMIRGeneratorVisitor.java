@@ -10,7 +10,6 @@ import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
 import ifsc.compiladores.projeto.LLVM.scopeManager.ScopeManager;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammarBaseVisitor;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
 
@@ -88,9 +87,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         Type type = new Type(BaseType.INT);
         String name = "main";
 
-        Function mainFunction = new Function(type, name);
-
-        return mainFunction;
+        return new Function(type, name);
     }
 
     @Override

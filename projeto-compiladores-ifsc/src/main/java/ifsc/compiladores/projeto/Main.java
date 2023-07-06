@@ -31,7 +31,7 @@ public class Main implements Callable<Integer> {
     private boolean showTree;
 
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {

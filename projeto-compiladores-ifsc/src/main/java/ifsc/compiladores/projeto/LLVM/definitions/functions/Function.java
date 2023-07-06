@@ -1,7 +1,6 @@
 package ifsc.compiladores.projeto.LLVM.definitions.functions;
 
 import ifsc.compiladores.projeto.LLVM.Fragment;
-import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
 import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
 
 import java.util.ArrayList;
