@@ -12,13 +12,19 @@ public class Parameter implements Fragment {
         this.variable = variable;
     }
 
+    public Variable getVariable() {
+        return variable;
+    }
+
+    public String getNameInParameterForm() {
+        return String.format("%s.param",
+                this.variable.name());
+    }
+
     @Override
     public String getText() {
-        Type type = this.variable.type();
-        String typeDefinition = type.getText() + (type.isArrayType() ? '*' : "");
-
-        return String.format("%s %%%s.param",
-                typeDefinition,
-                this.variable.name());
+        return String.format("%s %%%s",
+                this.variable.referenceType().getText(),
+                this.getNameInParameterForm());
     }
 }

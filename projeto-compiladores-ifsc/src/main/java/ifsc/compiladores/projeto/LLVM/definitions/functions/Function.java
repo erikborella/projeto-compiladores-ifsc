@@ -1,20 +1,23 @@
 package ifsc.compiladores.projeto.LLVM.definitions.functions;
 
 import ifsc.compiladores.projeto.LLVM.Fragment;
-import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
+import ifsc.compiladores.projeto.LLVM.FragmentBlock;
+import ifsc.compiladores.projeto.LLVM.definitions.types.ReferenceType;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 public class Function implements Fragment {
-    private final Type type;
+    private final ReferenceType returnType;
     private final String name;
     private final ArrayList<Parameter> parameters;
+    private final FragmentBlock body;
 
-    public Function(Type type, String name) {
-        this.type = type;
+    public Function(ReferenceType returnType, String name) {
+        this.returnType = returnType;
         this.name = name;
         this.parameters = new ArrayList<>();
+        this.body = new FragmentBlock();
     }
 
     public String getName() {
@@ -25,21 +28,24 @@ public class Function implements Fragment {
         return parameters;
     }
 
-    public Type getType() {
-        return type;
+    public ReferenceType getReturnType() {
+        return returnType;
+    }
+
+    public FragmentBlock getBody() {
+        return body;
     }
 
     @Override
     public String getText() {
-        String typeDefinition = type.getText() + (type.isArrayType() ? '*' : "");
-        
         String parametersDefinition = this.parameters.stream()
                 .map(Parameter::getText)
                 .collect(Collectors.joining(", "));
 
-        return String.format("define %s @%s(%s) {\n}",
-                typeDefinition,
+        return String.format("define %s @%s(%s) {\n%s\n}",
+                this.returnType.getText(),
                 this.name,
-                parametersDefinition);
+                parametersDefinition,
+                this.body.getIndentedText(1));
     }
 }

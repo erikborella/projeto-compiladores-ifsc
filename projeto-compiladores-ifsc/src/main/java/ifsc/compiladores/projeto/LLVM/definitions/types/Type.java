@@ -22,6 +22,10 @@ public class Type implements Fragment {
         return !this.dimensions.isEmpty();
     }
 
+    public ReferenceType asReferenceType() {
+        return new ReferenceType(this, 0);
+    }
+
     @Override
     public String getText() {
         StringBuilder builder = new StringBuilder();

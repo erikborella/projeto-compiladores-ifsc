@@ -2,10 +2,13 @@ package ifsc.compiladores.projeto.LLVM.generator;
 
 import ifsc.compiladores.projeto.LLVM.Fragment;
 import ifsc.compiladores.projeto.LLVM.FragmentBlock;
+import ifsc.compiladores.projeto.LLVM.definitions.Alloca;
+import ifsc.compiladores.projeto.LLVM.definitions.Store;
 import ifsc.compiladores.projeto.LLVM.definitions.Variable;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Function;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Parameter;
 import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
+import ifsc.compiladores.projeto.LLVM.definitions.types.ReferenceType;
 import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
 import ifsc.compiladores.projeto.LLVM.scopeManager.ScopeManager;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
@@ -36,7 +39,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
     @Override
     public Function visitDecfuncao(ParserGrammar.DecfuncaoContext ctx) {
-        Type type = visitTiporetorno(ctx.tiporetorno());
+        ReferenceType type = visitTiporetorno(ctx.tiporetorno());
         String name = ctx.ID().getText();
 
         Function function = new Function(type, name);
@@ -52,6 +55,9 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         if (ctx.parametros() != null) {
             ArrayList<Parameter> parameters = getParameters(ctx.parametros());
             function.getParameters().addAll(parameters);
+
+            FragmentBlock parametersDeclaration = declareParameters(parameters);
+            function.getBody().addAll(parametersDeclaration);
         }
 
         this.scopeManager.finishScope();
@@ -59,11 +65,30 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         return function;
     }
 
+    private FragmentBlock declareParameters(ArrayList<Parameter> parameters) {
+        FragmentBlock parametersDeclaration = new FragmentBlock();
+
+        for (Parameter parameter : parameters) {
+            ReferenceType allocaReturnType = parameter.getVariable().referenceType().getNewReferencePointerToThis();
+            Variable allocaReturnVariable = new Variable(allocaReturnType, parameter.getVariable().name());
+
+            Alloca parameterDeclaration = new Alloca(allocaReturnVariable, parameter.getVariable().referenceType());
+            parametersDeclaration.add(parameterDeclaration);
+
+            Variable sourceParameterVariable = new Variable(parameter.getVariable().referenceType(),
+                    parameter.getNameInParameterForm());
+            Store parameterStore = new Store(sourceParameterVariable, allocaReturnVariable);
+            parametersDeclaration.add(parameterStore);
+        }
+
+        return parametersDeclaration;
+    }
+
     private ArrayList<Parameter> getParameters(ParserGrammar.ParametrosContext ctx) {
         ArrayList<Parameter> parameters = new ArrayList<>();
 
         for (int i = 0; i < ctx.ID().size(); i++) {
-            Type type = visitTipo(ctx.tipo(i));
+            ReferenceType type = visitTipo(ctx.tipo(i));
             String name = ctx.ID(i).getText();
 
             Variable variable = new Variable(type, name);
@@ -84,25 +109,25 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
     @Override
     public Function visitPrincipal(ParserGrammar.PrincipalContext ctx) {
-        Type type = new Type(BaseType.INT);
+        ReferenceType type = new Type(BaseType.INT).asReferenceType();
         String name = "main";
 
         return new Function(type, name);
     }
 
     @Override
-    public Type visitTiporetorno(ParserGrammar.TiporetornoContext ctx) {
+    public ReferenceType visitTiporetorno(ParserGrammar.TiporetornoContext ctx) {
         boolean isVoidType = ctx.TIPO_VOID() != null;
 
         if (isVoidType) {
-            return new Type(BaseType.VOID);
+            return new Type(BaseType.VOID).asReferenceType();
         }
 
         return visitTipo(ctx.tipo());
     }
 
     @Override
-    public Type visitTipo(ParserGrammar.TipoContext ctx) {
+    public ReferenceType visitTipo(ParserGrammar.TipoContext ctx) {
         BaseType baseType = visitTipobase(ctx.tipobase());
         Type type = new Type(baseType);
 
@@ -111,7 +136,10 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             type.getDimensions().add(dimension);
         }
 
-        return type;
+        if (type.isArrayType())
+            return type.asReferenceType().getNewReferencePointerToThis();
+
+        return type.asReferenceType();
     }
 
     @Override
