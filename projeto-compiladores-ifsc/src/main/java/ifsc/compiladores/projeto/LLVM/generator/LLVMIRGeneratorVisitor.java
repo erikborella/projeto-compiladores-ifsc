@@ -8,8 +8,8 @@ import ifsc.compiladores.projeto.LLVM.definitions.Variable;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Function;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Parameter;
 import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
-import ifsc.compiladores.projeto.LLVM.definitions.types.ReferenceType;
 import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
+import ifsc.compiladores.projeto.LLVM.definitions.types.BaseArrayType;
 import ifsc.compiladores.projeto.LLVM.scopeManager.ScopeManager;
 import ifsc.compiladores.projeto.LLVM.scopeManager.SingleUseVariablesManager;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
@@ -42,13 +42,14 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
     @Override
     public Function visitDecfuncao(ParserGrammar.DecfuncaoContext ctx) {
-        ReferenceType type = visitTiporetorno(ctx.tiporetorno());
-        String name = ctx.ID().getText();
+        Type functionReturnType = visitTiporetorno(ctx.tiporetorno());
+        String functionName = ctx.ID().getText();
 
-        Function function = new Function(type, name);
+        Function function = new Function(functionReturnType, functionName);
 
-        if (this.scopeManager.isFunctionDeclared(name)) {
-            throw new IllegalStateException(String.format("Já existe uma função com o nome %s declarada.", name));
+        if (this.scopeManager.isFunctionDeclared(functionName)) {
+            throw new IllegalStateException(String.format("Já existe uma função com o nome %s declarada.",
+                    functionName));
         }
 
         this.scopeManager.declareFunction(function);
@@ -76,13 +77,13 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         FragmentBlock parametersDeclaration = new FragmentBlock();
 
         for (Parameter parameter : parameters) {
-            ReferenceType allocaReturnType = parameter.getVariable().referenceType().getNewReferencePointerToThis();
+            Type allocaReturnType = parameter.getVariable().type().getNewReferencePointerToThis();
             Variable allocaReturnVariable = new Variable(allocaReturnType, parameter.getVariable().name());
 
-            Alloca parameterDeclaration = new Alloca(allocaReturnVariable, parameter.getVariable().referenceType());
+            Alloca parameterDeclaration = new Alloca(allocaReturnVariable, parameter.getVariable().type());
             parametersDeclaration.add(parameterDeclaration);
 
-            Variable sourceParameterVariable = new Variable(parameter.getVariable().referenceType(),
+            Variable sourceParameterVariable = new Variable(parameter.getVariable().type(),
                     parameter.getNameInParameterForm());
             Store parameterStore = new Store(sourceParameterVariable, allocaReturnVariable);
             parametersDeclaration.add(parameterStore);
@@ -95,13 +96,14 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         ArrayList<Parameter> parameters = new ArrayList<>();
 
         for (int i = 0; i < ctx.ID().size(); i++) {
-            ReferenceType type = visitTipo(ctx.tipo(i));
-            String name = ctx.ID(i).getText();
+            Type parameterType = visitTipo(ctx.tipo(i));
+            String parameterName = ctx.ID(i).getText();
 
-            Variable variable = new Variable(type, name);
+            Variable variable = new Variable(parameterType, parameterName);
 
-            if (this.scopeManager.isVariableDeclared(name)) {
-                throw new IllegalStateException(String.format("Já existe um parametro com o nome %s declarado.", name));
+            if (this.scopeManager.isVariableDeclared(parameterName)) {
+                throw new IllegalStateException(String.format("Já existe um parametro com o nome %s declarado.",
+                        parameterName));
             }
 
             this.scopeManager.declareVariable(variable);
@@ -116,7 +118,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
     @Override
     public Function visitPrincipal(ParserGrammar.PrincipalContext ctx) {
-        ReferenceType type = new Type(BaseType.INT).asReferenceType();
+        Type type = new BaseArrayType(BaseType.INT).asReferenceType();
         String name = "main";
 
         return new Function(type, name);
@@ -138,7 +140,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     @Override
     public FragmentBlock visitDecvariavel(ParserGrammar.DecvariavelContext ctx) {
         FragmentBlock variableDeclarations = new FragmentBlock();
-        ReferenceType variableType = visitTipo(ctx.tipo());
+        Type variableType = visitTipo(ctx.tipo());
 
         for (int i = 0; i < ctx.ID().size(); i++) {
             String variableName = ctx.ID(i).getText();
@@ -165,25 +167,25 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     }
 
     private Fragment declareValueVariable(Variable variable, String variableName) {
-        ReferenceType referenceToValue = variable.referenceType().getNewReferencePointerToThis();
+        Type referenceToValue = variable.type().getNewReferencePointerToThis();
         Variable variableAllocaReturnType = new Variable(referenceToValue, variableName);
 
-        return new Alloca(variableAllocaReturnType, variable.referenceType());
+        return new Alloca(variableAllocaReturnType, variable.type());
     }
 
     private FragmentBlock declareArrayVariable(Variable variable, String variableName) {
         FragmentBlock arrayDeclaration = new FragmentBlock();
 
-        Variable arrayAllocaVariable = this.singleUseVariablesManager.getNewVariableOfType(variable.referenceType());
-        ReferenceType arrayBaseType = variable.referenceType().getNewDeferencePointerOfThis();
+        Variable arrayAllocaVariable = this.singleUseVariablesManager.getNewVariableOfType(variable.type());
+        Type arrayBaseType = variable.type().getNewDeferencePointerOfThis();
 
         Alloca arrayAlloca = new Alloca(arrayAllocaVariable, arrayBaseType);
         arrayDeclaration.add(arrayAlloca);
 
-        ReferenceType arrayReferenceType = variable.referenceType().getNewReferencePointerToThis();
-        Variable referenceAllocaVariable = new Variable(arrayReferenceType, variableName);
+        Type arrayType = variable.type().getNewReferencePointerToThis();
+        Variable referenceAllocaVariable = new Variable(arrayType, variableName);
 
-        Alloca arrayReferenceAlloca = new Alloca(referenceAllocaVariable, variable.referenceType());
+        Alloca arrayReferenceAlloca = new Alloca(referenceAllocaVariable, variable.type());
         arrayDeclaration.add(arrayReferenceAlloca);
 
         Store arrayReferenceStore = new Store(arrayAllocaVariable, referenceAllocaVariable);
@@ -193,30 +195,30 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     }
 
     @Override
-    public ReferenceType visitTiporetorno(ParserGrammar.TiporetornoContext ctx) {
+    public Type visitTiporetorno(ParserGrammar.TiporetornoContext ctx) {
         boolean isVoidType = ctx.TIPO_VOID() != null;
 
         if (isVoidType) {
-            return new Type(BaseType.VOID).asReferenceType();
+            return new BaseArrayType(BaseType.VOID).asReferenceType();
         }
 
         return visitTipo(ctx.tipo());
     }
 
     @Override
-    public ReferenceType visitTipo(ParserGrammar.TipoContext ctx) {
+    public Type visitTipo(ParserGrammar.TipoContext ctx) {
         BaseType baseType = visitTipobase(ctx.tipobase());
-        Type type = new Type(baseType);
+        BaseArrayType baseArrayType = new BaseArrayType(baseType);
 
         for (ParserGrammar.DimensaoContext dimensaoContext : ctx.dimensao()) {
             int dimension = Integer.parseInt(dimensaoContext.NUM_INT().getText());
-            type.getDimensions().add(dimension);
+            baseArrayType.getDimensions().add(dimension);
         }
 
-        if (type.isArrayType())
-            return type.asReferenceType().getNewReferencePointerToThis();
+        if (baseArrayType.isArrayType())
+            return baseArrayType.asReferenceType().getNewReferencePointerToThis();
 
-        return type.asReferenceType();
+        return baseArrayType.asReferenceType();
     }
 
     @Override

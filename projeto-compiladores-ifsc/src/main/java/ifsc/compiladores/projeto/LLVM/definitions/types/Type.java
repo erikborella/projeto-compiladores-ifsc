@@ -2,47 +2,33 @@ package ifsc.compiladores.projeto.LLVM.definitions.types;
 
 import ifsc.compiladores.projeto.LLVM.Fragment;
 
-import java.util.ArrayList;
-
 public class Type implements Fragment {
+    private final BaseArrayType baseArrayType;
+    private final int pointerCount;
 
-    private final BaseType baseType;
-    private final ArrayList<Integer> dimensions;
+    public Type(BaseArrayType baseArrayType, int pointerCount) {
+        if (pointerCount < 0) {
+            throw new IllegalArgumentException("pointerCount cannot be negative");
+        }
 
-    public Type(BaseType baseType) {
-        this.baseType = baseType;
-        this.dimensions = new ArrayList<>();
+        this.baseArrayType = baseArrayType;
+        this.pointerCount = pointerCount;
     }
 
-    public ArrayList<Integer> getDimensions() {
-        return this.dimensions;
+    public Type getNewReferencePointerToThis() {
+        return new Type(this.baseArrayType, this.pointerCount + 1);
     }
 
-    public boolean isArrayType() {
-        return !this.dimensions.isEmpty();
+    public Type getNewDeferencePointerOfThis() {
+        return new Type(this.baseArrayType, this.pointerCount - 1);
     }
 
-    public ReferenceType asReferenceType() {
-        return new ReferenceType(this, 0);
+    public BaseArrayType getType() {
+        return baseArrayType;
     }
 
     @Override
     public String getText() {
-        StringBuilder builder = new StringBuilder();
-
-        builder.append(this.baseType.getText());
-
-        for (int i = this.dimensions.size() - 1; i >= 0; i--) {
-            int dimension = this.dimensions.get(i);
-
-            // Insert "[dimension x" at the start
-            String arrayDefinition = String.format("[%d x ", dimension);
-            builder.insert(0, arrayDefinition);
-
-            // Then close the ']' at the end
-            builder.append(']');
-        }
-
-        return builder.toString();
+        return this.baseArrayType.getText() + "*".repeat(Math.max(0, this.pointerCount));
     }
 }

@@ -15,9 +15,9 @@ public class Store implements Fragment {
     @Override
     public String getText() {
         return String.format("store %s %%%s, %s %%%s",
-                this.source.referenceType().getText(),
+                this.source.type().getText(),
                 this.source.name(),
-                this.destination.referenceType().getText(),
+                this.destination.type().getText(),
                 this.destination.name());
     }
 }

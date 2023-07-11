@@ -2,7 +2,6 @@ package ifsc.compiladores.projeto.LLVM.definitions.functions;
 
 import ifsc.compiladores.projeto.LLVM.Fragment;
 import ifsc.compiladores.projeto.LLVM.definitions.Variable;
-import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
 
 public class Parameter implements Fragment {
 
@@ -24,7 +23,7 @@ public class Parameter implements Fragment {
     @Override
     public String getText() {
         return String.format("%s %%%s",
-                this.variable.referenceType().getText(),
+                this.variable.type().getText(),
                 this.getNameInParameterForm());
     }
 }

@@ -1,7 +1,7 @@
 package ifsc.compiladores.projeto.LLVM.scopeManager;
 
 import ifsc.compiladores.projeto.LLVM.definitions.Variable;
-import ifsc.compiladores.projeto.LLVM.definitions.types.ReferenceType;
+import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
 
 public class SingleUseVariablesManager {
     private final int startVariable;
@@ -16,7 +16,7 @@ public class SingleUseVariablesManager {
         this(1);
     }
 
-    public Variable getNewVariableOfType(ReferenceType variableType) {
+    public Variable getNewVariableOfType(Type variableType) {
         Variable singleUseVariable = new Variable(variableType, String.valueOf(this.currentVariable));
 
         this.currentVariable++;
