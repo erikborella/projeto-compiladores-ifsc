@@ -11,6 +11,7 @@ import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
 import ifsc.compiladores.projeto.LLVM.definitions.types.ReferenceType;
 import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
 import ifsc.compiladores.projeto.LLVM.scopeManager.ScopeManager;
+import ifsc.compiladores.projeto.LLVM.scopeManager.SingleUseVariablesManager;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammarBaseVisitor;
 
@@ -19,9 +20,11 @@ import java.util.ArrayList;
 public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
     private final ScopeManager scopeManager;
+    private final SingleUseVariablesManager singleUseVariablesManager;
 
     public LLVMIRGeneratorVisitor() {
         this.scopeManager = new ScopeManager();
+        this.singleUseVariablesManager = new SingleUseVariablesManager();
     }
 
     @Override
@@ -51,6 +54,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         this.scopeManager.declareFunction(function);
 
         this.scopeManager.startScope();
+        this.singleUseVariablesManager.resetVariables();
 
         if (ctx.parametros() != null) {
             ArrayList<Parameter> parameters = getParameters(ctx.parametros());
@@ -59,6 +63,9 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             FragmentBlock parametersDeclaration = declareParameters(parameters);
             function.getBody().addAll(parametersDeclaration);
         }
+
+        FragmentBlock functionBody = visitBloco(ctx.bloco());
+        function.getBody().addAll(functionBody);
 
         this.scopeManager.finishScope();
 
@@ -113,6 +120,76 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         String name = "main";
 
         return new Function(type, name);
+    }
+
+    @Override
+    public FragmentBlock visitBloco(ParserGrammar.BlocoContext ctx) {
+        FragmentBlock block = new FragmentBlock();
+
+        for (ParserGrammar.DecvariavelContext decvariavelContext : ctx.decvariavel()) {
+            FragmentBlock variableDeclarations = visitDecvariavel(decvariavelContext);
+
+            block.addAll(variableDeclarations);
+        }
+
+        return block;
+    }
+
+    @Override
+    public FragmentBlock visitDecvariavel(ParserGrammar.DecvariavelContext ctx) {
+        FragmentBlock variableDeclarations = new FragmentBlock();
+        ReferenceType variableType = visitTipo(ctx.tipo());
+
+        for (int i = 0; i < ctx.ID().size(); i++) {
+            String variableName = ctx.ID(i).getText();
+            Variable variable = new Variable(variableType, variableName);
+
+            if (this.scopeManager.isVariableDeclared(variableName)) {
+                throw new IllegalStateException(String.format("Já existe uma variavel com o nome %s declarada.",
+                        variableName));
+            }
+
+            this.scopeManager.declareVariable(variable);
+
+            if (variableType.getType().isArrayType()) {
+                FragmentBlock arrayVariableDeclaration = declareArrayVariable(variable, variableName);
+                variableDeclarations.addAll(arrayVariableDeclaration);
+            }
+            else {
+                Fragment valueVariableDeclaration = declareValueVariable(variable, variableName);
+                variableDeclarations.add(valueVariableDeclaration);
+            }
+        }
+
+        return variableDeclarations;
+    }
+
+    private Fragment declareValueVariable(Variable variable, String variableName) {
+        ReferenceType referenceToValue = variable.referenceType().getNewReferencePointerToThis();
+        Variable variableAllocaReturnType = new Variable(referenceToValue, variableName);
+
+        return new Alloca(variableAllocaReturnType, variable.referenceType());
+    }
+
+    private FragmentBlock declareArrayVariable(Variable variable, String variableName) {
+        FragmentBlock arrayDeclaration = new FragmentBlock();
+
+        Variable arrayAllocaVariable = this.singleUseVariablesManager.getNewVariableOfType(variable.referenceType());
+        ReferenceType arrayBaseType = variable.referenceType().getNewDeferencePointerOfThis();
+
+        Alloca arrayAlloca = new Alloca(arrayAllocaVariable, arrayBaseType);
+        arrayDeclaration.add(arrayAlloca);
+
+        ReferenceType arrayReferenceType = variable.referenceType().getNewReferencePointerToThis();
+        Variable referenceAllocaVariable = new Variable(arrayReferenceType, variableName);
+
+        Alloca arrayReferenceAlloca = new Alloca(referenceAllocaVariable, variable.referenceType());
+        arrayDeclaration.add(arrayReferenceAlloca);
+
+        Store arrayReferenceStore = new Store(arrayAllocaVariable, referenceAllocaVariable);
+        arrayDeclaration.add(arrayReferenceStore);
+
+        return arrayDeclaration;
     }
 
     @Override

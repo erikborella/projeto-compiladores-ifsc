@@ -36,20 +36,32 @@ public class Main implements Callable<Integer> {
 
         while (true) {
             StringBuilder inputBuilder = new StringBuilder();
-            System.out.println("Enter your code (type '--stop' to stop and compile the input or '--exit' to exit the program): ");
-            while (true) {
-                String line = scanner.nextLine();
+//            System.out.println("Enter your code (type '--stop' to stop and compile the input or '--exit' to exit the program): ");
+//            while (true) {
+//                String line = scanner.nextLine();
+//
+//                if (line.trim().equalsIgnoreCase("--exit")) {
+//                    return 0;
+//                }
+//
+//                if (line.trim().equalsIgnoreCase("--stop")) {
+//                    break;
+//                }
+//
+//                inputBuilder.append(line).append(System.lineSeparator());
+//            }
 
-                if (line.trim().equalsIgnoreCase("--exit")) {
-                    return 0;
-                }
-
-                if (line.trim().equalsIgnoreCase("--stop")) {
-                    break;
-                }
-
-                inputBuilder.append(line).append(System.lineSeparator());
-            }
+            inputBuilder.append("""
+                    int test() {
+                        int[10][5] arr1;
+                    }
+                    
+                    int test2() {
+                        int[10][5] arr1;
+                    }
+                    
+                    main() {}
+                    """);
 
             String input = inputBuilder.toString().trim();
             if (input.isEmpty()) {

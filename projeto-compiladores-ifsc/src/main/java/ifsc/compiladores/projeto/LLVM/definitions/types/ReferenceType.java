@@ -23,6 +23,10 @@ public class ReferenceType implements Fragment {
         return new ReferenceType(this.type, this.pointerCount - 1);
     }
 
+    public Type getType() {
+        return type;
+    }
+
     @Override
     public String getText() {
         return this.type.getText() + "*".repeat(Math.max(0, this.pointerCount));
