@@ -24,6 +24,14 @@ public class SingleUseVariablesManager {
         return singleUseVariable;
     }
 
+    public String getNewVariableName() {
+        String singleUseVariableName = String.valueOf(this.currentVariable);
+
+        this.currentVariable++;
+
+        return singleUseVariableName;
+    }
+
     public void resetVariables() {
         this.currentVariable = startVariable;
     }

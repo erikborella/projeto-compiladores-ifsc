@@ -13,6 +13,19 @@ public class Alloca implements Fragment {
         this.alocationType = alocationType;
     }
 
+    public Alloca(String returnVariableName, Type alocationType) {
+        this.returnVariable = new Variable(alocationType.getNewReferencePointerToThis(), returnVariableName);
+        this.alocationType = alocationType;
+    }
+
+    public Variable getReturnVariable() {
+        return returnVariable;
+    }
+
+    public Type getAlocationType() {
+        return alocationType;
+    }
+
     @Override
     public String getText() {
         return String.format("%%%s = alloca %s",

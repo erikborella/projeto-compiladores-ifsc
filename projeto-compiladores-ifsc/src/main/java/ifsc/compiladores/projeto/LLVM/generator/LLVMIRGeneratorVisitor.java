@@ -9,7 +9,6 @@ import ifsc.compiladores.projeto.LLVM.definitions.functions.Function;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Parameter;
 import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
 import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
-import ifsc.compiladores.projeto.LLVM.definitions.types.BaseArrayType;
 import ifsc.compiladores.projeto.LLVM.scopeManager.ScopeManager;
 import ifsc.compiladores.projeto.LLVM.scopeManager.SingleUseVariablesManager;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
@@ -77,15 +76,18 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         FragmentBlock parametersDeclaration = new FragmentBlock();
 
         for (Parameter parameter : parameters) {
-            Type allocaReturnType = parameter.getVariable().type().getNewReferencePointerToThis();
-            Variable allocaReturnVariable = new Variable(allocaReturnType, parameter.getVariable().name());
-
-            Alloca parameterDeclaration = new Alloca(allocaReturnVariable, parameter.getVariable().type());
+            Alloca parameterDeclaration = new Alloca(parameter.getVariable().name(), parameter.getVariable().type());
             parametersDeclaration.add(parameterDeclaration);
+
 
             Variable sourceParameterVariable = new Variable(parameter.getVariable().type(),
                     parameter.getNameInParameterForm());
-            Store parameterStore = new Store(sourceParameterVariable, allocaReturnVariable);
+
+            Store parameterStore = new Store(
+                    sourceParameterVariable,
+                    parameterDeclaration.getReturnVariable()
+            );
+
             parametersDeclaration.add(parameterStore);
         }
 
@@ -118,7 +120,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
     @Override
     public Function visitPrincipal(ParserGrammar.PrincipalContext ctx) {
-        Type type = new BaseArrayType(BaseType.INT).asReferenceType();
+        Type type = new Type(BaseType.INT);
         String name = "main";
 
         return new Function(type, name);
@@ -153,7 +155,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
             this.scopeManager.declareVariable(variable);
 
-            if (variableType.getType().isArrayType()) {
+            if (variableType.isArrayType()) {
                 FragmentBlock arrayVariableDeclaration = declareArrayVariable(variable, variableName);
                 variableDeclarations.addAll(arrayVariableDeclaration);
             }
@@ -167,28 +169,25 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     }
 
     private Fragment declareValueVariable(Variable variable, String variableName) {
-        Type referenceToValue = variable.type().getNewReferencePointerToThis();
-        Variable variableAllocaReturnType = new Variable(referenceToValue, variableName);
-
-        return new Alloca(variableAllocaReturnType, variable.type());
+        return new Alloca(variableName, variable.type());
     }
 
     private FragmentBlock declareArrayVariable(Variable variable, String variableName) {
         FragmentBlock arrayDeclaration = new FragmentBlock();
 
-        Variable arrayAllocaVariable = this.singleUseVariablesManager.getNewVariableOfType(variable.type());
         Type arrayBaseType = variable.type().getNewDeferencePointerOfThis();
 
-        Alloca arrayAlloca = new Alloca(arrayAllocaVariable, arrayBaseType);
+        Alloca arrayAlloca = new Alloca(this.singleUseVariablesManager.getNewVariableName(), arrayBaseType);
         arrayDeclaration.add(arrayAlloca);
 
-        Type arrayType = variable.type().getNewReferencePointerToThis();
-        Variable referenceAllocaVariable = new Variable(arrayType, variableName);
-
-        Alloca arrayReferenceAlloca = new Alloca(referenceAllocaVariable, variable.type());
+        Alloca arrayReferenceAlloca = new Alloca(variableName, variable.type());
         arrayDeclaration.add(arrayReferenceAlloca);
 
-        Store arrayReferenceStore = new Store(arrayAllocaVariable, referenceAllocaVariable);
+        Store arrayReferenceStore = new Store(
+                arrayAlloca.getReturnVariable(),
+                arrayReferenceAlloca.getReturnVariable()
+        );
+
         arrayDeclaration.add(arrayReferenceStore);
 
         return arrayDeclaration;
@@ -199,7 +198,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         boolean isVoidType = ctx.TIPO_VOID() != null;
 
         if (isVoidType) {
-            return new BaseArrayType(BaseType.VOID).asReferenceType();
+            return new Type(BaseType.VOID);
         }
 
         return visitTipo(ctx.tipo());
@@ -208,17 +207,17 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     @Override
     public Type visitTipo(ParserGrammar.TipoContext ctx) {
         BaseType baseType = visitTipobase(ctx.tipobase());
-        BaseArrayType baseArrayType = new BaseArrayType(baseType);
+        ArrayList<Integer> dimensions = new ArrayList<>();
 
         for (ParserGrammar.DimensaoContext dimensaoContext : ctx.dimensao()) {
             int dimension = Integer.parseInt(dimensaoContext.NUM_INT().getText());
-            baseArrayType.getDimensions().add(dimension);
+            dimensions.add(dimension);
         }
 
-        if (baseArrayType.isArrayType())
-            return baseArrayType.asReferenceType().getNewReferencePointerToThis();
+        if (!dimensions.isEmpty())
+            return new Type(baseType, 1, dimensions);
 
-        return baseArrayType.asReferenceType();
+        return new Type(baseType);
     }
 
     @Override
