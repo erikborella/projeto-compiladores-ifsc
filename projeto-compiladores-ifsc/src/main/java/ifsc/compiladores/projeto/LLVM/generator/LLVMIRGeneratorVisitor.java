@@ -2,9 +2,13 @@ package ifsc.compiladores.projeto.LLVM.generator;
 
 import ifsc.compiladores.projeto.LLVM.Fragment;
 import ifsc.compiladores.projeto.LLVM.FragmentBlock;
+import ifsc.compiladores.projeto.LLVM.ReturnableFragment;
+import ifsc.compiladores.projeto.LLVM.ReturnableFragmentBlock;
 import ifsc.compiladores.projeto.LLVM.definitions.Alloca;
+import ifsc.compiladores.projeto.LLVM.definitions.Load;
 import ifsc.compiladores.projeto.LLVM.definitions.Store;
 import ifsc.compiladores.projeto.LLVM.definitions.Variable;
+import ifsc.compiladores.projeto.LLVM.definitions.expressions.Constant;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Function;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Parameter;
 import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
@@ -13,7 +17,12 @@ import ifsc.compiladores.projeto.LLVM.scopeManager.ScopeManager;
 import ifsc.compiladores.projeto.LLVM.scopeManager.SingleUseVariablesManager;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammarBaseVisitor;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.RuleNode;
+import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
+import javax.swing.text.html.parser.Parser;
 import java.util.ArrayList;
 
 public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
@@ -136,6 +145,10 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             block.addAll(variableDeclarations);
         }
 
+        for (ParserGrammar.ComandoContext comandoContext : ctx.comando()) {
+            block.addAll((FragmentBlock) visitComando(comandoContext));
+        }
+
         return block;
     }
 
@@ -194,6 +207,82 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     }
 
     @Override
+    public FragmentBlock visitAtribuicao(ParserGrammar.AtribuicaoContext ctx) {
+        FragmentBlock attribuition = new FragmentBlock();
+        String attributionId = ctx.ID().getText();
+
+        if (!this.scopeManager.isVariableDeclared(attributionId)) {
+            throw new IllegalStateException(String.format("Variavel %s não está declarada",
+                    attributionId));
+        }
+
+        Variable id = this.scopeManager.getDeclaredVariable(attributionId);
+        Variable storeId = new Variable(id.type().getNewReferencePointerToThis(), id.name());
+
+        ReturnableFragmentBlock expressionReturn = (ReturnableFragmentBlock) visitExpressao(ctx.complemento().expressao());
+        attribuition.addAll(expressionReturn.getFragmentBlock());
+
+        Store idStore = new Store(expressionReturn.getReturnVariable(), storeId);
+        attribuition.add(idStore);
+
+        return attribuition;
+    }
+
+    @Override
+    public ReturnableFragmentBlock visitFator(ParserGrammar.FatorContext ctx) {
+
+        switch (ctx.getStart().getType()) {
+            case ParserGrammar.TEXTO, ParserGrammar.OP_NEGACAO, ParserGrammar.PARENTESE_ABRE -> {
+                return null;
+            }
+        }
+
+        ReturnableFragmentBlock term = visitTermo(ctx.termo());
+
+        return term;
+    }
+
+    @Override
+    public ReturnableFragmentBlock visitTermo(ParserGrammar.TermoContext ctx) {
+        if (ctx.getChild(0) instanceof TerminalNodeImpl) {
+            String id = ctx.start.getText();
+            Load idLoad = this.loadId(id);
+
+
+            return new ReturnableFragmentBlock(idLoad);
+        }
+
+        return (ReturnableFragmentBlock) super.visitTermo(ctx);
+    }
+
+    @Override
+    public ReturnableFragmentBlock visitConstante(ParserGrammar.ConstanteContext ctx) {
+        Token constantToken = ctx.getStart();
+
+        Constant constant = switch (constantToken.getType()) {
+            case ParserGrammar.NUM_INT -> new Constant(BaseType.INT, constantToken.getText());
+            case ParserGrammar.NUM_DEC -> new Constant(BaseType.FLOAT, constantToken.getText());
+            default -> throw new IllegalStateException("Invalid type");
+        };
+
+        ReturnableFragmentBlock returnableFragmentBlock = new ReturnableFragmentBlock();
+        returnableFragmentBlock.setReturnVariable(constant.getReturnVariable());
+
+        return returnableFragmentBlock;
+    }
+
+    private Load loadId(String idName) {
+        if (!this.scopeManager.isVariableDeclared(idName)) {
+            throw new IllegalStateException(String.format("Variavel %s não está declarada",
+                    idName));
+        }
+
+        Variable id = this.scopeManager.getDeclaredVariable(idName);
+
+        return new Load(this.singleUseVariablesManager.getNewVariableName(), id);
+    }
+
+    @Override
     public Type visitTiporetorno(ParserGrammar.TiporetornoContext ctx) {
         boolean isVoidType = ctx.TIPO_VOID() != null;
 
@@ -229,5 +318,26 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             case ParserGrammar.TIPO_CHAR -> BaseType.CHAR;
             default -> throw new IllegalStateException("Invalid type");
         };
+    }
+
+    @Override
+    public Fragment visitChildren(RuleNode node) {
+        Fragment result = defaultResult();
+        int n = node.getChildCount();
+        for (int i=0; i<n; i++) {
+            if (!shouldVisitNextChild(node, result)) {
+                break;
+            }
+
+            ParseTree c = node.getChild(i);
+
+            if (c instanceof TerminalNodeImpl)
+                continue;
+
+            Fragment childResult = c.accept(this);
+            result = aggregateResult(result, childResult);
+        }
+
+        return result;
     }
 }

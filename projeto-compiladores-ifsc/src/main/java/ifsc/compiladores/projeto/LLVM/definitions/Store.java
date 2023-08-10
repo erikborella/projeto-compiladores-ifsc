@@ -14,10 +14,10 @@ public class Store implements Fragment {
 
     @Override
     public String getText() {
-        return String.format("store %s %%%s, %s %%%s",
+        return String.format("store %s %s, %s %s",
                 this.source.type().getText(),
-                this.source.name(),
+                this.source.getNameInIRForm(),
                 this.destination.type().getText(),
-                this.destination.name());
+                this.destination.getNameInIRForm());
     }
 }

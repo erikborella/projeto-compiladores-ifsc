@@ -43,19 +43,23 @@ public class ScopeManager {
         currentScope.getDeclaredVariables().put(variable.name(), variable);
     }
 
-    public boolean isVariableDeclared(String variableName) {
+    public Variable getDeclaredVariable(String variableName) {
         Scope scope = this.getCurrentScope();
 
         while (scope != null) {
             HashMap<String, Variable> declaredVariables = scope.getDeclaredVariables();
 
             if (declaredVariables.containsKey(variableName))
-                return true;
+                return declaredVariables.get(variableName);
 
             scope = scope.getParent();
         }
 
-        return false;
+        return null;
+    }
+
+    public boolean isVariableDeclared(String variableName) {
+        return getDeclaredVariable(variableName) != null;
     }
 
     public HashMap<String, Function> getDeclaredFunctions() {

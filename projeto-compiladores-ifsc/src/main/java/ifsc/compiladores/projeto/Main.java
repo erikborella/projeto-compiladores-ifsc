@@ -53,14 +53,12 @@ public class Main implements Callable<Integer> {
 
             inputBuilder.append("""
                     int test() {
-                        int[10][5] arr1;
+                        int a, b;
+                        
+                        a = 10;
+                        b = 5;
+                        b = a;
                     }
-                    
-                    int test2() {
-                        int[10][5] arr1;
-                    }
-                    
-                    main() {}
                     """);
 
             String input = inputBuilder.toString().trim();
@@ -84,6 +82,8 @@ public class Main implements Callable<Integer> {
             if (showTree) {
                 showTree(parser, programaContext);
             }
+
+            scanner.next();
         }
     }
 
