@@ -4,6 +4,8 @@ import ifsc.compiladores.projeto.LLVM.Fragment;
 
 public enum OperationType implements Fragment{
     
+    ADD("add"),
+    SUBTRACTION("sub"),
     MULTIPLICATION("mul"),
     DIVISION("sdiv"),
     MOD("srem");

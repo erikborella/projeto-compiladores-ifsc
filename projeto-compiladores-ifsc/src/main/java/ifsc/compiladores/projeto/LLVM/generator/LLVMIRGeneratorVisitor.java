@@ -231,6 +231,53 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     }
 
     @Override
+    public Fragment visitExpr_aditiva(ParserGrammar.Expr_aditivaContext ctx) {
+        ReturnableFragmentBlock expression = new ReturnableFragmentBlock();
+        
+        for (int i = 0; i < ctx.children.size(); i++) {
+            ParseTree child = ctx.getChild(i);
+            
+            if (child instanceof ParserGrammar.Expr_multiplicativaContext ExprMultiplicativaContext) {
+                ReturnableFragmentBlock exprMultiplicativa = visitExpr_multiplicativa(ExprMultiplicativaContext);
+                
+                expression.getFragmentBlock().addAll(exprMultiplicativa.getFragmentBlock());
+                expression.setReturnVariable(exprMultiplicativa.getReturnVariable());
+                continue;
+            }
+            
+            if (child instanceof ParserGrammar.Op_aditivoContext opAditivoContext) {
+                OperationType operationType = switch (opAditivoContext.start.getType()) {
+                    case ParserGrammar.SINAL_MAIS -> OperationType.ADD;
+                    case ParserGrammar.SINAL_MENOS -> OperationType.SUBTRACTION;
+                    default -> throw new IllegalStateException("Invalid operation type");
+                };
+                
+                ReturnableFragmentBlock op2Expression = visitExpr_multiplicativa(
+                        (ParserGrammar.Expr_multiplicativaContext) ctx.getChild(i+1));
+                expression.getFragmentBlock().addAll(op2Expression.getFragmentBlock());
+                i++;
+                
+                Variable returnVariable = this.singleUseVariablesManager.getNewVariableOfType(
+                    expression.getReturnVariable().type());
+                
+                Variable op1 = expression.getReturnVariable();
+                Variable op2 = op2Expression.getReturnVariable();
+                
+                Operation operation = new Operation(
+                        operationType, 
+                        returnVariable, 
+                        op1, 
+                        op2);
+                
+                expression.getFragmentBlock().add(operation);
+                expression.setReturnVariable(operation.getReturnVariable());
+            }
+        }
+        
+        return expression;
+    }
+
+    @Override
     public ReturnableFragmentBlock visitExpr_multiplicativa(ParserGrammar.Expr_multiplicativaContext ctx) {
         ReturnableFragmentBlock expression = new ReturnableFragmentBlock();
         
@@ -242,7 +289,6 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
                 
                 expression.getFragmentBlock().addAll(fator.getFragmentBlock());
                 expression.setReturnVariable(fator.getReturnVariable());
-                
                 continue;
             }
             
@@ -277,8 +323,6 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         
         return expression;
     }
-    
-    
 
     @Override
     public ReturnableFragmentBlock visitFator(ParserGrammar.FatorContext ctx) {
