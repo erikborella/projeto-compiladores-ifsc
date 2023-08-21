@@ -26,6 +26,8 @@ import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
 import javax.swing.text.html.parser.Parser;
 import java.util.ArrayList;
+import java.util.Arrays;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
@@ -232,31 +234,42 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
     @Override
     public Fragment visitExpr_aditiva(ParserGrammar.Expr_aditivaContext ctx) {
+        return createExpression(ctx);
+    }
+
+    @Override
+    public ReturnableFragmentBlock visitExpr_multiplicativa(ParserGrammar.Expr_multiplicativaContext ctx) {
+        return createExpression(ctx);
+    }
+
+    public ReturnableFragmentBlock createExpression(ParserRuleContext ctx) {
         ReturnableFragmentBlock expression = new ReturnableFragmentBlock();
+
+        ArrayList<Class> operatorsContextClass = new ArrayList<>(Arrays.asList(
+            ParserGrammar.Op_multiplicativoContext.class,
+            ParserGrammar.Op_aditivoContext.class,
+            ParserGrammar.Op_relacionalContext.class
+        ));
         
         for (int i = 0; i < ctx.children.size(); i++) {
             ParseTree child = ctx.getChild(i);
-            
-            if (child instanceof ParserGrammar.Expr_multiplicativaContext ExprMultiplicativaContext) {
-                ReturnableFragmentBlock exprMultiplicativa = visitExpr_multiplicativa(ExprMultiplicativaContext);
+
+            if (operatorsContextClass.stream().anyMatch(op -> child.getClass() == op)) {
+                ParserRuleContext operatorContext = (ParserRuleContext) child;
                 
-                expression.getFragmentBlock().addAll(exprMultiplicativa.getFragmentBlock());
-                expression.setReturnVariable(exprMultiplicativa.getReturnVariable());
-                continue;
-            }
-            
-            if (child instanceof ParserGrammar.Op_aditivoContext opAditivoContext) {
-                OperationType operationType = switch (opAditivoContext.start.getType()) {
+                OperationType operationType = switch (operatorContext.start.getType()) {
+                    case ParserGrammar.OP_MULTIPLICACAO -> OperationType.MULTIPLICATION;
+                    case ParserGrammar.OP_DIVISAO -> OperationType.DIVISION;
+                    case ParserGrammar.OP_RESTO_DIVISAO -> OperationType.MOD;
                     case ParserGrammar.SINAL_MAIS -> OperationType.ADD;
                     case ParserGrammar.SINAL_MENOS -> OperationType.SUBTRACTION;
                     default -> throw new IllegalStateException("Invalid operation type");
                 };
                 
-                ReturnableFragmentBlock op2Expression = visitExpr_multiplicativa(
-                        (ParserGrammar.Expr_multiplicativaContext) ctx.getChild(i+1));
+                ReturnableFragmentBlock op2Expression = (ReturnableFragmentBlock) visit(ctx.getChild(i+1));
                 expression.getFragmentBlock().addAll(op2Expression.getFragmentBlock());
                 i++;
-                
+
                 Variable returnVariable = this.singleUseVariablesManager.getNewVariableOfType(
                     expression.getReturnVariable().type());
                 
@@ -271,59 +284,18 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
                 
                 expression.getFragmentBlock().add(operation);
                 expression.setReturnVariable(operation.getReturnVariable());
-            }
-        }
-        
-        return expression;
-    }
-
-    @Override
-    public ReturnableFragmentBlock visitExpr_multiplicativa(ParserGrammar.Expr_multiplicativaContext ctx) {
-        ReturnableFragmentBlock expression = new ReturnableFragmentBlock();
-        
-        for (int i = 0; i < ctx.children.size(); i++) {
-            ParseTree child = ctx.getChild(i);
-            
-            if (child instanceof ParserGrammar.FatorContext fatorContext) {
-                ReturnableFragmentBlock fator = visitFator(fatorContext);
-                
-                expression.getFragmentBlock().addAll(fator.getFragmentBlock());
-                expression.setReturnVariable(fator.getReturnVariable());
                 continue;
             }
             
-            if (child instanceof ParserGrammar.Op_multiplicativoContext opMultiplicativoContext) {
-                OperationType operationType = switch (opMultiplicativoContext.start.getType()) {
-                    case ParserGrammar.OP_MULTIPLICACAO -> OperationType.MULTIPLICATION;
-                    case ParserGrammar.OP_DIVISAO -> OperationType.DIVISION;
-                    case ParserGrammar.OP_RESTO_DIVISAO -> OperationType.MOD;
-                    default -> throw new IllegalStateException("Invalid operation type");
-                };
+            ReturnableFragmentBlock operator = (ReturnableFragmentBlock) visit(child);
                 
-                ReturnableFragmentBlock op2Expression = visitFator((ParserGrammar.FatorContext) ctx.getChild(i+1));
-                expression.getFragmentBlock().addAll(op2Expression.getFragmentBlock());
-                i++;
-                
-                Variable returnVariable = this.singleUseVariablesManager.getNewVariableOfType(
-                    expression.getReturnVariable().type());
-                
-                Variable op1 = expression.getReturnVariable();
-                Variable op2 = op2Expression.getReturnVariable();
-                
-                Operation operation = new Operation(
-                        operationType, 
-                        returnVariable, 
-                        op1, 
-                        op2);
-                
-                expression.getFragmentBlock().add(operation);
-                expression.setReturnVariable(operation.getReturnVariable());
-            }
+            expression.getFragmentBlock().addAll(operator.getFragmentBlock());
+            expression.setReturnVariable(operator.getReturnVariable());
         }
         
         return expression;
     }
-
+    
     @Override
     public ReturnableFragmentBlock visitFator(ParserGrammar.FatorContext ctx) {
 
