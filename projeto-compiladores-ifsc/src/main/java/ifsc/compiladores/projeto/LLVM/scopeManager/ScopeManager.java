@@ -61,6 +61,13 @@ public class ScopeManager {
     public boolean isVariableDeclared(String variableName) {
         return getDeclaredVariable(variableName) != null;
     }
+    
+    public Function getDeclaredFunction(String functionName) {
+        if (this.declaredFunctions.containsKey(functionName))
+            return this.declaredFunctions.get(functionName);
+        
+        return null;
+    }
 
     public HashMap<String, Function> getDeclaredFunctions() {
         return declaredFunctions;

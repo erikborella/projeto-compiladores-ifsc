@@ -12,6 +12,7 @@ import ifsc.compiladores.projeto.LLVM.definitions.expressions.Constant;
 import ifsc.compiladores.projeto.LLVM.definitions.expressions.Operation;
 import ifsc.compiladores.projeto.LLVM.definitions.expressions.OperationType;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Function;
+import ifsc.compiladores.projeto.LLVM.definitions.functions.FunctionCall;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Parameter;
 import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
 import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
@@ -305,22 +306,17 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             }
         }
 
-        ReturnableFragmentBlock term = visitTermo(ctx.termo());
+        ReturnableFragmentBlock term = (ReturnableFragmentBlock) visit(ctx.termo());
 
         return term;
     }
 
     @Override
-    public ReturnableFragmentBlock visitTermo(ParserGrammar.TermoContext ctx) {
-        if (ctx.getChild(0) instanceof TerminalNodeImpl) {
-            String id = ctx.start.getText();
-            Load idLoad = this.loadId(id);
-
-
-            return new ReturnableFragmentBlock(idLoad);
-        }
-
-        return (ReturnableFragmentBlock) super.visitTermo(ctx);
+    public ReturnableFragmentBlock visitTermoVariavel(ParserGrammar.TermoVariavelContext ctx) {
+        String id = ctx.ID().getText();
+        Load idLoad = this.loadId(id);
+        
+        return new ReturnableFragmentBlock(idLoad);
     }
 
     @Override
@@ -338,6 +334,42 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
         return returnableFragmentBlock;
     }
+
+    @Override
+    public ReturnableFragmentBlock visitFuncao(ParserGrammar.FuncaoContext ctx) {
+        ReturnableFragmentBlock functionCallExpresion = new ReturnableFragmentBlock();
+        String functionName = ctx.ID().getText();
+        
+        if (!this.scopeManager.isFunctionDeclared(functionName)) {
+            throw new IllegalStateException(String.format("Função %s não está declarada",
+                    functionName));
+        }
+        
+        Function functionDefinition = this.scopeManager.getDeclaredFunction(functionName);
+        ArrayList<Variable> arguments = new ArrayList<>();
+        
+        if (ctx.argumentos() != null) {
+            for (int i = 0; i < ctx.argumentos().expressao().size(); i++) {
+                ParserGrammar.ExpressaoContext argumentExpression = ctx.argumentos().expressao(i);
+
+                ReturnableFragmentBlock argument = (ReturnableFragmentBlock) visit(argumentExpression);  
+                functionCallExpresion.getFragmentBlock().addAll(argument.getFragmentBlock());
+
+                arguments.add(argument.getReturnVariable());
+            }
+        }
+        
+        Variable functionCallReturnVariable = 
+                this.singleUseVariablesManager.getNewVariableOfType(functionDefinition.getReturnType());
+        FunctionCall functionCall = new FunctionCall(functionCallReturnVariable, functionName, arguments);
+        
+        functionCallExpresion.getFragmentBlock().add(functionCall);
+        functionCallExpresion.setReturnVariable(functionCall.getReturnVariable());
+        
+        return functionCallExpresion;
+    }
+    
+    
 
     private Load loadId(String idName) {
         if (!this.scopeManager.isVariableDeclared(idName)) {

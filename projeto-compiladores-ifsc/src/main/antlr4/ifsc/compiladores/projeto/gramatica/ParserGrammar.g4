@@ -178,9 +178,9 @@ fator
     ;
 
 termo
-    : ID (dimensao2)*
-    | constante
-    | funcao
+    : ID (dimensao2)* #TermoVariavel
+    | constante #TermoConstante
+    | funcao #TermoFuncao
     ;
 
 sinal
