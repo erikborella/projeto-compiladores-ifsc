@@ -11,6 +11,7 @@ import ifsc.compiladores.projeto.LLVM.definitions.Variable;
 import ifsc.compiladores.projeto.LLVM.definitions.expressions.Constant;
 import ifsc.compiladores.projeto.LLVM.definitions.expressions.Operation;
 import ifsc.compiladores.projeto.LLVM.definitions.expressions.OperationType;
+import ifsc.compiladores.projeto.LLVM.definitions.expressions.Return;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Function;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.FunctionCall;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Parameter;
@@ -231,6 +232,25 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         attribuition.add(idStore);
 
         return attribuition;
+    }
+
+    @Override
+    public FragmentBlock visitRetorno(ParserGrammar.RetornoContext ctx) {
+        FragmentBlock returnBlock = new FragmentBlock();
+        
+        if (ctx.expressao() == null) {
+            Return voidReturn = Return.asVoid();
+            returnBlock.add(voidReturn);
+            return returnBlock;
+        }
+        
+        ReturnableFragmentBlock expression = (ReturnableFragmentBlock) visit(ctx.expressao());
+        returnBlock.addAll(expression.getFragmentBlock());
+        
+        Return returnExpression = new Return(expression.getReturnVariable());
+        returnBlock.add(returnExpression);
+        
+        return returnBlock;
     }
 
     @Override
