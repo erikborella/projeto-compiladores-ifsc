@@ -296,21 +296,50 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         
         return expression;
     }
-    
+
     @Override
-    public ReturnableFragmentBlock visitFator(ParserGrammar.FatorContext ctx) {
-
-        switch (ctx.getStart().getType()) {
-            case ParserGrammar.TEXTO, ParserGrammar.OP_NEGACAO, ParserGrammar.PARENTESE_ABRE -> {
-                return null;
-            }
-        }
-
+    public ReturnableFragmentBlock visitFatorTermo(ParserGrammar.FatorTermoContext ctx) {
         ReturnableFragmentBlock term = (ReturnableFragmentBlock) visit(ctx.termo());
-
+        
+        if (ctx.sinal() !=  null && ctx.sinal().getStart().getType() == ParserGrammar.SINAL_MENOS) {
+            Variable valueVariable = term.getReturnVariable();            
+            Variable negateReturnVariable = this.singleUseVariablesManager.getNewVariableOfType(valueVariable.type());
+                    
+            Operation negation = new Operation(
+                    OperationType.MULTIPLICATION,
+                    negateReturnVariable, 
+                    valueVariable, 
+                    Variable.asConstant(valueVariable.type(), "-1"));
+            
+            term.getFragmentBlock().add(negation);
+            term.setReturnVariable(negation.getReturnVariable());
+        }
+        
         return term;
     }
 
+    @Override
+    public Fragment visitFatorExpressao(ParserGrammar.FatorExpressaoContext ctx) {
+        ReturnableFragmentBlock expression = (ReturnableFragmentBlock) visit(ctx.expressao());
+        
+        if (ctx.sinal() !=  null && ctx.sinal().getStart().getType() == ParserGrammar.SINAL_MENOS) {
+            Variable valueVariable = expression.getReturnVariable();            
+            Variable negateReturnVariable = this.singleUseVariablesManager.getNewVariableOfType(valueVariable.type());
+                    
+            Operation negation = new Operation(
+                    OperationType.MULTIPLICATION,
+                    negateReturnVariable, 
+                    valueVariable, 
+                    Variable.asConstant(valueVariable.type(), "-1"));
+            
+            expression.getFragmentBlock().add(negation);
+            expression.setReturnVariable(negation.getReturnVariable());
+        }
+        
+        return expression;
+    }
+    
+    
     @Override
     public ReturnableFragmentBlock visitTermoVariavel(ParserGrammar.TermoVariavelContext ctx) {
         String id = ctx.ID().getText();

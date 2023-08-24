@@ -123,7 +123,7 @@ argumentos
     ;
 
 retorno
-    : RETURN expressao
+    : RETURN (expressao)?
     ;
 
 expressao
@@ -171,10 +171,10 @@ op_multiplicativo
     ;
 
 fator
-    : (sinal)? termo
-    | TEXTO
-    | OP_NEGACAO fator
-    | PARENTESE_ABRE expressao PARENTESE_FECHA
+    : (sinal)? termo #FatorTermo
+    | TEXTO #FatorText
+    | OP_NEGACAO fator #FatorNegacaoFator
+    | (sinal)? PARENTESE_ABRE expressao PARENTESE_FECHA #FatorExpressao
     ;
 
 termo
