@@ -57,6 +57,17 @@ public class Type implements Fragment {
     public Type getNewDeferencePointerOfThis() {
         return new Type(this.baseType, this.pointerCount - 1, this.dimensions);
     }
+    
+    public Type getNewDeferenceArrayOfThis(int deferenceNumber) {
+        ArrayList<Integer> cloneDimensions = (ArrayList<Integer>) this.dimensions.clone();
+        Type newType = new Type(this.baseType, this.pointerCount, cloneDimensions);
+       
+        for (int i = 0; i < deferenceNumber; i++) {
+            newType.dimensions.remove(0);
+        }
+        
+        return newType;
+    }
 
     @Override
     public String getText() {

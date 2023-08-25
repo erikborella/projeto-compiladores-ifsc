@@ -103,7 +103,7 @@ para
     ;
 
 atribuicao
-    : ID OP_ATRIBUICAO complemento
+    : acesso_id OP_ATRIBUICAO complemento
     ;
 
 para_atribuicoes
@@ -171,16 +171,16 @@ op_multiplicativo
     ;
 
 fator
-    : (sinal)? termo #FatorTermo
-    | TEXTO #FatorText
-    | OP_NEGACAO fator #FatorNegacaoFator
+    : (sinal)? termo                                    #FatorTermo
+    | TEXTO                                             #FatorText
+    | OP_NEGACAO fator                                  #FatorNegacaoFator
     | (sinal)? PARENTESE_ABRE expressao PARENTESE_FECHA #FatorExpressao
     ;
 
 termo
-    : ID (dimensao2)* #TermoVariavel
+    : acesso_id #TermoVariavel
     | constante #TermoConstante
-    | funcao #TermoFuncao
+    | funcao    #TermoFuncao
     ;
 
 sinal
@@ -191,4 +191,9 @@ sinal
 constante
     : NUM_INT
     | NUM_DEC
+    ;
+    
+acesso_id
+    : ID                #AcessoId
+    | ID (dimensao2)*   #AcessoIdArray
     ;

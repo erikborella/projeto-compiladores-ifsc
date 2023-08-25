@@ -5,6 +5,7 @@ import ifsc.compiladores.projeto.LLVM.FragmentBlock;
 import ifsc.compiladores.projeto.LLVM.ReturnableFragment;
 import ifsc.compiladores.projeto.LLVM.ReturnableFragmentBlock;
 import ifsc.compiladores.projeto.LLVM.definitions.Alloca;
+import ifsc.compiladores.projeto.LLVM.definitions.GetElementPtr;
 import ifsc.compiladores.projeto.LLVM.definitions.Load;
 import ifsc.compiladores.projeto.LLVM.definitions.Store;
 import ifsc.compiladores.projeto.LLVM.definitions.Variable;
@@ -215,14 +216,11 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     @Override
     public FragmentBlock visitAtribuicao(ParserGrammar.AtribuicaoContext ctx) {
         FragmentBlock attribuition = new FragmentBlock();
-        String attributionId = ctx.ID().getText();
+        
+        ReturnableFragmentBlock idAccess = (ReturnableFragmentBlock) visit(ctx.acesso_id());
+        attribuition.addAll(idAccess.getFragmentBlock());
 
-        if (!this.scopeManager.isVariableDeclared(attributionId)) {
-            throw new IllegalStateException(String.format("Variavel %s não está declarada",
-                    attributionId));
-        }
-
-        Variable id = this.scopeManager.getDeclaredVariable(attributionId);
+        Variable id = idAccess.getReturnVariable();
         Variable storeId = new Variable(id.type().getNewReferencePointerToThis(), id.name());
 
         ReturnableFragmentBlock expressionReturn = (ReturnableFragmentBlock) visitExpressao(ctx.complemento().expressao());
@@ -254,7 +252,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     }
 
     @Override
-    public Fragment visitExpr_aditiva(ParserGrammar.Expr_aditivaContext ctx) {
+    public ReturnableFragmentBlock visitExpr_aditiva(ParserGrammar.Expr_aditivaContext ctx) {
         return createExpression(ctx);
     }
 
@@ -359,11 +357,17 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         return expression;
     }
     
-    
     @Override
     public ReturnableFragmentBlock visitTermoVariavel(ParserGrammar.TermoVariavelContext ctx) {
-        String id = ctx.ID().getText();
-        Load idLoad = this.loadId(id);
+        ReturnableFragmentBlock term = new ReturnableFragmentBlock();
+        
+        ReturnableFragmentBlock idAccess = (ReturnableFragmentBlock) visit(ctx.acesso_id());
+        term.getFragmentBlock().addAll(idAccess.getFragmentBlock());
+        
+        Load idLoad = new Load(
+                this.singleUseVariablesManager.getNewVariableName(), 
+                idAccess.getReturnVariable()
+        );
         
         return new ReturnableFragmentBlock(idLoad);
     }
@@ -417,19 +421,6 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         
         return functionCallExpresion;
     }
-    
-    
-
-    private Load loadId(String idName) {
-        if (!this.scopeManager.isVariableDeclared(idName)) {
-            throw new IllegalStateException(String.format("Variavel %s não está declarada",
-                    idName));
-        }
-
-        Variable id = this.scopeManager.getDeclaredVariable(idName);
-
-        return new Load(this.singleUseVariablesManager.getNewVariableName(), id);
-    }
 
     @Override
     public Type visitTiporetorno(ParserGrammar.TiporetornoContext ctx) {
@@ -468,6 +459,70 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             default -> throw new IllegalStateException("Invalid type");
         };
     }
+
+    @Override
+    public ReturnableFragmentBlock visitAcessoId(ParserGrammar.AcessoIdContext ctx) {
+        String id = ctx.ID().getText();
+        
+        if (!this.scopeManager.isVariableDeclared(id)) {
+            throw new IllegalStateException(String.format("Variavel %s não está declarada",
+                    id));
+        }
+        
+        Variable idVariable = this.scopeManager.getDeclaredVariable(id);
+        
+        ReturnableFragmentBlock idAccess = new ReturnableFragmentBlock();
+        idAccess.setReturnVariable(idVariable);
+        
+        return idAccess;
+    }
+
+    @Override
+    public ReturnableFragmentBlock visitAcessoIdArray(ParserGrammar.AcessoIdArrayContext ctx) {
+        ReturnableFragmentBlock arrayAccess = new ReturnableFragmentBlock();
+        
+        String id = ctx.ID().getText();
+        
+        if (!this.scopeManager.isVariableDeclared(id)) {
+            throw new IllegalStateException(String.format("Variavel %s não está declarada",
+                    id));
+        }
+        
+        Variable idVariable = this.scopeManager.getDeclaredVariable(id);
+        
+        Load arrayLoad = new Load(this.singleUseVariablesManager.getNewVariableName(), idVariable);
+        arrayAccess.getFragmentBlock().add(arrayLoad);
+        
+        ArrayList<Variable> indexes = new ArrayList<>();
+        
+        for (ParserGrammar.Dimensao2Context dimensao2Context : ctx.dimensao2()) {
+            ReturnableFragmentBlock dimensionExpression = visitExpr_aditiva(dimensao2Context.expr_aditiva());
+            arrayAccess.getFragmentBlock().addAll(dimensionExpression.getFragmentBlock());
+
+            indexes.add(dimensionExpression.getReturnVariable());
+        }
+        
+        Type returnType = arrayLoad.getReturnVariable()
+                .type()
+                .getNewDeferencePointerOfThis()
+                .getNewDeferenceArrayOfThis(indexes.size());
+        
+        Variable returnVariable = this.singleUseVariablesManager.getNewVariableOfType(returnType);
+        GetElementPtr arrayElementPtr = new GetElementPtr(
+                returnVariable, 
+                arrayLoad.getReturnVariable(), 
+                indexes
+        );
+        
+        arrayElementPtr.getText();
+        
+        arrayAccess.getFragmentBlock().add(arrayElementPtr);
+        arrayAccess.setReturnVariable(returnVariable);
+
+        return arrayAccess;
+    }
+    
+    
 
     @Override
     public Fragment visitChildren(RuleNode node) {
