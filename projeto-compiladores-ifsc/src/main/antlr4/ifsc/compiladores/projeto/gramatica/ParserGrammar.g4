@@ -195,5 +195,5 @@ constante
     
 acesso_id
     : ID                #AcessoId
-    | ID (dimensao2)*   #AcessoIdArray
+    | ID (dimensao2)+   #AcessoIdArray
     ;
