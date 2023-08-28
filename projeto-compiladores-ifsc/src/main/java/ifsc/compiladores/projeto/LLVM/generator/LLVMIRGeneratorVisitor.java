@@ -364,12 +364,20 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         ReturnableFragmentBlock idAccess = (ReturnableFragmentBlock) visit(ctx.acesso_id());
         term.getFragmentBlock().addAll(idAccess.getFragmentBlock());
         
+        if (idAccess.getReturnVariable().type().isArrayType()) {
+            term.setReturnVariable(idAccess.getReturnVariable());
+            return term;
+        }
+        
         Load idLoad = new Load(
                 this.singleUseVariablesManager.getNewVariableName(), 
                 idAccess.getReturnVariable()
         );
         
-        return new ReturnableFragmentBlock(idLoad);
+        term.getFragmentBlock().add(idLoad);
+        term.setReturnVariable(idLoad.getReturnVariable());
+        
+        return term;
     }
 
     @Override
@@ -471,7 +479,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         
         Variable idVariable = this.scopeManager.getDeclaredVariable(id);
         
-        ReturnableFragmentBlock idAccess = new ReturnableFragmentBlock();
+        ReturnableFragmentBlock idAccess = new ReturnableFragmentBlock();        
         idAccess.setReturnVariable(idVariable);
         
         return idAccess;
