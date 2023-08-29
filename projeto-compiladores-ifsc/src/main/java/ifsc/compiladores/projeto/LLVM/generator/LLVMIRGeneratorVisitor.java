@@ -212,7 +212,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
         return arrayDeclaration;
     }
-
+    
     @Override
     public FragmentBlock visitAtribuicao(ParserGrammar.AtribuicaoContext ctx) {
         FragmentBlock attribuition = new FragmentBlock();
@@ -512,8 +512,11 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         
         Type returnType = arrayLoad.getReturnVariable()
                 .type()
-                .getNewDeferencePointerOfThis()
                 .getNewDeferenceArrayOfThis(indexes.size());
+        
+        if (!returnType.isArrayType()) {
+            returnType = returnType.getNewDeferencePointerOfThis();
+        }
         
         Variable returnVariable = this.singleUseVariablesManager.getNewVariableOfType(returnType);
         GetElementPtr arrayElementPtr = new GetElementPtr(
