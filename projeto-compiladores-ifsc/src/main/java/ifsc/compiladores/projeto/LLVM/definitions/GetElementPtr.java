@@ -25,7 +25,8 @@ public class GetElementPtr extends ReturnableFragment {
                 .getNewDeferencePointerOfThis()
                 .getText();
         
-        return String.format("getelementptr inbounds %s, %s %s, i32 0, %s",
+        return String.format("%s = getelementptr inbounds %s, %s %s, i32 0, %s",
+                this.returnVariable.getNameInIRForm(),
                 inboundTypeString,
                 this.accessVariable.type().getText(),
                 this.accessVariable.getNameInIRForm(),
