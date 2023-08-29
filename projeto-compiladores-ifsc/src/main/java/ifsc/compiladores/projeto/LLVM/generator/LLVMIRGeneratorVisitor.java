@@ -2,7 +2,6 @@ package ifsc.compiladores.projeto.LLVM.generator;
 
 import ifsc.compiladores.projeto.LLVM.Fragment;
 import ifsc.compiladores.projeto.LLVM.FragmentBlock;
-import ifsc.compiladores.projeto.LLVM.ReturnableFragment;
 import ifsc.compiladores.projeto.LLVM.ReturnableFragmentBlock;
 import ifsc.compiladores.projeto.LLVM.definitions.Alloca;
 import ifsc.compiladores.projeto.LLVM.definitions.GetElementPtr;
@@ -27,7 +26,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
-import javax.swing.text.html.parser.Parser;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -117,16 +115,19 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             Type parameterType = visitTipo(ctx.tipo(i));
             String parameterName = ctx.ID(i).getText();
 
-            Variable variable = new Variable(parameterType, parameterName);
-
             if (this.scopeManager.isVariableDeclared(parameterName)) {
                 throw new IllegalStateException(String.format("Já existe um parametro com o nome %s declarado.",
                         parameterName));
             }
 
-            this.scopeManager.declareVariable(variable);
+            Variable declareVariable = new Variable(
+                    parameterType.getNewReferencePointerToThis(), 
+                    parameterName
+            );
+            this.scopeManager.declareVariable(declareVariable);
 
-            Parameter parameter = new Parameter(variable);
+            Variable parameterVariable = new Variable(parameterType, parameterName);
+            Parameter parameter = new Parameter(parameterVariable);
 
             parameters.add(parameter);
         }
@@ -162,7 +163,8 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     @Override
     public FragmentBlock visitDecvariavel(ParserGrammar.DecvariavelContext ctx) {
         FragmentBlock variableDeclarations = new FragmentBlock();
-        Type variableType = visitTipo(ctx.tipo());
+        Type variableType = visitTipo(ctx.tipo())
+                .getNewReferencePointerToThis();
 
         for (int i = 0; i < ctx.ID().size(); i++) {
             String variableName = ctx.ID(i).getText();
@@ -189,23 +191,25 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     }
 
     private Fragment declareValueVariable(Variable variable, String variableName) {
-        return new Alloca(variableName, variable.type());
+        return new Alloca(variableName, variable.type().getNewDeferencePointerOfThis());
     }
-
+    
     private FragmentBlock declareArrayVariable(Variable variable, String variableName) {
         FragmentBlock arrayDeclaration = new FragmentBlock();
-
-        Type arrayBaseType = variable.type().getNewDeferencePointerOfThis();
-
+        
+        Type arrayReferenceType = variable.type().getNewDeferencePointerOfThis();
+        
+        Alloca arrayReferenceAlloca = new Alloca(variableName, arrayReferenceType);
+        arrayDeclaration.add(arrayReferenceAlloca);
+        
+        Type arrayBaseType = arrayReferenceType.getNewDeferencePointerOfThis();
+        
         Alloca arrayAlloca = new Alloca(this.singleUseVariablesManager.getNewVariableName(), arrayBaseType);
         arrayDeclaration.add(arrayAlloca);
-
-        Alloca arrayReferenceAlloca = new Alloca(variableName, variable.type());
-        arrayDeclaration.add(arrayReferenceAlloca);
-
+        
         Store arrayReferenceStore = new Store(
-                arrayAlloca.getReturnVariable(),
-                arrayReferenceAlloca.getReturnVariable()
+            arrayAlloca.getReturnVariable(),
+            arrayReferenceAlloca.getReturnVariable()
         );
 
         arrayDeclaration.add(arrayReferenceStore);
@@ -220,8 +224,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         ReturnableFragmentBlock idAccess = (ReturnableFragmentBlock) visit(ctx.acesso_id());
         attribuition.addAll(idAccess.getFragmentBlock());
 
-        Variable id = idAccess.getReturnVariable();
-        Variable storeId = new Variable(id.type().getNewReferencePointerToThis(), id.name());
+        Variable storeId = idAccess.getReturnVariable();
 
         ReturnableFragmentBlock expressionReturn = (ReturnableFragmentBlock) visitExpressao(ctx.complemento().expressao());
         attribuition.addAll(expressionReturn.getFragmentBlock());
@@ -231,7 +234,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
         return attribuition;
     }
-
+    
     @Override
     public FragmentBlock visitRetorno(ParserGrammar.RetornoContext ctx) {
         FragmentBlock returnBlock = new FragmentBlock();
@@ -363,12 +366,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         
         ReturnableFragmentBlock idAccess = (ReturnableFragmentBlock) visit(ctx.acesso_id());
         term.getFragmentBlock().addAll(idAccess.getFragmentBlock());
-        
-        if (idAccess.getReturnVariable().type().isArrayType()) {
-            term.setReturnVariable(idAccess.getReturnVariable());
-            return term;
-        }
-        
+       
         Load idLoad = new Load(
                 this.singleUseVariablesManager.getNewVariableName(), 
                 idAccess.getReturnVariable()
@@ -513,10 +511,6 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         Type returnType = arrayLoad.getReturnVariable()
                 .type()
                 .getNewDeferenceArrayOfThis(indexes.size());
-        
-        if (!returnType.isArrayType()) {
-            returnType = returnType.getNewDeferencePointerOfThis();
-        }
         
         Variable returnVariable = this.singleUseVariablesManager.getNewVariableOfType(returnType);
         GetElementPtr arrayElementPtr = new GetElementPtr(

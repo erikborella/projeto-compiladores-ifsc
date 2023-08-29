@@ -51,11 +51,11 @@ comando
     ;
 
 comando_linha
-    : leitura
-    | escrita
-    | atribuicao
-    | funcao
-    | retorno
+    : leitura    #ComandoLinhaLeitura
+    | escrita    #ComandoLinhaEscrita
+    | atribuicao #ComandoLinhaAtribuicao
+    | funcao     #ComandoLinhaFuncao
+    | retorno    #ComandoLinhaRetorno
     ;
 
 comando_bloco
