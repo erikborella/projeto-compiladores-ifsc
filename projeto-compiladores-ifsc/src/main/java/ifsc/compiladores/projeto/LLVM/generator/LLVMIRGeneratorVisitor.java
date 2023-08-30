@@ -216,6 +216,41 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
         return arrayDeclaration;
     }
+
+    @Override
+    public FragmentBlock visitComandoLinhaFuncao(ParserGrammar.ComandoLinhaFuncaoContext ctx) {
+        FragmentBlock functionCallExpresion = new FragmentBlock();
+        String functionName = ctx.funcao().ID().getText();
+        
+        if (!this.scopeManager.isFunctionDeclared(functionName)) {
+            throw new IllegalStateException(String.format("Função %s não está declarada",
+                    functionName));
+        }
+        
+        Function functionDefinition = this.scopeManager.getDeclaredFunction(functionName);
+        ArrayList<Variable> arguments = new ArrayList<>();
+        
+        if (ctx.funcao().argumentos() != null) {
+            for (int i = 0; i < ctx.funcao().argumentos().expressao().size(); i++) {
+                ParserGrammar.ExpressaoContext argumentExpression = ctx.funcao().argumentos().expressao(i);
+
+                ReturnableFragmentBlock argument = (ReturnableFragmentBlock) visit(argumentExpression);  
+                functionCallExpresion.addAll(argument.getFragmentBlock());
+
+                arguments.add(argument.getReturnVariable());
+            }
+        }
+        
+        FunctionCall functionCall = FunctionCall.withoutReturn(
+                functionDefinition.getReturnType(), 
+                functionName, 
+                arguments
+        );
+        
+        functionCallExpresion.add(functionCall);
+   
+        return functionCallExpresion;
+    } 
     
     @Override
     public FragmentBlock visitAtribuicao(ParserGrammar.AtribuicaoContext ctx) {
