@@ -12,6 +12,8 @@ import ifsc.compiladores.projeto.LLVM.definitions.expressions.Constant;
 import ifsc.compiladores.projeto.LLVM.definitions.expressions.Operation;
 import ifsc.compiladores.projeto.LLVM.definitions.expressions.OperationType;
 import ifsc.compiladores.projeto.LLVM.definitions.expressions.Return;
+import ifsc.compiladores.projeto.LLVM.definitions.expressions.comparisons.IntegerComparison;
+import ifsc.compiladores.projeto.LLVM.definitions.expressions.comparisons.IntegerComparisonType;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Function;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.FunctionCall;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Parameter;
@@ -290,6 +292,54 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     }
 
     @Override
+    public ReturnableFragmentBlock visitExpr_relacional(ParserGrammar.Expr_relacionalContext ctx) {
+        ReturnableFragmentBlock expression = new ReturnableFragmentBlock();
+        
+        for (int i = 0; i < ctx.children.size(); i++) {
+            ParseTree child = ctx.getChild(i);
+            
+            if (child instanceof ParserGrammar.Op_relacionalContext opRelacionalContext) {
+                IntegerComparisonType comparisonType = switch (opRelacionalContext.start.getType()) {
+                    case ParserGrammar.OP_IGUAL -> IntegerComparisonType.EQUALS;
+                    case ParserGrammar.OP_DIFERENTE -> IntegerComparisonType.NOT_EQUALS;
+                    case ParserGrammar.OP_MENOR -> IntegerComparisonType.LESS;
+                    case ParserGrammar.OP_MENOR_IGUAL -> IntegerComparisonType.LESS_EQUALS;
+                    case ParserGrammar.OP_MAIOR -> IntegerComparisonType.GREATER;
+                    case ParserGrammar.OP_MAIOR_IGUAL -> IntegerComparisonType.GREATER_EQUALS;
+                    default -> throw new IllegalStateException("Invalid operation type");
+                };
+                
+                ReturnableFragmentBlock op2Expression = (ReturnableFragmentBlock) visit(ctx.getChild(i+1));
+                expression.getFragmentBlock().addAll(op2Expression.getFragmentBlock());
+                i++;
+                
+                String returnVariableName = this.singleUseVariablesManager.getNewVariableName();
+                
+                Variable op1 = expression.getReturnVariable();
+                Variable op2 = op2Expression.getReturnVariable();
+                
+                IntegerComparison comparison = new IntegerComparison(
+                        comparisonType,
+                        returnVariableName,
+                        op1,
+                        op2
+                );
+                
+                expression.getFragmentBlock().add(comparison);
+                expression.setReturnVariable(comparison.getReturnVariable());
+                continue;
+            }
+            
+            ReturnableFragmentBlock initialOp = (ReturnableFragmentBlock) visit(child);
+                
+            expression.getFragmentBlock().addAll(initialOp.getFragmentBlock());
+            expression.setReturnVariable(initialOp.getReturnVariable());
+        }
+        
+        return expression;
+    }
+
+    @Override
     public ReturnableFragmentBlock visitExpr_aditiva(ParserGrammar.Expr_aditivaContext ctx) {
         return createExpression(ctx);
     }
@@ -304,8 +354,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
         ArrayList<Class> operatorsContextClass = new ArrayList<>(Arrays.asList(
             ParserGrammar.Op_multiplicativoContext.class,
-            ParserGrammar.Op_aditivoContext.class,
-            ParserGrammar.Op_relacionalContext.class
+            ParserGrammar.Op_aditivoContext.class
         ));
         
         for (int i = 0; i < ctx.children.size(); i++) {
@@ -344,10 +393,10 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
                 continue;
             }
             
-            ReturnableFragmentBlock operator = (ReturnableFragmentBlock) visit(child);
+            ReturnableFragmentBlock initialOp = (ReturnableFragmentBlock) visit(child);
                 
-            expression.getFragmentBlock().addAll(operator.getFragmentBlock());
-            expression.setReturnVariable(operator.getReturnVariable());
+            expression.getFragmentBlock().addAll(initialOp.getFragmentBlock());
+            expression.setReturnVariable(initialOp.getReturnVariable());
         }
         
         return expression;
