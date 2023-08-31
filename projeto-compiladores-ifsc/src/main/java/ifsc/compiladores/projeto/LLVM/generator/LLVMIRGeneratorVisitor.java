@@ -46,6 +46,8 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     public Fragment visitPrograma(ParserGrammar.ProgramaContext ctx) {
         FragmentBlock program = new FragmentBlock();
 
+        declareFunctions(ctx);
+        
         for (ParserGrammar.DecfuncaoContext decfuncaoContext : ctx.decfuncao()) {
             program.add(visitDecfuncao(decfuncaoContext));
         }
@@ -54,20 +56,27 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
         return program;
     }
+    
+    private void declareFunctions(ParserGrammar.ProgramaContext ctx) {
+        for (ParserGrammar.DecfuncaoContext decfuncaoContext : ctx.decfuncao()) {
+            Type functionReturnType = visitTiporetorno(decfuncaoContext.tiporetorno());
+            String functionName = decfuncaoContext.ID().getText();
+
+            Function function = new Function(functionReturnType, functionName);
+
+            if (this.scopeManager.isFunctionDeclared(functionName)) {
+                throw new IllegalStateException(String.format("Já existe uma função com o nome %s declarada.",
+                        functionName));
+            }
+
+            this.scopeManager.declareFunction(function);
+        }
+    }
 
     @Override
     public Function visitDecfuncao(ParserGrammar.DecfuncaoContext ctx) {
-        Type functionReturnType = visitTiporetorno(ctx.tiporetorno());
         String functionName = ctx.ID().getText();
-
-        Function function = new Function(functionReturnType, functionName);
-
-        if (this.scopeManager.isFunctionDeclared(functionName)) {
-            throw new IllegalStateException(String.format("Já existe uma função com o nome %s declarada.",
-                    functionName));
-        }
-
-        this.scopeManager.declareFunction(function);
+        Function function = this.scopeManager.getDeclaredFunction(functionName);
 
         this.scopeManager.startScope();
         this.singleUseVariablesManager.resetVariables();
@@ -141,8 +150,18 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     public Function visitPrincipal(ParserGrammar.PrincipalContext ctx) {
         Type type = new Type(BaseType.INT);
         String name = "main";
+        
+        Function mainFunction = new Function(type, name);
+        
+        this.scopeManager.startScope();
+        this.singleUseVariablesManager.resetVariables();
 
-        return new Function(type, name);
+        FragmentBlock functionBody = visitBloco(ctx.bloco());
+        mainFunction.getBody().addAll(functionBody);
+
+        this.scopeManager.finishScope();
+
+        return mainFunction;
     }
 
     @Override
