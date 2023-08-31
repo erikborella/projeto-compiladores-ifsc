@@ -37,6 +37,6 @@ class ParameterTest {
         String emitValue = parameter.getText();
 
         // Assert
-        assertEquals("[5 x i32]* %myArray.param", emitValue);
+        assertEquals("[5 x i32] %myArray.param", emitValue);
     }
 }

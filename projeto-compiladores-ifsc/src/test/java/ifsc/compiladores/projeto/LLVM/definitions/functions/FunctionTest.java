@@ -20,7 +20,7 @@ class FunctionTest {
         String emitValue = function.getText();
 
         // Assert
-        assertEquals("define i32 @myFunction() {\n}", emitValue);
+        assertEquals("define i32 @myFunction() {\n\n}", emitValue);
     }
 
     @Test
@@ -42,7 +42,7 @@ class FunctionTest {
         String emitValue = function.getText();
 
         // Assert
-        assertEquals("define i32 @myFunction(i32 %myVariable1.param, i32 %myVariable2.param) {\n}", emitValue);
+        assertEquals("define i32 @myFunction(i32 %myVariable1.param, i32 %myVariable2.param) {\n\n}", emitValue);
     }
 
     @Test
@@ -57,7 +57,7 @@ class FunctionTest {
         String emitValue = function.getText();
 
         // Assert
-        assertEquals("define [5 x double]* @myFunction() {\n}", emitValue);
+        assertEquals("define [5 x double] @myFunction() {\n\n}", emitValue);
     }
 
     @Test
@@ -81,6 +81,6 @@ class FunctionTest {
         String emitValue = function.getText();
 
         // Assert
-        assertEquals("define [5 x double]* @myFunction([5 x double]* %myVariable1.param, [5 x double]* %myVariable2.param) {\n}", emitValue);
+        assertEquals("define [5 x double] @myFunction([5 x double] %myVariable1.param, [5 x double] %myVariable2.param) {\n\n}", emitValue);
     }
 }
