@@ -4,7 +4,7 @@ import ifsc.compiladores.projeto.LLVM.definitions.Variable;
 
 public class ReturnableFragmentBlock extends ReturnableFragment {
 
-    private final FragmentBlock fragmentBlock;
+    protected final FragmentBlock fragmentBlock;
 
     public ReturnableFragmentBlock() {
         this.fragmentBlock = new FragmentBlock();

@@ -2,6 +2,7 @@ package ifsc.compiladores.projeto.LLVM.generator;
 
 import ifsc.compiladores.projeto.LLVM.Fragment;
 import ifsc.compiladores.projeto.LLVM.FragmentBlock;
+import ifsc.compiladores.projeto.LLVM.LabeledFragmentBlock;
 import ifsc.compiladores.projeto.LLVM.ReturnableFragmentBlock;
 import ifsc.compiladores.projeto.LLVM.definitions.Alloca;
 import ifsc.compiladores.projeto.LLVM.definitions.GetElementPtr;
@@ -17,8 +18,10 @@ import ifsc.compiladores.projeto.LLVM.definitions.expressions.comparisons.Intege
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Function;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.FunctionCall;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Parameter;
+import ifsc.compiladores.projeto.LLVM.definitions.jumps.ConditionalJump;
 import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
 import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
+import ifsc.compiladores.projeto.LLVM.scopeManager.LabelManager;
 import ifsc.compiladores.projeto.LLVM.scopeManager.ScopeManager;
 import ifsc.compiladores.projeto.LLVM.scopeManager.SingleUseVariablesManager;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
@@ -36,10 +39,12 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
     private final ScopeManager scopeManager;
     private final SingleUseVariablesManager singleUseVariablesManager;
+    private final LabelManager labelManager;
 
     public LLVMIRGeneratorVisitor() {
         this.scopeManager = new ScopeManager();
         this.singleUseVariablesManager = new SingleUseVariablesManager();
+        this.labelManager = new LabelManager();
     }
 
     @Override
@@ -308,6 +313,31 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         returnBlock.add(returnExpression);
         
         return returnBlock;
+    }
+
+    @Override
+    public ReturnableFragmentBlock visitExpr_e(ParserGrammar.Expr_eContext ctx) {
+        LLVMIRShortCircuitCreator circuitCreator = new LLVMIRShortCircuitCreator("expression", this.labelManager);
+        
+        ReturnableFragmentBlock r = visitExpr_relacional(ctx.expr_relacional(1));
+        LabeledFragmentBlock rBlock = new LabeledFragmentBlock(this.labelManager.createLabel("..rand"));
+        rBlock.getFragmentBlock().addAll(r.getFragmentBlock());
+        
+        ConditionalJump jumpRigh = new ConditionalJump(
+                r.getReturnVariable(),
+                circuitCreator.getTrueBlock().getLabel(), 
+                circuitCreator.getFalseBlock().getLabel()
+        );
+        rBlock.getFragmentBlock().add(jumpRigh);
+        
+        ReturnableFragmentBlock l = visitExpr_relacional(ctx.expr_relacional(0));
+        ConditionalJump jumpLeft = new ConditionalJump(
+                l.getReturnVariable(), 
+                rBlock.getLabel(), 
+                circuitCreator.getFalseBlock().getLabel()
+        );
+        
+        return null;
     }
 
     @Override
