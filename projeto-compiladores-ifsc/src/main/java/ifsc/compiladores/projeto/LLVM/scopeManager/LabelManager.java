@@ -1,20 +1,22 @@
 package ifsc.compiladores.projeto.LLVM.scopeManager;
 
 import ifsc.compiladores.projeto.LLVM.definitions.Label;
+import java.util.HashMap;
 
 public class LabelManager {
-    private int labelCount;
-
-    public LabelManager(int labelCount) {
-        this.labelCount = labelCount;
-    }
+    private final HashMap<String, Integer> uniqueLabelsTable;
 
     public LabelManager() {
-        this(0);
+        this.uniqueLabelsTable = new HashMap<>();
     }
     
     public Label createLabel(String labelName) {
-        Label label = new Label(labelName + String.valueOf(this.labelCount));
+        int labelCount = this.uniqueLabelsTable.getOrDefault(labelName, 0);
+      
+        Label label = new Label(labelName + String.valueOf(labelCount));
+        labelCount++;
+        
+        this.uniqueLabelsTable.put(labelName, labelCount);
         
         return label;
     }

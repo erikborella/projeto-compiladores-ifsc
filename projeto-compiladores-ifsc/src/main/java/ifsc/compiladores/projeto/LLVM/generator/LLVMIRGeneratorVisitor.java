@@ -6,6 +6,7 @@ import ifsc.compiladores.projeto.LLVM.LabeledFragmentBlock;
 import ifsc.compiladores.projeto.LLVM.ReturnableFragmentBlock;
 import ifsc.compiladores.projeto.LLVM.definitions.Alloca;
 import ifsc.compiladores.projeto.LLVM.definitions.GetElementPtr;
+import ifsc.compiladores.projeto.LLVM.definitions.Label;
 import ifsc.compiladores.projeto.LLVM.definitions.Load;
 import ifsc.compiladores.projeto.LLVM.definitions.Store;
 import ifsc.compiladores.projeto.LLVM.definitions.Variable;
@@ -316,26 +317,49 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     }
 
     @Override
+    public Fragment visitExpr_ou(ParserGrammar.Expr_ouContext ctx) {
+        LLVMIRShortCircuitCreator circuitCreator = new LLVMIRShortCircuitCreator("expr", this.labelManager);
+        
+        for (ParserGrammar.Expr_eContext expr_eContext : ctx.expr_e()) {
+            expr_eContext.label = this.labelManager.createLabel("..expr.or");
+            expr_eContext.trueLabel = circuitCreator.getTrueBlock().getLabel();
+        }
+        
+        Label currentLabel = circuitCreator.getFalseBlock().getLabel();
+        for (int i = ctx.expr_e().size() - 1; i >= 0; i--) {
+            ParserGrammar.Expr_eContext expr_eContext = ctx.expr_e(i);
+            
+            expr_eContext.falseLabel = currentLabel;
+            currentLabel = expr_eContext.label;
+        }
+        
+        visitChildren(ctx);
+        
+        return null;
+    }
+    
+    @Override
     public ReturnableFragmentBlock visitExpr_e(ParserGrammar.Expr_eContext ctx) {
-        LLVMIRShortCircuitCreator circuitCreator = new LLVMIRShortCircuitCreator("expression", this.labelManager);
+        Label nextLabel = this.labelManager.createLabel("..expr.and");
         
-        ReturnableFragmentBlock r = visitExpr_relacional(ctx.expr_relacional(1));
-        LabeledFragmentBlock rBlock = new LabeledFragmentBlock(this.labelManager.createLabel("..rand"));
-        rBlock.getFragmentBlock().addAll(r.getFragmentBlock());
+        for (int i = 0; i < ctx.expr_relacional().size(); i++) {
+            ParserGrammar.Expr_relacionalContext expr_relacionalContext = ctx.expr_relacional(i);
+            expr_relacionalContext.falseLabel = ctx.falseLabel;
+            expr_relacionalContext.label = this.labelManager.createLabel("..expr.and");
+        }
         
-        ConditionalJump jumpRigh = new ConditionalJump(
-                r.getReturnVariable(),
-                circuitCreator.getTrueBlock().getLabel(), 
-                circuitCreator.getFalseBlock().getLabel()
-        );
-        rBlock.getFragmentBlock().add(jumpRigh);
-        
-        ReturnableFragmentBlock l = visitExpr_relacional(ctx.expr_relacional(0));
-        ConditionalJump jumpLeft = new ConditionalJump(
-                l.getReturnVariable(), 
-                rBlock.getLabel(), 
-                circuitCreator.getFalseBlock().getLabel()
-        );
+        for (int i = 0; i < ctx.expr_relacional().size(); i++) {
+            ParserGrammar.Expr_relacionalContext expr_relacionalContext = ctx.expr_relacional(i);
+            
+            Label trueLabel;
+            if (i == ctx.expr_relacional().size() - 1)
+                trueLabel = ctx.trueLabel;
+            else
+                trueLabel = ctx.expr_relacional(i+1).label;
+            
+            expr_relacionalContext.trueLabel = trueLabel;
+            
+        }
         
         return null;
     }

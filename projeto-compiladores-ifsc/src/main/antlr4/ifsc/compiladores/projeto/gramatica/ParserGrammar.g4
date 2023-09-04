@@ -1,6 +1,10 @@
 parser grammar ParserGrammar;
 options { tokenVocab=LexerGrammar; }
 
+@header {
+    import ifsc.compiladores.projeto.LLVM.definitions.Label;
+}
+
 programa
     : (decfuncao)* principal
     ;
@@ -134,11 +138,11 @@ expr_ou
     : expr_e (OP_OU expr_e)*
     ;
 
-expr_e
+expr_e locals [Label label, Label trueLabel, Label falseLabel]
     : expr_relacional (OP_E expr_relacional)*
     ;
 
-expr_relacional
+expr_relacional locals [Label label, Label trueLabel, Label falseLabel]
     : expr_aditiva (op_relacional expr_aditiva)*
     ;
 
