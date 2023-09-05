@@ -20,6 +20,7 @@ import ifsc.compiladores.projeto.LLVM.definitions.functions.Function;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.FunctionCall;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Parameter;
 import ifsc.compiladores.projeto.LLVM.definitions.jumps.ConditionalJump;
+import ifsc.compiladores.projeto.LLVM.definitions.jumps.UnconditionalJump;
 import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
 import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
 import ifsc.compiladores.projeto.LLVM.scopeManager.LabelManager;
@@ -317,11 +318,16 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     }
 
     @Override
-    public Fragment visitExpr_ou(ParserGrammar.Expr_ouContext ctx) {
-        LLVMIRShortCircuitCreator circuitCreator = new LLVMIRShortCircuitCreator("expr", this.labelManager);
+    public ReturnableFragmentBlock visitExpr_ou(ParserGrammar.Expr_ouContext ctx) {
+        // Skips generation of short-circuit when is not necessary
+        if (ctx.children.size() == 1 && ctx.expr_e(0).children.size() == 1) {
+            return visitExpr_relacional(ctx.expr_e(0).expr_relacional(0));
+        }
+        
+        LLVMIRShortCircuitCreator circuitCreator = new LLVMIRShortCircuitCreator(this.labelManager);
         
         for (ParserGrammar.Expr_eContext expr_eContext : ctx.expr_e()) {
-            expr_eContext.label = this.labelManager.createLabel("..expr.or");
+            expr_eContext.label = this.labelManager.createLabel("..or");
             expr_eContext.trueLabel = circuitCreator.getTrueBlock().getLabel();
         }
         
@@ -333,35 +339,61 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             currentLabel = expr_eContext.label;
         }
         
-        visitChildren(ctx);
+        ReturnableFragmentBlock orExpressionBlock = new ReturnableFragmentBlock();
+        orExpressionBlock.getFragmentBlock().addAll(circuitCreator.getHeadBlock());
         
-        return null;
+        UnconditionalJump jumpToExpression = new UnconditionalJump(ctx.expr_e(0).label);
+        orExpressionBlock.getFragmentBlock().add(jumpToExpression);
+        
+        for (ParserGrammar.Expr_eContext expr_eContext : ctx.expr_e()) {
+            ReturnableFragmentBlock andExpression = visitExpr_e(expr_eContext);
+            
+            orExpressionBlock.getFragmentBlock().addAll(andExpression.getFragmentBlock());
+        }
+        
+        orExpressionBlock.getFragmentBlock().addAll(circuitCreator.getTrueBlock().getFragmentBlock());
+        orExpressionBlock.getFragmentBlock().addAll(circuitCreator.getFalseBlock().getFragmentBlock());
+        orExpressionBlock.getFragmentBlock().addAll(circuitCreator.getEndBlock().getFragmentBlock());
+        
+        orExpressionBlock.setReturnVariable(circuitCreator.getReturnVariable());
+        
+        return orExpressionBlock;
     }
-    
+
     @Override
     public ReturnableFragmentBlock visitExpr_e(ParserGrammar.Expr_eContext ctx) {
-        Label nextLabel = this.labelManager.createLabel("..expr.and");
-        
         for (int i = 0; i < ctx.expr_relacional().size(); i++) {
             ParserGrammar.Expr_relacionalContext expr_relacionalContext = ctx.expr_relacional(i);
+            expr_relacionalContext.label = this.labelManager.createLabel("..and");
             expr_relacionalContext.falseLabel = ctx.falseLabel;
-            expr_relacionalContext.label = this.labelManager.createLabel("..expr.and");
         }
         
-        for (int i = 0; i < ctx.expr_relacional().size(); i++) {
+        ReturnableFragmentBlock andExpressionBlock = new ReturnableFragmentBlock();
+        
+        for (int i = 0; i < ctx.expr_relacional().size(); i++) {;
             ParserGrammar.Expr_relacionalContext expr_relacionalContext = ctx.expr_relacional(i);
             
-            Label trueLabel;
-            if (i == ctx.expr_relacional().size() - 1)
-                trueLabel = ctx.trueLabel;
-            else
-                trueLabel = ctx.expr_relacional(i+1).label;
-            
+            Label trueLabel = (i == ctx.expr_relacional().size() - 1) 
+                    ? ctx.trueLabel 
+                    : ctx.expr_relacional(i+1).label;
             expr_relacionalContext.trueLabel = trueLabel;
             
+            if (i == 0)
+                andExpressionBlock.getFragmentBlock().add(ctx.label);
+            else
+                andExpressionBlock.getFragmentBlock().add(expr_relacionalContext.label);
+            
+            ReturnableFragmentBlock expresionReturn = visitExpr_relacional(expr_relacionalContext);
+            andExpressionBlock.getFragmentBlock().addAll(expresionReturn.getFragmentBlock());
+            
+            ConditionalJump jump = new ConditionalJump(
+                expresionReturn.getReturnVariable(),
+                expr_relacionalContext.trueLabel,
+                expr_relacionalContext.falseLabel);
+            andExpressionBlock.getFragmentBlock().add(jump);
         }
         
-        return null;
+        return andExpressionBlock;
     }
 
     @Override

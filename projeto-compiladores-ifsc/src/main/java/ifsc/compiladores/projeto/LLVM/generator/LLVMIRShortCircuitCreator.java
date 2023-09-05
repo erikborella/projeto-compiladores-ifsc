@@ -1,5 +1,6 @@
 package ifsc.compiladores.projeto.LLVM.generator;
 
+import ifsc.compiladores.projeto.LLVM.FragmentBlock;
 import ifsc.compiladores.projeto.LLVM.LabeledFragmentBlock;
 import ifsc.compiladores.projeto.LLVM.ReturnableFragmentBlock;
 import ifsc.compiladores.projeto.LLVM.definitions.Alloca;
@@ -12,36 +13,38 @@ import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
 import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
 import ifsc.compiladores.projeto.LLVM.scopeManager.LabelManager;
 
-public class LLVMIRShortCircuitCreator extends ReturnableFragmentBlock {
+public class LLVMIRShortCircuitCreator {
     
     private static int retValCount = 0;
     
     private LabeledFragmentBlock trueBlock;
     private LabeledFragmentBlock falseBlock;
     private LabeledFragmentBlock endBlock;
+    
+    private FragmentBlock headBlock;
+    
     private Variable retValHolder;
+    private Variable returnVariable;
 
-    public LLVMIRShortCircuitCreator(String structureName, LabelManager labelManager) {
-        retValCount++;
-
+    public LLVMIRShortCircuitCreator(LabelManager labelManager) {
         this.retValHolder = new Variable(new Type(BaseType.BOOLEAN, 1), "..retValHolder" + retValCount);
-
+   
         Alloca retValHolderAlloca = new Alloca(this.retValHolder, new Type(BaseType.BOOLEAN));
-        this.fragmentBlock.add(retValHolderAlloca);
+        
+        this.headBlock = new FragmentBlock();
+        this.headBlock.add(retValHolderAlloca);
 
-        Label endLabel = labelManager.createLabel(".." + structureName + ".end");
+        Label endLabel = labelManager.createLabel("..end");
         this.endBlock = new LabeledFragmentBlock(endLabel);        
         
-        this.trueBlock = this.generateTrueBlock(labelManager.createLabel(".." + structureName + ".t"));
-        this.falseBlock = this.generateFalseBlock(labelManager.createLabel(".." + structureName + ".f"));
+        this.trueBlock = this.generateTrueBlock(labelManager.createLabel("..t"));
+        this.falseBlock = this.generateFalseBlock(labelManager.createLabel("..f"));
         
         this.returnVariable = new Variable(new Type(BaseType.BOOLEAN), "..retVal" + retValCount);
         Load returnVariableLoad = new Load(this.returnVariable, this.retValHolder);
         this.endBlock.getFragmentBlock().add(returnVariableLoad);
-        
-        this.fragmentBlock.addAll(this.trueBlock.getFragmentBlock());
-        this.fragmentBlock.addAll(this.falseBlock.getFragmentBlock());
-        this.fragmentBlock.addAll(this.endBlock.getFragmentBlock());
+
+        retValCount++;
     }
 
     public LabeledFragmentBlock getTrueBlock() {
@@ -51,7 +54,18 @@ public class LLVMIRShortCircuitCreator extends ReturnableFragmentBlock {
     public LabeledFragmentBlock getFalseBlock() {
         return falseBlock;
     }
-    
+
+    public LabeledFragmentBlock getEndBlock() {
+        return endBlock;
+    }
+
+    public FragmentBlock getHeadBlock() {
+        return headBlock;
+    }
+
+    public Variable getReturnVariable() {
+        return returnVariable;
+    }
     
     private LabeledFragmentBlock generateTrueBlock(Label trueLabel) {
         LabeledFragmentBlock newTrueBlock = new LabeledFragmentBlock(trueLabel);
