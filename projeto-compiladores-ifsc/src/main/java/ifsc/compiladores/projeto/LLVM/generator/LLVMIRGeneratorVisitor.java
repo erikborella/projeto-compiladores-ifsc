@@ -318,6 +318,61 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     }
 
     @Override
+    public FragmentBlock visitSelecao(ParserGrammar.SelecaoContext ctx) {
+        FragmentBlock ifStructure = new FragmentBlock();
+        
+        ReturnableFragmentBlock ifExpression = visitExpressao(ctx.expressao());
+        ifStructure.addAll(ifExpression.getFragmentBlock());
+        
+        Label ifLabel = this.labelManager.createLabel("..if");
+        Label endIfLabel = this.labelManager.createLabel("..endIf");
+        Label falseIfLabel = endIfLabel;
+        
+        if (ctx.senao() != null) {
+            falseIfLabel = this.labelManager.createLabel("..else");
+        }
+        
+        ConditionalJump ifEnterJump = new ConditionalJump(
+                ifExpression.getReturnVariable(), 
+                ifLabel, 
+                falseIfLabel
+        );
+        ifStructure.add(ifEnterJump);
+        ifStructure.add(ifLabel);
+        
+        this.scopeManager.startScope();
+        FragmentBlock ifBlock = visitBloco(ctx.bloco());
+        this.scopeManager.finishScope();
+        
+        ifStructure.addAll(ifBlock);
+        
+        UnconditionalJump exitIfJump = new UnconditionalJump(endIfLabel);
+        ifStructure.add(exitIfJump);
+        
+        if (ctx.senao() != null) {
+            ifStructure.add(falseIfLabel);
+            
+            this.scopeManager.startScope();
+            FragmentBlock elseBlock = visitBloco(ctx.senao().bloco());
+            this.scopeManager.finishScope();
+            
+            ifStructure.addAll(elseBlock);
+            
+            UnconditionalJump exitElseJump = new UnconditionalJump(endIfLabel);
+            ifStructure.add(exitElseJump);
+        }
+        
+        ifStructure.add(endIfLabel);
+        
+        return ifStructure;
+    }
+
+    @Override
+    public ReturnableFragmentBlock visitExpressao(ParserGrammar.ExpressaoContext ctx) {
+        return visitExpr_ou(ctx.expr_ou());
+    }
+    
+    @Override
     public ReturnableFragmentBlock visitExpr_ou(ParserGrammar.Expr_ouContext ctx) {
         // Skips generation of short-circuit when is not necessary
         if (ctx.children.size() == 1 && ctx.expr_e(0).children.size() == 1) {
