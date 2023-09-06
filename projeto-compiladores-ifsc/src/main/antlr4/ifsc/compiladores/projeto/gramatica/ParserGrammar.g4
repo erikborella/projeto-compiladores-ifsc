@@ -103,7 +103,7 @@ enquanto
     ;
 
 para
-    : FOR PARENTESE_ABRE (para_atribuicoes)? PONTO_VIRGULA (expressao)? PONTO_VIRGULA (para_atribuicoes)? PARENTESE_FECHA bloco
+    : FOR PARENTESE_ABRE (atribuicaoInicio=para_atribuicoes)? PONTO_VIRGULA (expressao)? PONTO_VIRGULA (atribuicaoFinal=para_atribuicoes)? PARENTESE_FECHA bloco
     ;
 
 atribuicao

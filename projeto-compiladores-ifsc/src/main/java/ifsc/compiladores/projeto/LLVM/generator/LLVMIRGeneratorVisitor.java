@@ -327,7 +327,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         ifStructure.addAll(ifExpression.getFragmentBlock());
         
         Label ifLabel = this.labelManager.createLabel("..if");
-        Label endIfLabel = this.labelManager.createLabel("..endIf");
+        Label endIfLabel = this.labelManager.createLabel("..if.end");
         Label falseIfLabel = endIfLabel;
         
         if (ctx.senao() != null) {
@@ -371,6 +371,100 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         ifStructure.add(endIfLabel);
         
         return ifStructure;
+    }
+
+    @Override
+    public FragmentBlock visitEnquanto(ParserGrammar.EnquantoContext ctx) {
+        FragmentBlock whileStructure = new FragmentBlock();
+        
+        Label whileHeadLabel = this.labelManager.createLabel("..while.head");
+        Label whileBodyLabel = this.labelManager.createLabel("..while.body");
+        Label whileEndLabel = this.labelManager.createLabel("..while.end");
+        
+        UnconditionalJump enterWhileJump = new UnconditionalJump(whileHeadLabel);
+        
+        whileStructure.add(enterWhileJump);
+        whileStructure.add(whileHeadLabel);
+        
+        ReturnableFragmentBlock whileExpression = visitExpressao(ctx.expressao());
+        whileStructure.addAll(whileExpression.getFragmentBlock());
+        
+        ConditionalJump whileConditionJump = new ConditionalJump(
+                whileExpression.getReturnVariable(),
+                whileBodyLabel,
+                whileEndLabel
+        );
+        whileStructure.add(whileConditionJump);
+        
+        whileStructure.add(whileBodyLabel);
+        
+        this.scopeManager.startScope();
+        FragmentBlock whileBlock = visitBloco(ctx.bloco());
+        this.scopeManager.finishScope();
+        
+        whileStructure.addAll(whileBlock);
+        
+        if (!(whileBlock.get(whileBlock.size() - 1) instanceof Return)) {
+            UnconditionalJump exitIfJump = new UnconditionalJump(whileHeadLabel);
+            whileStructure.add(exitIfJump);
+        }
+        
+        whileStructure.add(whileEndLabel);
+        
+        return whileStructure;
+    }
+
+    @Override
+    public FragmentBlock visitPara(ParserGrammar.ParaContext ctx) {
+        FragmentBlock forStructure = new FragmentBlock();
+       
+        if (ctx.atribuicaoInicio != null) {
+            for (ParserGrammar.AtribuicaoContext attribution : ctx.atribuicaoInicio.atribuicao()) {
+                FragmentBlock attributionBlock = visitAtribuicao(attribution);
+                forStructure.addAll(attributionBlock);
+            }
+        }
+
+        Label forHeadLabel = this.labelManager.createLabel("..for.head");
+        Label forBodyLabel = this.labelManager.createLabel("..for.body");
+        Label forEndLabel = this.labelManager.createLabel("..for.end");
+
+        UnconditionalJump enterForJump = new UnconditionalJump(forHeadLabel);
+        forStructure.add(enterForJump);
+        forStructure.add(forHeadLabel);
+
+        ReturnableFragmentBlock forExpression = visitExpressao(ctx.expressao());
+        forStructure.addAll(forExpression.getFragmentBlock());
+
+        ConditionalJump forConditionJump = new ConditionalJump(
+                forExpression.getReturnVariable(),
+                forBodyLabel,
+                forEndLabel
+        );
+
+        forStructure.add(forConditionJump);
+        forStructure.add(forBodyLabel);
+
+        this.scopeManager.startScope();
+        FragmentBlock forBlock = visitBloco(ctx.bloco());
+        this.scopeManager.finishScope();
+
+        forStructure.addAll(forBlock);
+
+        if (!(forBlock.get(forBlock.size() - 1) instanceof Return)) {
+            if (ctx.atribuicaoFinal != null) {
+                for (ParserGrammar.AtribuicaoContext attribution : ctx.atribuicaoFinal.atribuicao()) {
+                    FragmentBlock attributionBlock = visitAtribuicao(attribution);
+                    forStructure.addAll(attributionBlock);
+                }
+            }
+            UnconditionalJump exitIfJump = new UnconditionalJump(forHeadLabel);
+            forStructure.add(exitIfJump);
+        }
+
+        forStructure.add(forEndLabel);
+
+        return forStructure;
     }
 
     @Override
