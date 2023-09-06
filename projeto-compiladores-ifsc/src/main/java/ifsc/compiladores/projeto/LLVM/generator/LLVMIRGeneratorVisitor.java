@@ -204,13 +204,15 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             }
 
             this.scopeManager.declareVariable(variable);
+            Variable variableWithoutConflit = this.scopeManager.getVariableWithoutNameConflit(variable);
+            String variableNameWithoutConflit = variableWithoutConflit.name();
 
             if (variableType.isArrayType()) {
-                FragmentBlock arrayVariableDeclaration = declareArrayVariable(variable, variableName);
+                FragmentBlock arrayVariableDeclaration = declareArrayVariable(variableWithoutConflit, variableNameWithoutConflit);
                 variableDeclarations.addAll(arrayVariableDeclaration);
             }
             else {
-                Fragment valueVariableDeclaration = declareValueVariable(variable, variableName);
+                Fragment valueVariableDeclaration = declareValueVariable(variableWithoutConflit, variableNameWithoutConflit);
                 variableDeclarations.add(valueVariableDeclaration);
             }
         }
@@ -343,11 +345,13 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         this.scopeManager.startScope();
         FragmentBlock ifBlock = visitBloco(ctx.bloco());
         this.scopeManager.finishScope();
-        
+                
         ifStructure.addAll(ifBlock);
         
-        UnconditionalJump exitIfJump = new UnconditionalJump(endIfLabel);
-        ifStructure.add(exitIfJump);
+        if (!(ifBlock.get(ifBlock.size() - 1) instanceof Return)) {
+            UnconditionalJump exitIfJump = new UnconditionalJump(endIfLabel);
+            ifStructure.add(exitIfJump);       
+        }
         
         if (ctx.senao() != null) {
             ifStructure.add(falseIfLabel);
@@ -358,8 +362,10 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             
             ifStructure.addAll(elseBlock);
             
-            UnconditionalJump exitElseJump = new UnconditionalJump(endIfLabel);
-            ifStructure.add(exitElseJump);
+            if (!(elseBlock.get(elseBlock.size() - 1) instanceof Return)) {
+                UnconditionalJump exitElseJump = new UnconditionalJump(endIfLabel);
+                ifStructure.add(exitElseJump);
+            }
         }
         
         ifStructure.add(endIfLabel);

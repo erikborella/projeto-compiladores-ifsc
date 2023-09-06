@@ -10,6 +10,8 @@ public class ScopeManager {
 
     private final Stack<Scope> scopeStack;
     private final HashMap<String, Function> declaredFunctions;
+    
+    private HashMap<String, Integer> declaredVariablesTable;
 
     public ScopeManager() {
         this.scopeStack = new Stack<>();
@@ -29,18 +31,29 @@ public class ScopeManager {
     public void startScope() {
         Scope currentScope = this.getCurrentScope();
         Scope newScope = new Scope(currentScope);
+        
+        if (currentScope == null) {
+            this.declaredVariablesTable = new HashMap<>();
+        }
 
         this.scopeStack.push(newScope);
     }
 
     public void finishScope() {
         this.scopeStack.pop();
+        
+        if (this.scopeStack.empty()) {
+            this.declaredVariablesTable = null;
+        }
     }
 
     public void declareVariable(Variable variable) {
         Scope currentScope = this.getCurrentScope();
 
         currentScope.getDeclaredVariables().put(variable.name(), variable);
+        
+        int variableNameUseCount = this.declaredVariablesTable.getOrDefault(variable.name(), -1);
+        this.declaredVariablesTable.put(variable.name(), variableNameUseCount + 1);
     }
 
     public Variable getDeclaredVariable(String variableName) {
@@ -49,13 +62,25 @@ public class ScopeManager {
         while (scope != null) {
             HashMap<String, Variable> declaredVariables = scope.getDeclaredVariables();
 
-            if (declaredVariables.containsKey(variableName))
-                return declaredVariables.get(variableName);
-
+            if (declaredVariables.containsKey(variableName)) {
+                Variable declaredVariable = declaredVariables.get(variableName);
+                return this.getVariableWithoutNameConflit(declaredVariable);
+            }
+            
             scope = scope.getParent();
         }
 
         return null;
+    }
+    
+    public Variable getVariableWithoutNameConflit(Variable variable) {
+        int varibleNameUseCount = this.declaredVariablesTable.get(variable.name());
+        
+        if (varibleNameUseCount == 0)
+            return variable;
+        
+        String resolvedName = variable.name() + String.valueOf(varibleNameUseCount);
+        return new Variable(variable.type(), resolvedName);
     }
 
     public boolean isVariableDeclared(String variableName) {
