@@ -2,7 +2,6 @@ package ifsc.compiladores.projeto.LLVM.generator;
 
 import ifsc.compiladores.projeto.LLVM.Fragment;
 import ifsc.compiladores.projeto.LLVM.FragmentBlock;
-import ifsc.compiladores.projeto.LLVM.LabeledFragmentBlock;
 import ifsc.compiladores.projeto.LLVM.ReturnableFragmentBlock;
 import ifsc.compiladores.projeto.LLVM.definitions.Alloca;
 import ifsc.compiladores.projeto.LLVM.definitions.GetElementPtr;
@@ -97,9 +96,15 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         }
 
         FragmentBlock functionBody = visitBloco(ctx.bloco());
-        function.getBody().addAll(functionBody);
 
         this.scopeManager.finishScope();
+        
+        if (functionBody.isEmpty() || !(functionBody.get(functionBody.size()-1) instanceof Return)) {
+            Return lastFunctionReturn = this.getDefaultLastFunctionReturn(function.getReturnType());
+            functionBody.add(lastFunctionReturn);
+        }
+        
+        function.getBody().addAll(functionBody);
 
         return function;
     }
@@ -164,11 +169,25 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         this.singleUseVariablesManager.resetVariables();
 
         FragmentBlock functionBody = visitBloco(ctx.bloco());
-        mainFunction.getBody().addAll(functionBody);
 
         this.scopeManager.finishScope();
+        
+        if (functionBody.isEmpty() || !(functionBody.get(functionBody.size()-1) instanceof Return)) {
+            Return lastFunctionReturn = this.getDefaultLastFunctionReturn(type);
+            functionBody.add(lastFunctionReturn);
+        }
+        
+        mainFunction.getBody().addAll(functionBody);
 
         return mainFunction;
+    }
+    
+    private Return getDefaultLastFunctionReturn(Type returnType) {
+        if (returnType.getBaseType() == BaseType.VOID) {
+            return Return.asVoid();
+        }
+        
+        return new Return(Variable.asConstant(returnType, String.valueOf(0)));
     }
 
     @Override
@@ -348,7 +367,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
                 
         ifStructure.addAll(ifBlock);
         
-        if (!(ifBlock.get(ifBlock.size() - 1) instanceof Return)) {
+        if (ifBlock.isEmpty() || !(ifBlock.get(ifBlock.size() - 1) instanceof Return)) {
             UnconditionalJump exitIfJump = new UnconditionalJump(endIfLabel);
             ifStructure.add(exitIfJump);       
         }
@@ -362,7 +381,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             
             ifStructure.addAll(elseBlock);
             
-            if (!(elseBlock.get(elseBlock.size() - 1) instanceof Return)) {
+            if (elseBlock.isEmpty() || !(elseBlock.get(elseBlock.size() - 1) instanceof Return)) {
                 UnconditionalJump exitElseJump = new UnconditionalJump(endIfLabel);
                 ifStructure.add(exitElseJump);
             }
@@ -404,7 +423,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         
         whileStructure.addAll(whileBlock);
         
-        if (!(whileBlock.get(whileBlock.size() - 1) instanceof Return)) {
+        if (whileBlock.isEmpty() || !(whileBlock.get(whileBlock.size() - 1) instanceof Return)) {
             UnconditionalJump exitIfJump = new UnconditionalJump(whileHeadLabel);
             whileStructure.add(exitIfJump);
         }
@@ -451,7 +470,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
         forStructure.addAll(forBlock);
 
-        if (!(forBlock.get(forBlock.size() - 1) instanceof Return)) {
+        if (forBlock.isEmpty() || !(forBlock.get(forBlock.size() - 1) instanceof Return)) {
             if (ctx.atribuicaoFinal != null) {
                 for (ParserGrammar.AtribuicaoContext attribution : ctx.atribuicaoFinal.atribuicao()) {
                     FragmentBlock attributionBlock = visitAtribuicao(attribution);
