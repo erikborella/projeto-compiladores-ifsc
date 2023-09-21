@@ -8,7 +8,11 @@ public enum OperationType implements Fragment{
     SUBTRACTION("sub"),
     MULTIPLICATION("mul"),
     DIVISION("sdiv"),
-    MOD("srem");
+    MOD("srem"),
+    
+    AND("and"),
+    OR("or"),
+    XOR("xor");
     
     private final String type;
 

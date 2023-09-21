@@ -9,6 +9,7 @@ import ifsc.compiladores.projeto.LLVM.definitions.Label;
 import ifsc.compiladores.projeto.LLVM.definitions.Load;
 import ifsc.compiladores.projeto.LLVM.definitions.Store;
 import ifsc.compiladores.projeto.LLVM.definitions.Variable;
+import ifsc.compiladores.projeto.LLVM.definitions.conversions.ConversionCreator;
 import ifsc.compiladores.projeto.LLVM.definitions.expressions.Constant;
 import ifsc.compiladores.projeto.LLVM.definitions.expressions.Operation;
 import ifsc.compiladores.projeto.LLVM.definitions.expressions.OperationType;
@@ -312,8 +313,15 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
         ReturnableFragmentBlock expressionReturn = (ReturnableFragmentBlock) visitExpressao(ctx.complemento().expressao());
         attribuition.addAll(expressionReturn.getFragmentBlock());
+        
+        ReturnableFragmentBlock expressionConversion = ConversionCreator.convert(
+                this.singleUseVariablesManager,
+                expressionReturn.getReturnVariable(),
+                storeId.type().getNewDeferencePointerOfThis()
+        );
+        attribuition.addAll(expressionConversion.getFragmentBlock());
 
-        Store idStore = new Store(expressionReturn.getReturnVariable(), storeId);
+        Store idStore = new Store(expressionConversion.getReturnVariable(), storeId);
         attribuition.add(idStore);
 
         return attribuition;
@@ -701,6 +709,33 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         
         return term;
     }
+
+    @Override
+    public ReturnableFragmentBlock visitFatorNegacaoFator(ParserGrammar.FatorNegacaoFatorContext ctx) {
+        ReturnableFragmentBlock negatedFator = new ReturnableFragmentBlock();
+        
+        ReturnableFragmentBlock fator = (ReturnableFragmentBlock) visit(ctx.fator());
+        
+        if (fator.getReturnVariable().type().getBaseType() != BaseType.BOOLEAN) {
+            throw new IllegalStateException("Operador de negação só pode ser aplicado em expressões booleanas");
+        }
+        
+        negatedFator.getFragmentBlock().addAll(fator.getFragmentBlock());
+        
+        Variable returnVariable = this.singleUseVariablesManager.getNewVariableOfType(new Type(BaseType.BOOLEAN));
+        
+        Operation negation = new Operation(
+                OperationType.XOR,
+                returnVariable,
+                fator.getReturnVariable(),
+                Variable.asConstant(new Type(BaseType.BOOLEAN), "true")
+        );
+        
+        negatedFator.getFragmentBlock().add(negation);
+        negatedFator.setReturnVariable(returnVariable);
+        
+        return negatedFator;
+    } 
 
     @Override
     public Fragment visitFatorExpressao(ParserGrammar.FatorExpressaoContext ctx) {
