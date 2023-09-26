@@ -10,6 +10,7 @@ import ifsc.compiladores.projeto.LLVM.definitions.Load;
 import ifsc.compiladores.projeto.LLVM.definitions.Store;
 import ifsc.compiladores.projeto.LLVM.definitions.Variable;
 import ifsc.compiladores.projeto.LLVM.definitions.conversions.ConversionCreator;
+import ifsc.compiladores.projeto.LLVM.definitions.conversions.NormalizedVariablesReturnableFragmentBlock;
 import ifsc.compiladores.projeto.LLVM.definitions.expressions.Constant;
 import ifsc.compiladores.projeto.LLVM.definitions.expressions.Operation;
 import ifsc.compiladores.projeto.LLVM.definitions.expressions.OperationType;
@@ -600,16 +601,24 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
                 expression.getFragmentBlock().addAll(op2Expression.getFragmentBlock());
                 i++;
                 
-                String returnVariableName = this.singleUseVariablesManager.getNewVariableName();
-                
                 Variable op1 = expression.getReturnVariable();
                 Variable op2 = op2Expression.getReturnVariable();
+                
+                NormalizedVariablesReturnableFragmentBlock variablesConversion = ConversionCreator.normalize(
+                    this.singleUseVariablesManager,
+                    op1,
+                    op2
+                );
+                
+                expression.getFragmentBlock().addAll(variablesConversion.getNormalizationBlock());
+                
+                String returnVariableName = this.singleUseVariablesManager.getNewVariableName();
                 
                 IntegerComparison comparison = new IntegerComparison(
                         comparisonType,
                         returnVariableName,
-                        op1,
-                        op2
+                        variablesConversion.getV1Normalized(),
+                        variablesConversion.getV2Normalized()
                 );
                 
                 expression.getFragmentBlock().add(comparison);
@@ -662,18 +671,26 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
                 ReturnableFragmentBlock op2Expression = (ReturnableFragmentBlock) visit(ctx.getChild(i+1));
                 expression.getFragmentBlock().addAll(op2Expression.getFragmentBlock());
                 i++;
-
-                Variable returnVariable = this.singleUseVariablesManager.getNewVariableOfType(
-                    expression.getReturnVariable().type());
                 
                 Variable op1 = expression.getReturnVariable();
                 Variable op2 = op2Expression.getReturnVariable();
                 
+                NormalizedVariablesReturnableFragmentBlock variablesConversion = ConversionCreator.normalize(
+                    this.singleUseVariablesManager,
+                    op1,
+                    op2
+                );
+                
+                expression.getFragmentBlock().addAll(variablesConversion.getNormalizationBlock());
+                
+                Variable returnVariable = this.singleUseVariablesManager.getNewVariableOfType(
+                    variablesConversion.getV1Normalized().type());
+                
                 Operation operation = new Operation(
-                        operationType, 
-                        returnVariable, 
-                        op1, 
-                        op2);
+                        operationType,
+                        returnVariable,
+                        variablesConversion.getV1Normalized(),
+                        variablesConversion.getV2Normalized());
                 
                 expression.getFragmentBlock().add(operation);
                 expression.setReturnVariable(operation.getReturnVariable());
