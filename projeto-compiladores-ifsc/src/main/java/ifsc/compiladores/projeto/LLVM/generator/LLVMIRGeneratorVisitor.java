@@ -800,6 +800,8 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         Constant constant = switch (constantToken.getType()) {
             case ParserGrammar.NUM_INT -> new Constant(BaseType.INT, constantToken.getText());
             case ParserGrammar.NUM_DEC -> new Constant(BaseType.FLOAT, constantToken.getText());
+            case ParserGrammar.TRUE -> new Constant(BaseType.BOOLEAN, "true");
+            case ParserGrammar.FALSE -> new Constant(BaseType.BOOLEAN, "false");
             default -> throw new IllegalStateException("Invalid type");
         };
 

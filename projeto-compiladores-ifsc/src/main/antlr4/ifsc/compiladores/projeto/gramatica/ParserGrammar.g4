@@ -195,6 +195,8 @@ sinal
 constante
     : NUM_INT
     | NUM_DEC
+    | TRUE
+    | FALSE
     ;
     
 acesso_id

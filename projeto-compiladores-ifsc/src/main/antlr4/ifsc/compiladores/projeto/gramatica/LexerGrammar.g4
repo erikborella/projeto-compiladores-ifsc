@@ -55,6 +55,9 @@ OP_ATRIBUICAO : '=' ;
 NUM_INT : [0-9]+ ;
 NUM_DEC : [0-9]+'.'[0-9]+;
 
+TRUE: 'true';
+FALSE: 'false';
+
 ID: [a-zA-Z_][a-zA-Z_0-9]* ;
 WS: [ \t\n\r\f]+ -> skip ;
 
