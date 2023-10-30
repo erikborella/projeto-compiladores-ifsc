@@ -27,6 +27,7 @@ import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
 import ifsc.compiladores.projeto.LLVM.scopeManager.LabelManager;
 import ifsc.compiladores.projeto.LLVM.scopeManager.ScopeManager;
 import ifsc.compiladores.projeto.LLVM.scopeManager.SingleUseVariablesManager;
+import ifsc.compiladores.projeto.LLVM.scopeManager.StringManager;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammarBaseVisitor;
 import org.antlr.v4.runtime.Token;
@@ -43,11 +44,17 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     private final ScopeManager scopeManager;
     private final SingleUseVariablesManager singleUseVariablesManager;
     private final LabelManager labelManager;
+    
+    private final StringManager stringManager;
+    private final LLVMStringCreator stringCreator;
 
     public LLVMIRGeneratorVisitor() {
         this.scopeManager = new ScopeManager();
         this.singleUseVariablesManager = new SingleUseVariablesManager();
         this.labelManager = new LabelManager();
+        
+        this.stringManager = new StringManager();
+        this.stringCreator = new LLVMStringCreator(this.stringManager);
     }
 
     @Override
@@ -61,6 +68,8 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         }
 
         program.add(visitPrincipal(ctx.principal()));
+        
+        program.addAll(this.stringCreator.getStringsDeclaration());
 
         return program;
     }
@@ -302,6 +311,18 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
    
         return functionCallExpresion;
     } 
+
+    @Override
+    public FragmentBlock visitComandoLinhaEscrita(ParserGrammar.ComandoLinhaEscritaContext ctx) {
+        FragmentBlock printlnExpression = new FragmentBlock();
+        
+        String newLineStringTemplate = ctx.escrita().TEXTO().getText() + "\\0A";
+        newLineStringTemplate = newLineStringTemplate.replace("\"", "");
+        
+        Variable stringVariable = this.stringCreator.declareLLVMString(newLineStringTemplate);
+        
+        return printlnExpression;
+    }
     
     @Override
     public FragmentBlock visitAtribuicao(ParserGrammar.AtribuicaoContext ctx) {

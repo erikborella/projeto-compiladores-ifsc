@@ -81,7 +81,7 @@ dimensao2
     ;
 
 escrita
-    : PRINTLN PARENTESE_ABRE termoescrita (VIRGULA termoescrita)* PARENTESE_FECHA
+    : PRINTLN PARENTESE_ABRE TEXTO (VIRGULA termoescrita)* PARENTESE_FECHA
     ;
 
 termoescrita
