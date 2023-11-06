@@ -26,10 +26,10 @@ public class StringManager {
         Type stringType = new Type(BaseType.CHAR);
         stringType.getDimensions().add(irStringLen);
         
-        String variableName = ".str" + stringsCount;
+        String variableName = "@.str" + stringsCount;
         this.stringsCount++;
         
-        Variable newStringVariable = new Variable(stringType, variableName, true);
+        Variable newStringVariable = Variable.asConstant(stringType, variableName);
         
         this.strings.put(str, newStringVariable);
         

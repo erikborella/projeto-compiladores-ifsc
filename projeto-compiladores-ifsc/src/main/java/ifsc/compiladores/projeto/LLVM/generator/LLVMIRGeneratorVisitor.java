@@ -20,6 +20,8 @@ import ifsc.compiladores.projeto.LLVM.definitions.expressions.comparisons.Intege
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Function;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.FunctionCall;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Parameter;
+import ifsc.compiladores.projeto.LLVM.definitions.io.Println;
+import ifsc.compiladores.projeto.LLVM.definitions.io.PrintlnDeclaration;
 import ifsc.compiladores.projeto.LLVM.definitions.jumps.ConditionalJump;
 import ifsc.compiladores.projeto.LLVM.definitions.jumps.UnconditionalJump;
 import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
@@ -70,6 +72,8 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         program.add(visitPrincipal(ctx.principal()));
         
         program.addAll(this.stringCreator.getStringsDeclaration());
+        
+        program.add(new PrintlnDeclaration());
 
         return program;
     }
@@ -321,7 +325,47 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         
         Variable stringVariable = this.stringCreator.declareLLVMString(newLineStringTemplate);
         
+        ArrayList<Variable> arguments = new ArrayList<>();
+        
+        for (ParserGrammar.TermoescritaContext termoescritaContext : ctx.escrita().termoescrita()) {
+            ReturnableFragmentBlock writeTerm = (ReturnableFragmentBlock) visit(termoescritaContext);
+            
+            printlnExpression.addAll(writeTerm.getFragmentBlock());
+            arguments.add(writeTerm.getReturnVariable());
+        }
+        
+        Println printlnCall = new Println(
+                this.singleUseVariablesManager.getNewVariableOfType(new Type(BaseType.INT)),
+                stringVariable, 
+                arguments
+        );
+        
+        printlnExpression.add(printlnCall);
+        
         return printlnExpression;
+    }
+
+    @Override
+    public ReturnableFragmentBlock visitTermoEscritaTexto(ParserGrammar.TermoEscritaTextoContext ctx) {
+        String str = ctx.TEXTO().getText();
+        str = str.replace("\"", "");
+        
+        Variable stringVariable = this.stringCreator.declareLLVMString(str);
+        
+        Variable argumentStringVariable = Variable.asConstant(
+                new Type(BaseType.CHAR, 1), 
+                stringVariable.name()
+        );
+        
+        ReturnableFragmentBlock stringBlock = new ReturnableFragmentBlock();
+        stringBlock.setReturnVariable(argumentStringVariable);
+        
+        return stringBlock;
+    }
+
+    @Override
+    public ReturnableFragmentBlock visitTermoEscritaExpressao(ParserGrammar.TermoEscritaExpressaoContext ctx) {
+        return (ReturnableFragmentBlock) visitExpressao(ctx.expressao());
     }
     
     @Override

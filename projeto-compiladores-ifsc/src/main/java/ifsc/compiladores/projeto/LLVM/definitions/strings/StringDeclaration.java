@@ -14,7 +14,7 @@ public class StringDeclaration extends ReturnableFragment {
 
     @Override
     public String getText() {
-        return String.format("@%s = private constant %s c\"%s\"",
+        return String.format("%s = private constant %s c\"%s\"",
                 this.returnVariable.name(),
                 this.returnVariable.type().getText(),
                 this.str);

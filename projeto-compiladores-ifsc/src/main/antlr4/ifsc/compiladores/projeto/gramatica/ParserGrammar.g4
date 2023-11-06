@@ -85,9 +85,8 @@ escrita
     ;
 
 termoescrita
-    : ID (dimensao2)*
-    | constante
-    | TEXTO
+    : TEXTO         #TermoEscritaTexto
+    | expressao     #TermoEscritaExpressao
     ;
 
 selecao
