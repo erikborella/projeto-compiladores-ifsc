@@ -22,6 +22,8 @@ import ifsc.compiladores.projeto.LLVM.definitions.functions.FunctionCall;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Parameter;
 import ifsc.compiladores.projeto.LLVM.definitions.io.Println;
 import ifsc.compiladores.projeto.LLVM.definitions.io.PrintlnDeclaration;
+import ifsc.compiladores.projeto.LLVM.definitions.io.Scanf;
+import ifsc.compiladores.projeto.LLVM.definitions.io.ScanfDeclaration;
 import ifsc.compiladores.projeto.LLVM.definitions.jumps.ConditionalJump;
 import ifsc.compiladores.projeto.LLVM.definitions.jumps.UnconditionalJump;
 import ifsc.compiladores.projeto.LLVM.definitions.types.BaseType;
@@ -74,7 +76,8 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         program.addAll(this.stringCreator.getStringsDeclaration());
         
         program.add(new PrintlnDeclaration());
-
+        program.add(new ScanfDeclaration());
+        
         return program;
     }
     
@@ -317,13 +320,42 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     } 
 
     @Override
-    public FragmentBlock visitComandoLinhaEscrita(ParserGrammar.ComandoLinhaEscritaContext ctx) {
+    public FragmentBlock visitComandoLinhaEscritaLn(ParserGrammar.ComandoLinhaEscritaLnContext ctx) {
         FragmentBlock printlnExpression = new FragmentBlock();
         
-        String newLineStringTemplate = ctx.escrita().TEXTO().getText() + "\\0A";
+        String newLineStringTemplate = ctx.escritaln().TEXTO().getText() + "\\0A";
         newLineStringTemplate = newLineStringTemplate.replace("\"", "");
         
         Variable stringVariable = this.stringCreator.declareLLVMString(newLineStringTemplate);
+        
+        ArrayList<Variable> arguments = new ArrayList<>();
+        
+        for (ParserGrammar.TermoescritaContext termoescritaContext : ctx.escritaln().termoescrita()) {
+            ReturnableFragmentBlock writeTerm = (ReturnableFragmentBlock) visit(termoescritaContext);
+            
+            printlnExpression.addAll(writeTerm.getFragmentBlock());
+            arguments.add(writeTerm.getReturnVariable());
+        }
+        
+        Println printlnCall = new Println(
+                this.singleUseVariablesManager.getNewVariableOfType(new Type(BaseType.INT)),
+                stringVariable, 
+                arguments
+        );
+        
+        printlnExpression.add(printlnCall);
+        
+        return printlnExpression;
+    }
+    
+    @Override
+    public FragmentBlock visitComandoLinhaEscrita(ParserGrammar.ComandoLinhaEscritaContext ctx) {
+        FragmentBlock printlnExpression = new FragmentBlock();
+        
+        String stringTemplate = ctx.escrita().TEXTO().getText();
+        stringTemplate = stringTemplate.replace("\"", "");
+        
+        Variable stringVariable = this.stringCreator.declareLLVMString(stringTemplate);
         
         ArrayList<Variable> arguments = new ArrayList<>();
         
@@ -344,7 +376,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         
         return printlnExpression;
     }
-
+ 
     @Override
     public ReturnableFragmentBlock visitTermoEscritaTexto(ParserGrammar.TermoEscritaTextoContext ctx) {
         String str = ctx.TEXTO().getText();
@@ -366,6 +398,41 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
     @Override
     public ReturnableFragmentBlock visitTermoEscritaExpressao(ParserGrammar.TermoEscritaExpressaoContext ctx) {
         return (ReturnableFragmentBlock) visitExpressao(ctx.expressao());
+    }
+
+    @Override
+    public FragmentBlock visitComandoLinhaLeitura(ParserGrammar.ComandoLinhaLeituraContext ctx) {
+        FragmentBlock scanfExpression = new FragmentBlock();
+        
+        ReturnableFragmentBlock idAccess = (ReturnableFragmentBlock) visit(ctx.leitura().acesso_id());
+        scanfExpression.addAll(idAccess.getFragmentBlock());
+        
+        Variable scanVariable = idAccess.getReturnVariable();
+        
+        if (scanVariable.type().isArrayType()) {
+            throw new IllegalStateException(String.format("O termo de leitura não pode ser um array: \"%s\"",
+                   ctx.leitura().acesso_id().getText()));
+        }
+        
+        String scanfTemplate;
+        if (scanVariable.type().getBaseType() == BaseType.FLOAT) {
+            scanfTemplate = "%f";
+        }
+        else {
+            scanfTemplate = "%d";
+        }
+        
+        Variable scanfTemplateVariable = this.stringCreator.declareLLVMString(scanfTemplate);
+        
+        Scanf scanf = new Scanf(
+                this.singleUseVariablesManager.getNewVariableOfType(new Type(BaseType.INT)),
+                scanfTemplateVariable,
+                scanVariable
+        );
+        
+        scanfExpression.add(scanf);
+        
+        return scanfExpression;
     }
     
     @Override

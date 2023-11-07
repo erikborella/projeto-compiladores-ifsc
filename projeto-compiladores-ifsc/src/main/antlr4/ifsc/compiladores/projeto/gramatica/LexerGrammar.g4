@@ -3,6 +3,7 @@ lexer grammar LexerGrammar;
 MAIN : 'main' ;
 SCANF : 'scanf' ;
 PRINTLN : 'println' ;
+PRINT : 'print' ;
 IF : 'if' ;
 ELSE : 'else' ;
 WHILE : 'while' ;
