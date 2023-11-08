@@ -1,0 +1,132 @@
+void iniciarTabuleiro(int[3][3] tabuleiro) {
+    int i, j;
+
+    for (i = 0; i < 3; i = i + 1) {
+        for (j = 0; j < 3; j = j + 1) {
+            tabuleiro[i][j] = 0;
+        }
+    }
+}
+
+void imprimeTabuleiro(int[3][3] tabuleiro) {
+    int i, j, count;
+
+    count = 1;
+
+    for (i = 0; i < 3; i = i + 1) {
+        for (j = 0; j < 3; j = j + 1) {
+            int cel;
+
+            cel = tabuleiro[i][j];
+
+            if (cel == 0) {
+                print(" %d", count);
+            }
+            else {
+                if (cel == 1) {
+                    print(" x");
+                }
+                else {
+                    print(" o");
+                }
+            }
+
+            if (j < 2) {
+                print(" |");
+            }
+
+            count = count + 1;
+        }
+
+        println("");
+    }
+}
+
+void jogar(int[3][3] tabuleiro, boolean jogadorTurno1, int posicao) {
+    int i, j, peca;
+
+    i = posicao / 3;
+    j = posicao % 3;
+
+    if (jogadorTurno1 == true) {
+        peca = 1;
+    }
+    else {
+        peca = -1;
+    }
+
+
+    tabuleiro[i][j] = peca;
+}
+
+int verificarGanhador(int[3][3] tabuleiro) {
+    if (tabuleiro[0][0] == 1 && tabuleiro[0][1] == 1 && tabuleiro[0][2] == 1 ||
+        tabuleiro[1][0] == 1 && tabuleiro[1][1] == 1 && tabuleiro[1][2] == 1 ||
+        tabuleiro[2][0] == 1 && tabuleiro[2][1] == 1 && tabuleiro[2][2] == 1 ||
+        tabuleiro[0][0] == 1 && tabuleiro[1][0] == 1 && tabuleiro[2][0] == 1 ||
+        tabuleiro[0][1] == 1 && tabuleiro[1][1] == 1 && tabuleiro[2][1] == 1 ||
+        tabuleiro[0][2] == 1 && tabuleiro[1][2] == 1 && tabuleiro[2][2] == 1 ||
+        tabuleiro[0][0] == 1 && tabuleiro[1][1] == 1 && tabuleiro[2][2] == 1 ||
+        tabuleiro[0][2] == 1 && tabuleiro[1][1] == 1 && tabuleiro[2][0] == 1) 
+    {
+        return 1;   
+    }
+
+    if (tabuleiro[0][0] == -1 && tabuleiro[0][1] == -1 && tabuleiro[0][2] == -1 ||
+        tabuleiro[1][0] == -1 && tabuleiro[1][1] == -1 && tabuleiro[1][2] == -1 ||
+        tabuleiro[2][0] == -1 && tabuleiro[2][1] == -1 && tabuleiro[2][2] == -1 ||
+        tabuleiro[0][0] == -1 && tabuleiro[1][0] == -1 && tabuleiro[2][0] == -1 ||
+        tabuleiro[0][1] == -1 && tabuleiro[1][1] == -1 && tabuleiro[2][1] == -1 ||
+        tabuleiro[0][2] == -1 && tabuleiro[1][2] == -1 && tabuleiro[2][2] == -1 ||
+        tabuleiro[0][0] == -1 && tabuleiro[1][1] == -1 && tabuleiro[2][2] == -1 ||
+        tabuleiro[0][2] == -1 && tabuleiro[1][1] == -1 && tabuleiro[2][0] == -1) 
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
+main() {
+    int[3][3] tabuleiro;
+    boolean jogadorTurno1, jogoEstaFinalizado;
+    int posicao;
+
+    jogadorTurno1 = true;
+    jogoEstaFinalizado = false;
+
+    func iniciarTabuleiro(tabuleiro);
+
+    while (jogoEstaFinalizado != true) {
+        int estado;
+
+        func imprimeTabuleiro(tabuleiro);
+        
+        if (jogadorTurno1 == true) {
+            println("Jogador X digite aonde deseja jogar: ");
+        } else {
+            println("Jogador O digite aonde deseja jogar: ");
+        }
+        
+        scanf(posicao);
+
+        posicao = posicao - 1;
+
+        func jogar(tabuleiro, jogadorTurno1, posicao);
+
+        jogadorTurno1 = !jogadorTurno1;
+
+        estado = func verificarGanhador(tabuleiro);
+
+        if (estado == 1) {
+            println("X ganhou!!!");
+            jogoEstaFinalizado = true;
+        }
+        
+        if (estado == -1) {
+            println("O ganhou!!!");
+            jogoEstaFinalizado = true;
+        }
+
+    }
+}
