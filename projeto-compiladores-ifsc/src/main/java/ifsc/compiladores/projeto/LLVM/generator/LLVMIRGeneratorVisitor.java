@@ -102,7 +102,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         String functionName = ctx.ID().getText();
         Function function = this.scopeManager.getDeclaredFunction(functionName);
 
-        this.scopeManager.startScope();
+        this.scopeManager.startScope(function.getReturnType());
         this.singleUseVariablesManager.resetVariables();
 
         if (ctx.parametros() != null) {
@@ -183,7 +183,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         
         Function mainFunction = new Function(type, name);
         
-        this.scopeManager.startScope();
+        this.scopeManager.startScope(type);
         this.singleUseVariablesManager.resetVariables();
 
         FragmentBlock functionBody = visitBloco(ctx.bloco());
@@ -473,7 +473,14 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         ReturnableFragmentBlock expression = (ReturnableFragmentBlock) visit(ctx.expressao());
         returnBlock.addAll(expression.getFragmentBlock());
         
-        Return returnExpression = new Return(expression.getReturnVariable());
+        ReturnableFragmentBlock expressionConversion = ConversionCreator.convert(
+                this.singleUseVariablesManager,
+                expression.getReturnVariable(),
+                this.scopeManager.getScopeReturnType()
+        );
+        returnBlock.addAll(expressionConversion.getFragmentBlock());
+        
+        Return returnExpression = new Return(expressionConversion.getReturnVariable());
         returnBlock.add(returnExpression);
         
         return returnBlock;

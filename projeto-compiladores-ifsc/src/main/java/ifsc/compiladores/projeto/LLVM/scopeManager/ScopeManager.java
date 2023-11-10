@@ -2,6 +2,7 @@ package ifsc.compiladores.projeto.LLVM.scopeManager;
 
 import ifsc.compiladores.projeto.LLVM.definitions.Variable;
 import ifsc.compiladores.projeto.LLVM.definitions.functions.Function;
+import ifsc.compiladores.projeto.LLVM.definitions.types.Type;
 
 import java.util.HashMap;
 import java.util.Stack;
@@ -29,13 +30,17 @@ public class ScopeManager {
     }
 
     public void startScope() {
+        this.startScope(null);
+    }
+    
+    public void startScope(Type returnType) {
         Scope currentScope = this.getCurrentScope();
-        Scope newScope = new Scope(currentScope);
+        Scope newScope = new Scope(currentScope, returnType);
         
         if (currentScope == null) {
             this.declaredVariablesTable = new HashMap<>();
         }
-
+        
         this.scopeStack.push(newScope);
     }
 
@@ -107,5 +112,21 @@ public class ScopeManager {
             return null;
 
         return this.scopeStack.peek();
+    }
+    
+    public Type getScopeReturnType() {
+        Scope scope = this.getCurrentScope();
+        
+        while (scope != null) {
+            Type returnType = scope.getReturnType();
+            
+            if (returnType != null) {
+                return returnType;
+            }
+            
+            scope = scope.getParent();
+        }
+        
+        return null;
     }
 }
