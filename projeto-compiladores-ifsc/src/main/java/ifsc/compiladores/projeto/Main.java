@@ -10,12 +10,12 @@ import ifsc.compiladores.projeto.LLVM.generator.LLVMIRGeneratorVisitor;
 import ifsc.compiladores.projeto.gramatica.LexerGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar.ProgramaContext;
+import java.io.File;
 import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import picocli.CommandLine;
-
 
 import javax.swing.*;
 
@@ -26,41 +26,35 @@ import javax.swing.*;
         description = "Compile the executable to LLVM IR"
 )
 public class Main implements Callable<Integer> {
-
     @CommandLine.Option(names = {"-t", "--showTree"}, description = "Display the parse tree")
     private boolean showTree;
+    
+    @CommandLine.Parameters(index = "0", description = "The file to be compiled", arity = "0")
+    private File file;
 
     @Override
     public Integer call() {
         Scanner scanner = new Scanner(System.in);
+        
+        System.out.println(file);
 
         while (true) {
             StringBuilder inputBuilder = new StringBuilder();
-//            System.out.println("Enter your code (type '--stop' to stop and compile the input or '--exit' to exit the program): ");
-//            while (true) {
-//                String line = scanner.nextLine();
-//
-//                if (line.trim().equalsIgnoreCase("--exit")) {
-//                    return 0;
-//                }
-//
-//                if (line.trim().equalsIgnoreCase("--stop")) {
-//                    break;
-//                }
-//
-//                inputBuilder.append(line).append(System.lineSeparator());
-//            }
+            System.out.println("Enter your code (type '--stop' to stop and compile the input or '--exit' to exit the program): ");
+            while (true) {
+                String line = scanner.nextLine();
 
-            inputBuilder.append("""
-                    int test() {
-                        int a, b;
-                        
-                        a = 10;
-                        b = 5;
-                        b = a;
-                    }
-                    """);
+                if (line.trim().equalsIgnoreCase("--exit")) {
+                    return 0;
+                }
 
+                if (line.trim().equalsIgnoreCase("--stop")) {
+                    break;
+                }
+
+                inputBuilder.append(line).append(System.lineSeparator());
+            }
+            
             String input = inputBuilder.toString().trim();
             if (input.isEmpty()) {
                 System.out.println("No input detected. Exiting...");
@@ -82,11 +76,9 @@ public class Main implements Callable<Integer> {
             if (showTree) {
                 showTree(parser, programaContext);
             }
-
-            scanner.next();
         }
     }
-
+    
     private static void showTree(ParserGrammar parser, ParseTree tree) {
         JFrame frame = new JFrame("Antlr Parser Tree");
         JPanel panel = new JPanel();
@@ -108,7 +100,7 @@ public class Main implements Callable<Integer> {
 
         frame.setVisible(true);
     }
-
+    
     public static void main(String[] args) {
         int exitCode = new CommandLine(new Main()).execute(args);
         System.exit(exitCode);
