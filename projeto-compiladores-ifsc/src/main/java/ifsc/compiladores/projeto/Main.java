@@ -11,6 +11,9 @@ import ifsc.compiladores.projeto.gramatica.LexerGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar.ProgramaContext;
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.file.Files;
 import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -26,18 +29,70 @@ import javax.swing.*;
         description = "Compile the executable to LLVM IR"
 )
 public class Main implements Callable<Integer> {
+    
+    static class FileArgs {
+        @CommandLine.Parameters(index = "0", description = "The file to be compiled")
+        private File inputFile;
+        
+        @CommandLine.Option(
+                names = { "-o", "--out", "--outFile" },
+                paramLabel = "OutputFile",
+                description = "Specify the output file, if not set it will be send to stdout")
+        private File outputFile;
+    }
+
+    
     @CommandLine.Option(names = {"-t", "--showTree"}, description = "Display the parse tree")
     private boolean showTree;
     
-    @CommandLine.Parameters(index = "0", description = "The file to be compiled", arity = "0")
-    private File file;
+    @CommandLine.ArgGroup(exclusive = false)
+    private FileArgs fileArgs;
 
     @Override
-    public Integer call() {
+    public Integer call() throws IOException {
+        if (this.fileArgs == null)
+            runInteractiveCompiler();
+        
+        String code = new String(Files.readAllBytes(this.fileArgs.inputFile.toPath()));
+        
+        String input = code.trim();
+        
+        LexerGrammar lexer = new LexerGrammar(CharStreams.fromString(input));
+        CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+        ParserGrammar parser = new ParserGrammar(tokenStream);
+
+        ProgramaContext programaContext = parser.programa();
+
+        LLVMIRGeneratorVisitor visitor = new LLVMIRGeneratorVisitor();
+
+        Fragment program = visitor.visitPrograma(programaContext);
+        
+        String irProgram = program.getText();
+        
+        PrintStream outStream;
+        
+        if (this.fileArgs.outputFile == null) {
+            outStream = System.out;
+        }
+        else {
+            outStream = new PrintStream(this.fileArgs.outputFile);
+        }
+        
+        outStream.print(irProgram);
+        
+        outStream.close();
+
+        if (showTree) {
+            showTree(parser, programaContext);
+            new Scanner(System.in).nextLine();
+        }
+
+        return 0;
+    }
+    
+    private int runInteractiveCompiler() {
         Scanner scanner = new Scanner(System.in);
         
-        System.out.println(file);
-
         while (true) {
             StringBuilder inputBuilder = new StringBuilder();
             System.out.println("Enter your code (type '--stop' to stop and compile the input or '--exit' to exit the program): ");
