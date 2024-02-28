@@ -798,15 +798,6 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             if (operatorsContextClass.stream().anyMatch(op -> child.getClass() == op)) {
                 ParserRuleContext operatorContext = (ParserRuleContext) child;
                 
-                OperationType operationType = switch (operatorContext.start.getType()) {
-                    case ParserGrammar.OP_MULTIPLICACAO -> OperationType.MULTIPLICATION;
-                    case ParserGrammar.OP_DIVISAO -> OperationType.DIVISION;
-                    case ParserGrammar.OP_RESTO_DIVISAO -> OperationType.MOD;
-                    case ParserGrammar.SINAL_MAIS -> OperationType.ADD;
-                    case ParserGrammar.SINAL_MENOS -> OperationType.SUBTRACTION;
-                    default -> throw new IllegalStateException("Invalid operation type");
-                };
-                
                 ReturnableFragmentBlock op2Expression = (ReturnableFragmentBlock) visit(ctx.getChild(i+1));
                 expression.getFragmentBlock().addAll(op2Expression.getFragmentBlock());
                 i++;
@@ -821,6 +812,11 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
                 );
                 
                 expression.getFragmentBlock().addAll(variablesConversion.getNormalizationBlock());
+                
+                boolean isFloatOperation = variablesConversion.getV1Normalized().type().getBaseType() == BaseType.FLOAT &&
+                                           variablesConversion.getV2Normalized().type().getBaseType() == BaseType.FLOAT;
+                
+                OperationType operationType = getOperationType(operatorContext, isFloatOperation);
                 
                 Variable returnVariable = this.singleUseVariablesManager.getNewVariableOfType(
                     variablesConversion.getV1Normalized().type());
@@ -843,6 +839,28 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         }
         
         return expression;
+    }
+    
+    private OperationType getOperationType(ParserRuleContext operatorContext, boolean isFloatOperation) {
+        if (isFloatOperation) {
+            return switch (operatorContext.start.getType()) {
+                case ParserGrammar.OP_MULTIPLICACAO -> OperationType.FLOAT_MULTIPLICATION;
+                case ParserGrammar.OP_DIVISAO -> OperationType.FLOAT_DIVISION;
+                case ParserGrammar.OP_RESTO_DIVISAO -> OperationType.FLOAT_MOD;
+                case ParserGrammar.SINAL_MAIS -> OperationType.FLOAT_ADD;
+                case ParserGrammar.SINAL_MENOS -> OperationType.FLOAT_SUBTRACTION;
+                default -> throw new IllegalStateException("Invalid operation type");
+            };
+        }
+        
+        return switch (operatorContext.start.getType()) {
+            case ParserGrammar.OP_MULTIPLICACAO -> OperationType.MULTIPLICATION;
+            case ParserGrammar.OP_DIVISAO -> OperationType.DIVISION;
+            case ParserGrammar.OP_RESTO_DIVISAO -> OperationType.MOD;
+            case ParserGrammar.SINAL_MAIS -> OperationType.ADD;
+            case ParserGrammar.SINAL_MENOS -> OperationType.SUBTRACTION;
+            default -> throw new IllegalStateException("Invalid operation type");
+        };
     }
 
     @Override
