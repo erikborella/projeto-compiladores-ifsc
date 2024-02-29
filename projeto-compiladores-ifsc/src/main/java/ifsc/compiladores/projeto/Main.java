@@ -100,7 +100,7 @@ public class Main implements Callable<Integer> {
                 String line = scanner.nextLine();
 
                 if (line.trim().equalsIgnoreCase("--exit")) {
-                    return 0;
+                    System.exit(0);
                 }
 
                 if (line.trim().equalsIgnoreCase("--stop")) {
