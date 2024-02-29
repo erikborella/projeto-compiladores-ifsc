@@ -41,6 +41,7 @@ import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
@@ -295,17 +296,39 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         }
         
         Function functionDefinition = this.scopeManager.getDeclaredFunction(functionName);
+        
+        boolean hasArguments = ctx.funcao().argumentos() != null && !ctx.funcao().argumentos().expressao().isEmpty();
+        int argumentsCount = (hasArguments) ? ctx.funcao().argumentos().expressao().size() : 0;
+
+        if (argumentsCount != functionDefinition.getParameters().size()) {
+            
+            String argumentsInformation = "";
+            
+            if (!functionDefinition.getParameters().isEmpty()) {
+                argumentsInformation = "\nLista de argumentos que a função precisa:\n" +
+                        functionDefinition.getParameters().stream()
+                        .map(arg -> "\t* " + arg.getVariable().type().getBaseType().toString() + " " + arg.getVariable().name())
+                        .collect(Collectors.joining("\n"));
+            }
+                                
+            throw new IllegalStateException(String.format("Função %s requer %d argumentos, mas foi chamada com %d argumentos.%s",
+                    functionName,
+                    functionDefinition.getParameters().size(),
+                    argumentsCount,
+                    argumentsInformation
+            ));
+        }
+        
+        
         ArrayList<Variable> arguments = new ArrayList<>();
         
-        if (ctx.funcao().argumentos() != null) {
-            for (int i = 0; i < ctx.funcao().argumentos().expressao().size(); i++) {
-                ParserGrammar.ExpressaoContext argumentExpression = ctx.funcao().argumentos().expressao(i);
+        for (int i = 0; i < argumentsCount; i++) {
+            ParserGrammar.ExpressaoContext argumentExpression = ctx.funcao().argumentos().expressao(i);
 
-                ReturnableFragmentBlock argument = (ReturnableFragmentBlock) visit(argumentExpression);  
-                functionCallExpresion.addAll(argument.getFragmentBlock());
+            ReturnableFragmentBlock argument = (ReturnableFragmentBlock) visit(argumentExpression);  
+            functionCallExpresion.addAll(argument.getFragmentBlock());
 
-                arguments.add(argument.getReturnVariable());
-            }
+            arguments.add(argument.getReturnVariable());
         }
         
         FunctionCall functionCall = FunctionCall.withoutReturn(
@@ -979,17 +1002,38 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         }
         
         Function functionDefinition = this.scopeManager.getDeclaredFunction(functionName);
+        
+        boolean hasArguments = ctx.argumentos() != null && !ctx.argumentos().expressao().isEmpty();
+        int argumentsCount = (hasArguments) ? ctx.argumentos().expressao().size() : 0;
+
+        if (argumentsCount != functionDefinition.getParameters().size()) {
+            
+            String argumentsInformation = "";
+            
+            if (!functionDefinition.getParameters().isEmpty()) {
+                argumentsInformation = "\nLista de argumentos que a função precisa:\n" +
+                        functionDefinition.getParameters().stream()
+                        .map(arg -> "\t* " + arg.getVariable().type().getBaseType().toString() + " " + arg.getVariable().name())
+                        .collect(Collectors.joining("\n"));
+            }
+                                
+            throw new IllegalStateException(String.format("Função %s requer %d argumentos, mas foi chamada com %d argumentos.%s",
+                    functionName,
+                    functionDefinition.getParameters().size(),
+                    argumentsCount,
+                    argumentsInformation
+            ));
+        }
+        
         ArrayList<Variable> arguments = new ArrayList<>();
         
-        if (ctx.argumentos() != null) {
-            for (int i = 0; i < ctx.argumentos().expressao().size(); i++) {
-                ParserGrammar.ExpressaoContext argumentExpression = ctx.argumentos().expressao(i);
+        for (int i = 0; i < argumentsCount; i++) {
+            ParserGrammar.ExpressaoContext argumentExpression = ctx.argumentos().expressao(i);
 
-                ReturnableFragmentBlock argument = (ReturnableFragmentBlock) visit(argumentExpression);  
-                functionCallExpresion.getFragmentBlock().addAll(argument.getFragmentBlock());
+            ReturnableFragmentBlock argument = (ReturnableFragmentBlock) visit(argumentExpression);  
+            functionCallExpresion.getFragmentBlock().addAll(argument.getFragmentBlock());
 
-                arguments.add(argument.getReturnVariable());
-            }
+            arguments.add(argument.getReturnVariable());
         }
         
         Variable functionCallReturnVariable = 
