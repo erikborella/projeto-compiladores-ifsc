@@ -327,8 +327,16 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
             ReturnableFragmentBlock argument = (ReturnableFragmentBlock) visit(argumentExpression);  
             functionCallExpresion.addAll(argument.getFragmentBlock());
+            
+            ReturnableFragmentBlock argumentTypeConversion = ConversionCreator.convert(
+                    singleUseVariablesManager,
+                    argument.getReturnVariable(),
+                    functionDefinition.getParameters().get(i).getVariable().type()
+            );
+            
+            functionCallExpresion.addAll(argumentTypeConversion.getFragmentBlock());
 
-            arguments.add(argument.getReturnVariable());
+            arguments.add(argumentTypeConversion.getReturnVariable());
         }
         
         FunctionCall functionCall = FunctionCall.withoutReturn(
@@ -1032,8 +1040,15 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
 
             ReturnableFragmentBlock argument = (ReturnableFragmentBlock) visit(argumentExpression);  
             functionCallExpresion.getFragmentBlock().addAll(argument.getFragmentBlock());
-
-            arguments.add(argument.getReturnVariable());
+            
+            ReturnableFragmentBlock argumentTypeConversion = ConversionCreator.convert(
+                    this.singleUseVariablesManager,
+                    argument.getReturnVariable(),
+                    functionDefinition.getParameters().get(i).getVariable().type()
+            );
+            functionCallExpresion.getFragmentBlock().addAll(argumentTypeConversion.getFragmentBlock());
+            
+            arguments.add(argumentTypeConversion.getReturnVariable());
         }
         
         Variable functionCallReturnVariable = 
