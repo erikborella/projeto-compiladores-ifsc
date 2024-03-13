@@ -5,7 +5,10 @@
 Compilador Java: JDK 19 ou maior. \
 Compialador LLVM: Clang 16.0.0.
 
-## 2. Instalação
+## 2. Download
+Baixe o programa já compilado e pronto para ser executado na ultima versão [aqui](https://github.com/erikborella/projeto-compiladores-ifsc/releases/download/0.1.0-alpha/projeto-compiladores-ifsc_0.1.0-alpha.zip). Veja nas [Releases](https://github.com/erikborella/projeto-compiladores-ifsc/releases) também outras versões disponiveis.
+
+## 2. Compilando o projeto
 
 1. Clone o projeto com o comando:
    ```sh
