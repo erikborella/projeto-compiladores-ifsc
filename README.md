@@ -49,7 +49,16 @@ java -jar .\projeto-compiladores-ifsc-1.0-SNAPSHOT.jar -t
 ```
 ![image](https://github.com/erikborella/projeto-compiladores-ifsc/assets/27148919/3a85eb1b-3411-47dd-a4f5-19ac171c6b11)
 
-## 4. Compilando o projeto
+## 4. Gerando um executavel
+
+Para criar um executavel é necessario ter o clang na versão 16.
+É necessário apenas especificar o caminho do código LLVM IR compilado para o clang:
+```sh
+clang-16 .\exemplos\jogoVelha.ll
+```
+E então um executavel deverá ser criado e o programa poderá ser executado.
+
+## 5. Compilando o projeto
 
 Caso deseja compilar o programa, siga os seguintes passos:
 
