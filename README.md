@@ -67,7 +67,7 @@ java -jar .\projeto-compiladores-ifsc-1.0-SNAPSHOT.jar ..\..\exemplos\jogoVelha.
 
 É possivel também habilitar a visualização da arvore de derivação usada pelo compilador na parte das analiases lexica e sintatica com o argumento `-t`:
 ```sh
-java -jar .\projeto-compiladores-ifsc-1.0-SNAPSHOT.jar
+java -jar .\projeto-compiladores-ifsc-1.0-SNAPSHOT.jar -t
 ```
 ![image](https://github.com/erikborella/projeto-compiladores-ifsc/assets/27148919/3a85eb1b-3411-47dd-a4f5-19ac171c6b11)
 
