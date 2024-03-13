@@ -12,7 +12,7 @@ Compialador LLVM: Clang 16.0.0.
    git clone https://github.com/erikborella/projeto-compiladores-ifsc.git
    ```
 
-2. Abra o projeto `projeto-compiladores-ifsc` localizado dentro da pasta do projeto clonado na sua IDE de preferencia.
+2. Abra o projeto `projeto-compiladores-ifsc` localizado dentro da pasta do projeto clonado na sua IDE de preferencia. \
    ![Captura de tela 2024-03-13 081727](https://github.com/erikborella/projeto-compiladores-ifsc/assets/27148919/5bf5bc8a-3125-4f4f-8321-6047bb776989)
 
 3. Compile o projeto usando o Maven executando o Goal `package`:
