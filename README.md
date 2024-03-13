@@ -56,13 +56,13 @@ java -jar .\projeto-compiladores-ifsc-1.0-SNAPSHOT.jar
 
 Para compilar de um arquivo salve em disco, passe o caminho do arquivo como o primeiro argumento do programa. Na pasta `exemplos` existe um exemplo de jogo da velha.
 ```sh
-java -jar .\projeto-compiladores-ifsc-1.0-SNAPSHOT.jar ..\..\exemplos\jogoVelha.txt
+java -jar .\projeto-compiladores-ifsc-1.0-SNAPSHOT.jar .\exemplos\jogoVelha.txt
 ```
 ![image](https://github.com/erikborella/projeto-compiladores-ifsc/assets/27148919/651166ac-d678-4504-9058-2235ec0224bf)
 
 Por padrão o programa imprime o código LLVM IR compilado em tela, mas também é possivel especificar um arquivo para o código compilado ser salvo em disco com o argumento `-o`. Exemplo compilando o jogo da velha e salvando em arquivo na pasta `exemplos`.
 ```sh
-java -jar .\projeto-compiladores-ifsc-1.0-SNAPSHOT.jar ..\..\exemplos\jogoVelha.txt -o ..\..\exemplos\jogoVelha.ll
+java -jar .\projeto-compiladores-ifsc-1.0-SNAPSHOT.jar .\exemplos\jogoVelha.txt -o .\exemplos\jogoVelha.ll
 ```
 > Recomendado sempre salvar os arquivos compilador com a extensão `.ll` para o compilador do LLVM indentificar corretamente o arquivo. \
 
