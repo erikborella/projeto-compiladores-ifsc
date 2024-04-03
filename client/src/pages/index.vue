@@ -7,9 +7,10 @@
         <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       </template>
 
-      <v-app-bar-title>Compilador</v-app-bar-title>
+      <v-app-bar-title>Projeto Compilador</v-app-bar-title>
 
       <template v-slot:append>
+        <v-btn text="Compilar" append-icon="mdi-send"></v-btn>
         <v-btn size="x-large" href="https://github.com/erikborella/projeto-compiladores-ifsc" target="_blank" icon="mdi-github"></v-btn>
       </template>
 
@@ -26,9 +27,12 @@
     </v-navigation-drawer>
 
     <v-main>
-      <v-container>
-        <h1>Código</h1>
-        <div id="codeContainer" style="height: 300px; width: 300px;"></div>
+      <v-container class="fill-height">
+        <v-row class="fill-height">
+          <v-col class="fill-height">
+            <div ref="codeEditorElement" class="fill-height"></div>
+          </v-col>
+        </v-row>
       </v-container>
     </v-main>
 
@@ -36,13 +40,22 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
+  import { onMounted, ref } from 'vue';
   import * as monaco from "monaco-editor";
 
   const drawer = ref(true);
+  const codeEditorElement = ref(null);
+  let codeEditor: monaco.editor.IStandaloneCodeEditor;
 
-  const editorElement = document.getElementById("codeContainer") as HTMLElement;
+  onMounted(() => {
+    const codeEditorHTMLElement = codeEditorElement.value! as HTMLElement;
+    codeEditor = monaco.editor.create(codeEditorHTMLElement, {
+      theme: 'vs-dark',
+      language: 'c',
+      automaticLayout: true,
+    });
 
-  console.log(editorElement);
-  
+    codeEditor.setValue("main() {\n\tprintf(\"Hello, World!\");\n}")
+  });
+
 </script>
