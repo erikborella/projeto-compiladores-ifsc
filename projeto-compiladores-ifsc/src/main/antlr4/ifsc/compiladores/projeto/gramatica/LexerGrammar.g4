@@ -10,6 +10,7 @@ WHILE : 'while' ;
 FOR : 'for' ;
 FUNC : 'func' ;
 RETURN : 'return';
+INPUT : 'input';
 
 TIPO_VOID : 'void' ;
 TIPO_CHAR : 'char' ;
