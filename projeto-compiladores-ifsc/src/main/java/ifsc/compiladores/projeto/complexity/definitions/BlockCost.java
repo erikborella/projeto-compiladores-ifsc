@@ -17,6 +17,11 @@ public class BlockCost implements CostResult {
         this.costs = costs;
     }
 
+    public BlockCost(ArrayList<CostResult> costs) {
+        this.blockCost = new NullCost();
+        this.costs = costs;
+    }
+
     @Override
     public TokenPosition getPosition() {
         return this.blockCost.getPosition();

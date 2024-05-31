@@ -8,8 +8,13 @@ import ifsc.compiladores.projeto.complexity.definitions.position.TokenPosition;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammarBaseVisitor;
 import java.util.ArrayList;
+
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import ifsc.compiladores.projeto.complexity.definitions.CostResult;
+import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
 
 public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor<CostResult> {
@@ -38,41 +43,81 @@ public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor
 
     @Override
     public BlockCost visitDecfuncao(ParserGrammar.DecfuncaoContext ctx) {
-        ArrayList<CostResult> costs = new ArrayList<>();
-        
-        BlockCost blockCost = visitBloco(ctx.bloco());
-        
-        return null;
+        return visitBloco(ctx.bloco());
     }
 
     public BlockCost visitBloco(ParserGrammar.BlocoContext ctx) {
         ArrayList<CostResult> costs = new ArrayList<>();
         
-//        for (ParserGrammar.DecvariavelContext decvariavelContext : ctx.decvariavel()) {
-//            
-//            if (decvariavelContext.ID().size() > 1) {
-//                for (TerminalNode variableNode : decvariavelContext.ID()) {
-//                    Position position = new Position(
-//                            variableNode.getSymbol().getLine(), 
-//                            variableNode.getSymbol().getCharPositionInLine()
-//                    );
-//                    TokenPosition tokenPosition = new TokenPosition(position, position);
-//
-//                    CostResult declarationCost = new CostResult(tokenPosition, BasicCommandCost.DECLARATION.getCost(), true);
-//                    costs.add(declarationCost);
-//                }
-//            }
-//            
-//            int totalDeclarationCost = decvariavelContext.ID().size() * BasicCommandCost.DECLARATION.getCost();
-//            
-//            TokenPosition tokenPosition = TokenPosition.fromContext(decvariavelContext);
-//            CostResult declarationTotalCost = new CostResult(tokenPosition, totalDeclarationCost);
-//           
-//            costs.add(declarationTotalCost);
-//        }
+        for (ParserGrammar.DecvariavelContext decvariavelContext : ctx.decvariavel()) {
+
+            TokenPosition tokenPosition = TokenPosition.fromContext(decvariavelContext);
+            Cost declarationCost = new Cost(tokenPosition, BasicCommandCost.DECLARATION.getCost());
+
+            costs.add(declarationCost);
+        }
+
+        for (ParserGrammar.ComandoContext comandoContext : ctx.comando()) {
+            CostResult c = visitComando(comandoContext);
+            costs.add(c);
+        }
         
-        return null;
+        return new BlockCost(costs);
     };
-    
-    
+
+    @Override
+    public CostResult visitComandoLinhaLeitura(ParserGrammar.ComandoLinhaLeituraContext ctx) {
+        TokenPosition tokenPosition = TokenPosition.fromContext(ctx);
+
+        return new Cost(tokenPosition, BasicCommandCost.SCANF.getCost());
+    }
+
+    @Override
+    public CostResult visitComandoLinhaEscritaLn(ParserGrammar.ComandoLinhaEscritaLnContext ctx) {
+        TokenPosition tokenPosition = TokenPosition.fromContext(ctx);
+
+        return new Cost(tokenPosition, BasicCommandCost.PRINT.getCost());
+    }
+
+    @Override
+    public CostResult visitComandoLinhaEscrita(ParserGrammar.ComandoLinhaEscritaContext ctx) {
+        TokenPosition tokenPosition = TokenPosition.fromContext(ctx);
+
+        return new Cost(tokenPosition, BasicCommandCost.PRINT.getCost());
+    }
+
+    @Override
+    public CostResult visitComandoLinhaAtribuicao(ParserGrammar.ComandoLinhaAtribuicaoContext ctx) {
+        TokenPosition tokenPosition = TokenPosition.fromContext(ctx);
+
+        return new Cost(tokenPosition, BasicCommandCost.ATTRIBUITION.getCost());
+    }
+
+    @Override
+    public CostResult visitComandoLinhaRetorno(ParserGrammar.ComandoLinhaRetornoContext ctx) {
+        TokenPosition tokenPosition = TokenPosition.fromContext(ctx);
+
+        return new Cost(tokenPosition, BasicCommandCost.RETURN.getCost());
+    }
+
+    @Override
+    public CostResult visitChildren(RuleNode node) {
+        CostResult result = defaultResult();
+        int n = node.getChildCount();
+        for (int i=0; i<n; i++) {
+            if (!shouldVisitNextChild(node, result)) {
+                break;
+            }
+
+            ParseTree c = node.getChild(i);
+
+            if (c instanceof TerminalNodeImpl)
+                continue;
+
+            CostResult childResult = c.accept(this);
+            result = aggregateResult(result, childResult);
+        }
+
+        return result;
+    }
 }

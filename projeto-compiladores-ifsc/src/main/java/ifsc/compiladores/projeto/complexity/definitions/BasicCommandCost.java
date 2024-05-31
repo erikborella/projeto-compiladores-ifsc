@@ -1,13 +1,12 @@
 package ifsc.compiladores.projeto.complexity.definitions;
 
-public enum BasicCommandCost {
+public enum BasicCommandCost  {
     
     DECLARATION(0),
+    ATTRIBUITION(1),
     RETURN(0),
-    ATTRIBUTION(1),
     SCANF(1),
     PRINT(1);
-    
     
     private final int cost;
 
