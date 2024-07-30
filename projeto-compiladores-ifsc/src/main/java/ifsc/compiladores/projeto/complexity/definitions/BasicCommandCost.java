@@ -4,6 +4,7 @@ public enum BasicCommandCost  {
     
     DECLARATION(0),
     ATTRIBUITION(1),
+    EXPRESSION(1),
     RETURN(0),
     SCANF(1),
     PRINT(1);

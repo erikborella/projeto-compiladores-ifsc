@@ -1,10 +1,10 @@
 package ifsc.compiladores.projeto.complexity.generator;
 
-import ifsc.compiladores.projeto.complexity.definitions.BasicCommandCost;
-import ifsc.compiladores.projeto.complexity.definitions.BlockCost;
-import ifsc.compiladores.projeto.complexity.definitions.Cost;
+import ifsc.compiladores.projeto.complexity.definitions.*;
 import ifsc.compiladores.projeto.complexity.definitions.position.Position;
 import ifsc.compiladores.projeto.complexity.definitions.position.TokenPosition;
+import ifsc.compiladores.projeto.complexity.variableManager.Variable;
+import ifsc.compiladores.projeto.complexity.variableManager.VariableManager;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammarBaseVisitor;
 import java.util.ArrayList;
@@ -13,11 +13,16 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import ifsc.compiladores.projeto.complexity.definitions.CostResult;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
 
 public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor<CostResult> {
+
+    private final VariableManager variableManager;
+
+    public ComplexityAnalysisGeneratorVisitor() {
+        this.variableManager = new VariableManager();
+    }
 
     public void analyseCode(ParserGrammar.ProgramaContext ctx) {
         visitPrograma(ctx);
@@ -43,6 +48,15 @@ public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor
 
     @Override
     public BlockCost visitDecfuncao(ParserGrammar.DecfuncaoContext ctx) {
+        this.variableManager.resetVariables();
+
+        for (int i = 0; i < ctx.parametros().ID().size(); i++) {
+            boolean isInput = i == 0 && ctx.parametros().INPUT() != null;
+            Variable parameterVariable = new Variable(ctx.parametros().ID(i).getText(), null, isInput);
+
+            this.variableManager.addVariable(parameterVariable);
+        }
+
         return visitBloco(ctx.bloco());
     }
 
@@ -98,6 +112,33 @@ public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor
         TokenPosition tokenPosition = TokenPosition.fromContext(ctx);
 
         return new Cost(tokenPosition, BasicCommandCost.RETURN.getCost());
+    }
+
+    @Override
+    public CostResult visitPara(ParserGrammar.ParaContext ctx) {
+        String forExpressionSizeVariableId = ctx.expressao().expr_ou().expr_e(0).expr_relacional(0).expr_aditiva(1).getText();
+        Variable forExpressionSizeVariable = this.variableManager.getVariable(forExpressionSizeVariableId);
+
+        if (forExpressionSizeVariable == null || !forExpressionSizeVariable.isInput())
+            return new NullCost();
+
+        if (!ctx.expressao().expr_ou().expr_e(0).expr_relacional(0).op_relacional(0).getText().equals("<"))
+            return new NullCost();
+
+        ArrayList<CostResult> costs = new ArrayList<>();
+
+        Cost forExpressionCost = new Cost(TokenPosition.fromContext(ctx.expressao()), BasicCommandCost.EXPRESSION.getCost());
+        costs.add(forExpressionCost);
+
+        int initialVariableValue = Integer.parseInt(ctx.atribuicaoInicio.atribuicao(0).complemento().getText());
+
+        int costRange = initialVariableValue * -1;
+        BlockCost forBlockCost = visitBloco(ctx.bloco());
+
+        VariableCost forVariableCost = new VariableCost(forExpressionSizeVariableId, costRange, forBlockCost);
+        costs.add(forVariableCost);
+
+        return new BlockCost(costs);
     }
 
     @Override

@@ -7,6 +7,7 @@ import java.util.concurrent.Callable;
 
 import ifsc.compiladores.projeto.LLVM.Fragment;
 import ifsc.compiladores.projeto.LLVM.generator.LLVMIRGeneratorVisitor;
+import ifsc.compiladores.projeto.complexity.generator.ComplexityAnalysisGeneratorVisitor;
 import ifsc.compiladores.projeto.gramatica.LexerGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar.ProgramaContext;
@@ -121,6 +122,9 @@ public class Main implements Callable<Integer> {
             ParserGrammar parser = new ParserGrammar(tokenStream);
 
             ProgramaContext programaContext = parser.programa();
+
+            ComplexityAnalysisGeneratorVisitor analysisGeneratorVisitor = new ComplexityAnalysisGeneratorVisitor();
+            analysisGeneratorVisitor.analyseCode(programaContext);
 
             LLVMIRGeneratorVisitor visitor = new LLVMIRGeneratorVisitor();
 
