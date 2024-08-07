@@ -50,11 +50,13 @@ public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor
     public BlockCost visitDecfuncao(ParserGrammar.DecfuncaoContext ctx) {
         this.variableManager.resetVariables();
 
-        for (int i = 0; i < ctx.parametros().ID().size(); i++) {
-            boolean isInput = i == 0 && ctx.parametros().INPUT() != null;
-            Variable parameterVariable = new Variable(ctx.parametros().ID(i).getText(), null, isInput);
+        if (ctx.parametros() != null) {
+            for (int i = 0; i < ctx.parametros().ID().size(); i++) {
+                boolean isInput = i == 0 && ctx.parametros().INPUT() != null;
+                Variable parameterVariable = new Variable(ctx.parametros().ID(i).getText(), null, isInput);
 
-            this.variableManager.addVariable(parameterVariable);
+                this.variableManager.addVariable(parameterVariable);
+            }
         }
 
         return visitBloco(ctx.bloco());
@@ -70,13 +72,20 @@ public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor
 
             costs.add(declarationCost);
         }
+        
+        int blockTotalCostsValue = 0;
 
         for (ParserGrammar.ComandoContext comandoContext : ctx.comando()) {
             CostResult c = visitComando(comandoContext);
             costs.add(c);
+            
+            blockTotalCostsValue += c.getValue();
         }
         
-        return new BlockCost(costs);
+        TokenPosition blockTotalCostPosition = TokenPosition.fromContext(ctx);
+        Cost blockTotalCost = new Cost(blockTotalCostPosition, blockTotalCostsValue);
+        
+        return new BlockCost(blockTotalCost, costs);
     };
 
     @Override
@@ -112,6 +121,22 @@ public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor
         TokenPosition tokenPosition = TokenPosition.fromContext(ctx);
 
         return new Cost(tokenPosition, BasicCommandCost.RETURN.getCost());
+    }
+
+    @Override
+    public CostResult visitSelecao(ParserGrammar.SelecaoContext ctx) {
+        CostResult ifBlockCost = visitBloco(ctx.bloco());
+        
+        if (ctx.senao() == null)
+            return ifBlockCost;
+        
+        CostResult elseBlockCost = visitBloco(ctx.senao().bloco());
+                
+        // Returns the block with the greatest costs
+        if (elseBlockCost.getValue() > ifBlockCost.getValue())
+            return elseBlockCost;
+        
+        return ifBlockCost;
     }
 
     @Override
