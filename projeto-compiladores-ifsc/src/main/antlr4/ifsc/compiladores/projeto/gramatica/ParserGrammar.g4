@@ -2,7 +2,7 @@ parser grammar ParserGrammar;
 options { tokenVocab=LexerGrammar; }
 
 @header {
-    import ifsc.compiladores.projeto.LLVM.definitions.Label;
+    import ifsc.compiladores.projeto.LLVM.translator.definitions.Label;
 }
 
 programa
