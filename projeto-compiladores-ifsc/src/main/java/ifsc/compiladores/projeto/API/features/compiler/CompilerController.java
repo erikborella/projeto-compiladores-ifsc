@@ -1,33 +1,44 @@
 package ifsc.compiladores.projeto.API.features.compiler;
 
-import ifsc.compiladores.projeto.API.features.compiler.domain.FileCacheManager;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import ifsc.compiladores.projeto.API.features.compiler.domain.CodeCacheManager;
+import ifsc.compiladores.projeto.API.features.compiler.domain.LLVMCompilerService;
+import ifsc.compiladores.projeto.API.features.compiler.exceptions.CodeFileNotFoundException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/compiler")
 public class CompilerController {
 
-    private final FileCacheManager fileHashService;
+    private final CodeCacheManager codeCacheManager;
+    private final LLVMCompilerService llvmCompilerService;
 
-    public CompilerController(FileCacheManager fileHashService) {
-        this.fileHashService = fileHashService;
+    public CompilerController(CodeCacheManager codeCacheManager, LLVMCompilerService llvmCompilerService) {
+        this.codeCacheManager = codeCacheManager;
+        this.llvmCompilerService = llvmCompilerService;
     }
 
     @PostMapping("/upload")
-    public String UploadCode(@RequestBody String code) throws IOException, NoSuchAlgorithmException {
+    public String uploadCode(@RequestBody String code) throws IOException, NoSuchAlgorithmException {
         String codeTrimmed = code.trim();
-        byte[] codeBytes = codeTrimmed.getBytes();
 
-        String fileHash = fileHashService.computeFileId(codeBytes);
+        String codeId = codeCacheManager.saveCodeFile(codeTrimmed);
 
-        fileHashService.saveFile(codeBytes);
+        return codeId;
+    }
 
-        return fileHash;
+    @GetMapping("/{codeId}/llvm/ir")
+    public String getLLVMIRCodeFromCodeId(@PathVariable("codeId") String codeId) throws IOException {
+        Optional<String> llvmIrResult = this.llvmCompilerService.getLLVMIRCode(codeId);
+
+        if (llvmIrResult.isEmpty()) {
+            throw new CodeFileNotFoundException();
+        }
+
+        return llvmIrResult.get();
     }
 
 }
