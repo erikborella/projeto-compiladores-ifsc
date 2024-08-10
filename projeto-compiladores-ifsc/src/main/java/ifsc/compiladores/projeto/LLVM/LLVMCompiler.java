@@ -7,6 +7,9 @@ import ifsc.compiladores.projeto.gramatica.ParserGrammar;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import java.io.File;
+import java.io.IOException;
+
 public class LLVMCompiler {
 
     public static String compileToIR(String sourceCode) {
@@ -22,6 +25,36 @@ public class LLVMCompiler {
         Fragment irCode = irGenerator.visitPrograma(programaContext);
 
         return irCode.getText();
+    }
+
+    public static boolean compileToAsm(String clangCompiler, File irCodePath, File destPath) throws IOException, InterruptedException {
+        Process asmCompileProcess = new ProcessBuilder(
+                clangCompiler,
+                "-masm=intel",
+                "-S",
+                irCodePath.toString(),
+                "-o",
+                destPath.toString()
+        )
+        .start();
+
+        return asmCompileProcess.waitFor() == 0;
+    }
+
+    public static boolean optimizeIR(String llvmOptimizer, File irCodePath, File destPath, String optLevelFlagValue) throws IOException, InterruptedException {
+        String optFlag = "-" + optLevelFlagValue;
+
+        Process optProcess = new ProcessBuilder(
+                llvmOptimizer,
+                optFlag,
+                "-S",
+                irCodePath.toString(),
+                "-o",
+                destPath.toString()
+        )
+        .start();
+
+        return optProcess.waitFor() == 0;
     }
 
 }

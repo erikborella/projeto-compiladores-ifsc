@@ -78,7 +78,14 @@ public class CodeCacheManagerImpl implements CodeCacheManager {
         return Optional.of(codeContent);
     }
 
-    private File buildFilePath(String codeId, String fileName) {
+    @Override
+    public boolean artifactExists(String codeId, String artifactName) throws IOException {
+        File filePath = this.buildFilePath(codeId, artifactName);
+
+        return filePath.exists();
+    }
+
+    public File buildFilePath(String codeId, String fileName) {
         return Paths.get(this.configuration.getCachePath(), codeId, fileName).toFile();
     }
 }

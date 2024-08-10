@@ -8,6 +8,10 @@ public class CompilerConfiguration {
     private String cachePath;
     private String codeFileName;
     private String irFileName;
+    private String asmFileName;
+    private String optFileNameTemplate;
+    private String clangCompiler;
+    private String llvmOptimizer;
 
     public String getCodeFileName() {
         return codeFileName;
@@ -31,5 +35,37 @@ public class CompilerConfiguration {
 
     public void setIrFileName(String irFileName) {
         this.irFileName = irFileName;
+    }
+
+    public String getAsmFileName() {
+        return asmFileName;
+    }
+
+    public void setAsmFileName(String asmFileName) {
+        this.asmFileName = asmFileName;
+    }
+
+    public String getOptFileNameTemplate() {
+        return optFileNameTemplate;
+    }
+
+    public void setOptFileNameTemplate(String optFileNameTemplate) {
+        this.optFileNameTemplate = optFileNameTemplate;
+    }
+
+    public String getClangCompiler() {
+        return clangCompiler;
+    }
+
+    public void setClangCompiler(String clangCompiler) {
+        this.clangCompiler = clangCompiler;
+    }
+
+    public String getLLVMOptimizer() {
+        return llvmOptimizer;
+    }
+
+    public void setLLVMOptimizer(String llvmOptimizer) {
+        this.llvmOptimizer = llvmOptimizer;
     }
 }

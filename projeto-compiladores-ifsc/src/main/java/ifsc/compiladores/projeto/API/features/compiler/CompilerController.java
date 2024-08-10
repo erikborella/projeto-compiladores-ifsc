@@ -2,7 +2,9 @@ package ifsc.compiladores.projeto.API.features.compiler;
 
 import ifsc.compiladores.projeto.API.features.compiler.domain.CodeCacheManager;
 import ifsc.compiladores.projeto.API.features.compiler.domain.LLVMCompilerService;
+import ifsc.compiladores.projeto.API.features.compiler.domain.OptLevel;
 import ifsc.compiladores.projeto.API.features.compiler.exceptions.CodeFileNotFoundException;
+import ifsc.compiladores.projeto.API.features.compiler.exceptions.InvalidOptLevelException;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -39,6 +41,34 @@ public class CompilerController {
         }
 
         return llvmIrResult.get();
+    }
+
+    @GetMapping("/{codeId}/asm")
+    public String getAsmFromCodeId(@PathVariable("codeId") String codeId) throws IOException, InterruptedException {
+        Optional<String> asmResult = this.llvmCompilerService.getAsmCode(codeId);
+
+        if (asmResult.isEmpty()) {
+            throw new CodeFileNotFoundException();
+        }
+
+        return asmResult.get();
+    }
+
+    @GetMapping("{codeId}/llvm/ir/opt/{optLevel}")
+    public String getLLVMCodeOptimized(@PathVariable("codeId") String codeId, @PathVariable("optLevel") String optLevel) throws IOException, InterruptedException {
+        Optional<OptLevel> optLevelResult = OptLevel.getOptLevelFromString(optLevel);
+
+        if (optLevelResult.isEmpty()) {
+            throw new InvalidOptLevelException();
+        }
+
+        Optional<String> optResult = this.llvmCompilerService.getOptLLVMIrCode(codeId, optLevelResult.get());
+
+        if (optResult.isEmpty()) {
+            throw new CodeFileNotFoundException();
+        }
+
+        return optResult.get();
     }
 
 }
