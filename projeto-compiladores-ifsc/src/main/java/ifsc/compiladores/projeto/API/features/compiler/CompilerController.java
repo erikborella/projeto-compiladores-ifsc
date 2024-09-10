@@ -3,8 +3,11 @@ package ifsc.compiladores.projeto.API.features.compiler;
 import ifsc.compiladores.projeto.API.features.compiler.domain.CodeCacheManager;
 import ifsc.compiladores.projeto.API.features.compiler.domain.LLVMCompilerService;
 import ifsc.compiladores.projeto.API.features.compiler.domain.OptLevel;
+import ifsc.compiladores.projeto.API.features.compiler.domain.SyntaxTreeService;
 import ifsc.compiladores.projeto.API.features.compiler.exceptions.CodeFileNotFoundException;
 import ifsc.compiladores.projeto.API.features.compiler.exceptions.InvalidOptLevelException;
+import ifsc.compiladores.projeto.syntax.SyntaxTreeBuilder;
+import ifsc.compiladores.projeto.syntax.syntaxBuilder.definitions.SyntaxTreeFragment;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -17,10 +20,12 @@ public class CompilerController {
 
     private final CodeCacheManager codeCacheManager;
     private final LLVMCompilerService llvmCompilerService;
+    private final SyntaxTreeService syntaxTreeService;
 
-    public CompilerController(CodeCacheManager codeCacheManager, LLVMCompilerService llvmCompilerService) {
+    public CompilerController(CodeCacheManager codeCacheManager, LLVMCompilerService llvmCompilerService, SyntaxTreeService syntaxTreeService) {
         this.codeCacheManager = codeCacheManager;
         this.llvmCompilerService = llvmCompilerService;
+        this.syntaxTreeService = syntaxTreeService;
     }
 
     @PostMapping("/upload")
@@ -69,6 +74,17 @@ public class CompilerController {
         }
 
         return optResult.get();
+    }
+
+    @GetMapping("{codeId}/syntax")
+    public String getSyntaxTree(@PathVariable("codeId") String codeId) throws IOException {
+        Optional<String> syntaxTreeResult = this.syntaxTreeService.getSyntaxTree(codeId);
+
+        if (syntaxTreeResult.isEmpty()) {
+            throw new CodeFileNotFoundException();
+        }
+
+        return syntaxTreeResult.get();
     }
 
 }

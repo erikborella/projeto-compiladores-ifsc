@@ -10,6 +10,7 @@ public class CompilerConfiguration {
     private String irFileName;
     private String asmFileName;
     private String optFileNameTemplate;
+    private String syntaxTreeFileName;
     private String clangCompiler;
     private String llvmOptimizer;
 
@@ -67,5 +68,13 @@ public class CompilerConfiguration {
 
     public void setLLVMOptimizer(String llvmOptimizer) {
         this.llvmOptimizer = llvmOptimizer;
+    }
+
+    public String getSyntaxTreeFileName() {
+        return syntaxTreeFileName;
+    }
+
+    public void setSyntaxTreeFileName(String syntaxTreeFileName) {
+        this.syntaxTreeFileName = syntaxTreeFileName;
     }
 }
