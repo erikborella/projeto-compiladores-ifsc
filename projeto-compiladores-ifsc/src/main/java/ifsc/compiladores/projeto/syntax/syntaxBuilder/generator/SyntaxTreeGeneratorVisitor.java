@@ -14,7 +14,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import java.util.ArrayList;
 
 public class SyntaxTreeGeneratorVisitor extends ParserGrammarBaseVisitor<SyntaxTreeFragment> {
-
+    
     @Override
     public SyntaxTreeFragment visit(ParseTree tree) {
         if (tree instanceof TerminalNode) {
@@ -34,7 +34,9 @@ public class SyntaxTreeGeneratorVisitor extends ParserGrammarBaseVisitor<SyntaxT
 
         TokenPosition position = TokenPosition.fromContext((ParserRuleContext) node);
 
-        SyntaxTreeNode syntaxTreeNode = new SyntaxTreeNode(position, node.getClass().getSimpleName(), children);
+        String ruleName = ParserGrammar.ruleNames[node.getRuleContext().getRuleIndex()];
+        
+        SyntaxTreeNode syntaxTreeNode = new SyntaxTreeNode(position, ruleName, children);
         return syntaxTreeNode;
     }
 
@@ -47,4 +49,5 @@ public class SyntaxTreeGeneratorVisitor extends ParserGrammarBaseVisitor<SyntaxT
         SyntaxTreeLeaf syntaxTreeLeaf = new SyntaxTreeLeaf(position, name, node.getText());
         return  syntaxTreeLeaf;
     }
+    
 }
