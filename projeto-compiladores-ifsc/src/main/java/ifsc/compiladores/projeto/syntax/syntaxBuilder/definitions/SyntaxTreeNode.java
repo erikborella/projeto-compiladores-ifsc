@@ -5,10 +5,12 @@ import ifsc.compiladores.projeto.syntax.syntaxBuilder.definitions.position.Token
 import java.util.List;
 
 public class SyntaxTreeNode extends SyntaxTreeFragment {
+    private final static String NODE_TYPE = "node";
+
     private final List<SyntaxTreeFragment> children;
 
     public SyntaxTreeNode(TokenPosition position, String label, List<SyntaxTreeFragment> children) {
-        super(position, label);
+        super(position, label, NODE_TYPE);
         this.children = children;
     }
 
