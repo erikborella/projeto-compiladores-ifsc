@@ -44,6 +44,34 @@ public class LLVMCompilerServiceImpl implements LLVMCompilerService {
     }
 
     @Override
+    public Optional<String> getOptLLVMIrCode(String codeId, OptLevel optLevel) throws IOException, InterruptedException {
+        String optimizedFileName = String.format(this.configuration.getIrOptFileNameTemplate(), optLevel.getStringValue());
+
+        Optional<String> optimizedCodeCacheResult = this.codeCacheManager.loadCodeArtifact(codeId, optimizedFileName);
+
+        if (optimizedCodeCacheResult.isPresent()) {
+            return optimizedCodeCacheResult;
+        }
+
+        Optional<String> llvmIRCodeResult = this.getLLVMIRCode(codeId);
+
+        if (llvmIRCodeResult.isEmpty()) {
+            return Optional.empty();
+        }
+
+        File irFilePath = this.codeCacheManager.buildFilePath(codeId, configuration.getIrFileName());
+        File optFilePath = this.codeCacheManager.buildFilePath(codeId, optimizedFileName);
+
+        boolean optSuccess = LLVMCompiler.optimizeIR(this.configuration.getLLVMOptimizer(), irFilePath, optFilePath, optLevel.getStringValue());
+
+        if (!optSuccess) {
+            return Optional.empty();
+        }
+
+        return this.codeCacheManager.loadCodeArtifact(codeId, optimizedFileName);
+    }
+
+    @Override
     public Optional<String> getAsmCode(String codeId) throws IOException, InterruptedException {
         Optional<String> asmCodeCacheResult = this.codeCacheManager.loadCodeArtifact(codeId, this.configuration.getAsmFileName());
 
@@ -70,8 +98,8 @@ public class LLVMCompilerServiceImpl implements LLVMCompilerService {
     }
 
     @Override
-    public Optional<String> getOptLLVMIrCode(String codeId, OptLevel optLevel) throws IOException, InterruptedException {
-        String optimizedFileName = String.format(this.configuration.getOptFileNameTemplate(), optLevel.getStringValue());
+    public Optional<String> getOptAsmCode(String codeId, OptLevel optLevel) throws IOException, InterruptedException {
+        String optimizedFileName = String.format(this.configuration.getAsmOptFileNameTemplate(), optLevel.getStringValue());
 
         Optional<String> optimizedCodeCacheResult = this.codeCacheManager.loadCodeArtifact(codeId, optimizedFileName);
 
@@ -79,16 +107,16 @@ public class LLVMCompilerServiceImpl implements LLVMCompilerService {
             return optimizedCodeCacheResult;
         }
 
-        Optional<String> llvmIRCodeResult = this.getLLVMIRCode(codeId);
+        Optional<String> asmOptCodeResult = this.getLLVMIRCode(codeId);
 
-        if (llvmIRCodeResult.isEmpty()) {
+        if (asmOptCodeResult.isEmpty()) {
             return Optional.empty();
         }
 
         File irFilePath = this.codeCacheManager.buildFilePath(codeId, configuration.getIrFileName());
         File optFilePath = this.codeCacheManager.buildFilePath(codeId, optimizedFileName);
 
-        boolean optSuccess = LLVMCompiler.optimizeIR(this.configuration.getLLVMOptimizer(), irFilePath, optFilePath, optLevel.getStringValue());
+        boolean optSuccess = LLVMCompiler.optimizeAsm(this.configuration.getClangCompiler(), irFilePath, optFilePath, optLevel.getStringValue());
 
         if (!optSuccess) {
             return Optional.empty();

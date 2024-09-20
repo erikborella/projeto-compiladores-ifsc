@@ -27,6 +27,22 @@ public class LLVMCompiler {
         return irCode.getText();
     }
 
+    public static boolean optimizeIR(String llvmOptimizer, File irCodePath, File destPath, String optLevelFlagValue) throws IOException, InterruptedException {
+        String optFlag = "-" + optLevelFlagValue;
+
+        Process optProcess = new ProcessBuilder(
+                llvmOptimizer,
+                optFlag,
+                "-S",
+                irCodePath.toString(),
+                "-o",
+                destPath.toString()
+        )
+                .start();
+
+        return optProcess.waitFor() == 0;
+    }
+
     public static boolean compileToAsm(String clangCompiler, File irCodePath, File destPath) throws IOException, InterruptedException {
         Process asmCompileProcess = new ProcessBuilder(
                 clangCompiler,
@@ -41,20 +57,20 @@ public class LLVMCompiler {
         return asmCompileProcess.waitFor() == 0;
     }
 
-    public static boolean optimizeIR(String llvmOptimizer, File irCodePath, File destPath, String optLevelFlagValue) throws IOException, InterruptedException {
+    public static boolean optimizeAsm(String clangCompiler, File irCodePath, File destPath, String optLevelFlagValue) throws IOException, InterruptedException {
         String optFlag = "-" + optLevelFlagValue;
 
-        Process optProcess = new ProcessBuilder(
-                llvmOptimizer,
-                optFlag,
+        Process asmOptimizeProcess = new ProcessBuilder(
+                clangCompiler,
+                "-masm=intel",
                 "-S",
+                optFlag,
                 irCodePath.toString(),
                 "-o",
                 destPath.toString()
         )
         .start();
 
-        return optProcess.waitFor() == 0;
+        return asmOptimizeProcess.waitFor() == 0;
     }
-
 }

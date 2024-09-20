@@ -6,8 +6,6 @@ import ifsc.compiladores.projeto.API.features.compiler.domain.OptLevel;
 import ifsc.compiladores.projeto.API.features.compiler.domain.SyntaxTreeService;
 import ifsc.compiladores.projeto.API.features.compiler.exceptions.CodeFileNotFoundException;
 import ifsc.compiladores.projeto.API.features.compiler.exceptions.InvalidOptLevelException;
-import ifsc.compiladores.projeto.syntax.SyntaxTreeBuilder;
-import ifsc.compiladores.projeto.syntax.syntaxBuilder.definitions.SyntaxTreeFragment;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -59,6 +57,23 @@ public class CompilerController {
         return llvmIrResult.get();
     }
 
+    @GetMapping("{codeId}/llvm/ir/opt/{optLevel}")
+    public String getLLVMCodeOptimized(@PathVariable("codeId") String codeId, @PathVariable("optLevel") String optLevel) throws IOException, InterruptedException {
+        Optional<OptLevel> optLevelResult = OptLevel.getOptLevelFromString(optLevel);
+
+        if (optLevelResult.isEmpty()) {
+            throw InvalidOptLevelException.inOptLevel(optLevel);
+        }
+
+        Optional<String> optResult = this.llvmCompilerService.getOptLLVMIrCode(codeId, optLevelResult.get());
+
+        if (optResult.isEmpty()) {
+            throw CodeFileNotFoundException.inCodeId(codeId);
+        }
+
+        return optResult.get();
+    }
+
     @GetMapping("/{codeId}/asm")
     public String getAsmFromCodeId(@PathVariable("codeId") String codeId) throws IOException, InterruptedException {
         Optional<String> asmResult = this.llvmCompilerService.getAsmCode(codeId);
@@ -70,15 +85,15 @@ public class CompilerController {
         return asmResult.get();
     }
 
-    @GetMapping("{codeId}/llvm/ir/opt/{optLevel}")
-    public String getLLVMCodeOptimized(@PathVariable("codeId") String codeId, @PathVariable("optLevel") String optLevel) throws IOException, InterruptedException {
+    @GetMapping("/{codeId}/asm/opt/{optLevel}")
+    public String getAsmCodeOptimized(@PathVariable("codeId") String codeId, @PathVariable("optLevel") String optLevel) throws IOException, InterruptedException {
         Optional<OptLevel> optLevelResult = OptLevel.getOptLevelFromString(optLevel);
 
         if (optLevelResult.isEmpty()) {
             throw InvalidOptLevelException.inOptLevel(optLevel);
         }
 
-        Optional<String> optResult = this.llvmCompilerService.getOptLLVMIrCode(codeId, optLevelResult.get());
+        Optional<String> optResult = this.llvmCompilerService.getOptAsmCode(codeId, optLevelResult.get());
 
         if (optResult.isEmpty()) {
             throw CodeFileNotFoundException.inCodeId(codeId);

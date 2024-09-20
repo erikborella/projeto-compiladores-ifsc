@@ -6,21 +6,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class CompilerConfiguration {
 
     private String cachePath;
+
     private String codeFileName;
+
     private String irFileName;
-    private String asmFileName;
-    private String optFileNameTemplate;
-    private String syntaxTreeFileName;
-    private String clangCompiler;
+    private String irOptFileNameTemplate;
     private String llvmOptimizer;
 
-    public String getCodeFileName() {
-        return codeFileName;
-    }
+    private String asmFileName;
+    private String asmOptFileNameTemplate;
+    private String clangCompiler;
 
-    public void setCodeFileName(String codeFileName) {
-        this.codeFileName = codeFileName;
-    }
+    private String syntaxTreeFileName;
 
     public String getCachePath() {
         return cachePath;
@@ -28,6 +25,14 @@ public class CompilerConfiguration {
 
     public void setCachePath(String cachePath) {
         this.cachePath = cachePath;
+    }
+
+    public String getCodeFileName() {
+        return codeFileName;
+    }
+
+    public void setCodeFileName(String codeFileName) {
+        this.codeFileName = codeFileName;
     }
 
     public String getIrFileName() {
@@ -38,28 +43,12 @@ public class CompilerConfiguration {
         this.irFileName = irFileName;
     }
 
-    public String getAsmFileName() {
-        return asmFileName;
+    public String getIrOptFileNameTemplate() {
+        return irOptFileNameTemplate;
     }
 
-    public void setAsmFileName(String asmFileName) {
-        this.asmFileName = asmFileName;
-    }
-
-    public String getOptFileNameTemplate() {
-        return optFileNameTemplate;
-    }
-
-    public void setOptFileNameTemplate(String optFileNameTemplate) {
-        this.optFileNameTemplate = optFileNameTemplate;
-    }
-
-    public String getClangCompiler() {
-        return clangCompiler;
-    }
-
-    public void setClangCompiler(String clangCompiler) {
-        this.clangCompiler = clangCompiler;
+    public void setIrOptFileNameTemplate(String irOptFileNameTemplate) {
+        this.irOptFileNameTemplate = irOptFileNameTemplate;
     }
 
     public String getLLVMOptimizer() {
@@ -68,6 +57,30 @@ public class CompilerConfiguration {
 
     public void setLLVMOptimizer(String llvmOptimizer) {
         this.llvmOptimizer = llvmOptimizer;
+    }
+
+    public String getAsmFileName() {
+        return asmFileName;
+    }
+
+    public void setAsmFileName(String asmFileName) {
+        this.asmFileName = asmFileName;
+    }
+
+    public String getAsmOptFileNameTemplate() {
+        return asmOptFileNameTemplate;
+    }
+
+    public void setAsmOptFileNameTemplate(String asmOptFileNameTemplate) {
+        this.asmOptFileNameTemplate = asmOptFileNameTemplate;
+    }
+
+    public String getClangCompiler() {
+        return clangCompiler;
+    }
+
+    public void setClangCompiler(String clangCompiler) {
+        this.clangCompiler = clangCompiler;
     }
 
     public String getSyntaxTreeFileName() {
