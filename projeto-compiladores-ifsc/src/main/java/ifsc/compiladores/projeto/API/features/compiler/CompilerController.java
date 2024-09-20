@@ -37,6 +37,17 @@ public class CompilerController {
         return codeId;
     }
 
+    @GetMapping("/{codeId}")
+    public String getCode(@PathVariable("codeId") String codeId) throws IOException {
+        Optional<String> codeResult = this.codeCacheManager.loadCodeFromId(codeId);
+
+        if (codeResult.isEmpty()) {
+            throw CodeFileNotFoundException.inCodeId(codeId);
+        }
+
+        return codeResult.get();
+    }
+
     @GetMapping("/{codeId}/llvm/ir")
     public String getLLVMIRCodeFromCodeId(@PathVariable("codeId") String codeId) throws IOException {
         Optional<String> llvmIrResult = this.llvmCompilerService.getLLVMIRCode(codeId);
