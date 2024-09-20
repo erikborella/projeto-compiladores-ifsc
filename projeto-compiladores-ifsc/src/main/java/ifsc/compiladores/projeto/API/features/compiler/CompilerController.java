@@ -42,7 +42,7 @@ public class CompilerController {
         Optional<String> llvmIrResult = this.llvmCompilerService.getLLVMIRCode(codeId);
 
         if (llvmIrResult.isEmpty()) {
-            throw new CodeFileNotFoundException();
+            throw CodeFileNotFoundException.inCodeId(codeId);
         }
 
         return llvmIrResult.get();
@@ -53,7 +53,7 @@ public class CompilerController {
         Optional<String> asmResult = this.llvmCompilerService.getAsmCode(codeId);
 
         if (asmResult.isEmpty()) {
-            throw new CodeFileNotFoundException();
+            throw CodeFileNotFoundException.inCodeId(codeId);
         }
 
         return asmResult.get();
@@ -64,13 +64,13 @@ public class CompilerController {
         Optional<OptLevel> optLevelResult = OptLevel.getOptLevelFromString(optLevel);
 
         if (optLevelResult.isEmpty()) {
-            throw new InvalidOptLevelException();
+            throw InvalidOptLevelException.inOptLevel(optLevel);
         }
 
         Optional<String> optResult = this.llvmCompilerService.getOptLLVMIrCode(codeId, optLevelResult.get());
 
         if (optResult.isEmpty()) {
-            throw new CodeFileNotFoundException();
+            throw CodeFileNotFoundException.inCodeId(codeId);
         }
 
         return optResult.get();
@@ -81,7 +81,7 @@ public class CompilerController {
         Optional<String> syntaxTreeResult = this.syntaxTreeService.getSyntaxTree(codeId);
 
         if (syntaxTreeResult.isEmpty()) {
-            throw new CodeFileNotFoundException();
+            throw CodeFileNotFoundException.inCodeId(codeId);
         }
 
         return syntaxTreeResult.get();
