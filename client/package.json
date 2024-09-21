@@ -8,9 +8,12 @@
     "lint": "eslint . --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@codemirror/lang-cpp": "^6.0.2",
+    "@codemirror/theme-one-dark": "^6.1.2",
     "@mdi/font": "6.2.95",
+    "axios": "^1.7.7",
+    "codemirror": "^6.0.1",
     "core-js": "^3.34.0",
-    "monaco-editor": "^0.45.0",
     "roboto-fontface": "*",
     "vue": "^3.4.21",
     "vuetify": "^3.5.8"
