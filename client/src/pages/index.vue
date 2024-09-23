@@ -4,7 +4,7 @@
     <v-app-bar color="indigo">
 
       <template v-slot:prepend>
-        <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon icon="mdi-file-code-outline" @click="drawer = !drawer"></v-app-bar-nav-icon>
       </template>
 
       <v-app-bar-title>Projeto Compilador</v-app-bar-title>
@@ -19,15 +19,47 @@
 
     <v-navigation-drawer v-model="drawer" width="700">
       <v-container class="d-flex flex-column ga-2">
-        <v-card text="Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi, ratione debitis quis est labore voluptatibus! Eaque cupiditate minima, at placeat totam, magni doloremque veniam neque porro libero rerum unde voluptatem!">
-          <!-- <div ref="codeEditorElement2" class="code-editor"></div> -->
-          <!-- <codemirror
-          /> -->
+        <v-card
+          elevation="4"
+          title="Função main" 
+          text="A função main é a função por onde o código começará a ser executado, servindo como a porta de entrada para e execução do código."
+        >
+          <div ref="exampleCodeEditorMain" class="code-editor"></div>
         </v-card>
-        <v-card text="Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi, ratione debitis quis est labore voluptatibus! Eaque cupiditate minima, at placeat totam, magni doloremque veniam neque porro libero rerum unde voluptatem!"></v-card>
-        <v-card text="Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi, ratione debitis quis est labore voluptatibus! Eaque cupiditate minima, at placeat totam, magni doloremque veniam neque porro libero rerum unde voluptatem!"></v-card>
-        <v-card text="Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi, ratione debitis quis est labore voluptatibus! Eaque cupiditate minima, at placeat totam, magni doloremque veniam neque porro libero rerum unde voluptatem!"></v-card>
-        <v-card text="Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi, ratione debitis quis est labore voluptatibus! Eaque cupiditate minima, at placeat totam, magni doloremque veniam neque porro libero rerum unde voluptatem!"></v-card>
+
+        <v-card 
+          elevation="4"
+          title="Declaração de váriaveis" 
+        >
+          <template v-slot:text>
+            <p>As declarações de váriaveis devem vir por primeiro nos blocos de código.</p>
+            <p>Os seguintes tipos de váriaveis são suportados:</p>
+
+            <v-card-text>
+              <ul>
+                <li>boolean</li>
+                <li>char</li>
+                <li>int</li>
+                <li>float</li>
+              </ul>
+            </v-card-text>
+
+            <p>É possivel declarar várias váriaveis do mesmo tipo na mesma linha separando os nomes por virgula (,).</p>
+            <br>
+            <p>Arrays de tamanho fixo também podem ser declarados adicionando <code>[tamanho_da_dimensão]</code> ao lado do tipo da declaração. Arrays de multiplas dimensões também são permitidas e não possui um limite de dimensões, sendo necessário apenas adicionar mais <code>[tamanho_da_dimensão]</code> ao lado do tipo.</p>
+
+          </template>
+          <div ref="exampleCodeEditorVariables" class="code-editor"></div>
+        </v-card>
+
+        <v-card
+          elevation="4"
+          title="Atribuição de váriaveis"
+          text="É possivel atribuir valores em váriaveis de valores contantes, expressões matemáticas, valores de arrays ou valores de retorno de funções"
+        >
+          <div ref="exampleCodeEditorVariableAttribuition" class="code-editor"></div>
+        </v-card>
+
       </v-container>
     </v-navigation-drawer>
 
@@ -95,6 +127,7 @@
   import { useTheme } from 'vuetify';
   import { useRouter } from 'vue-router';
   import { basicSetup, EditorView } from 'codemirror';
+  import { EditorState } from '@codemirror/state';
   import { oneDark } from '@codemirror/theme-one-dark';
   import { cppLanguage } from '@codemirror/lang-cpp';
 
@@ -114,6 +147,10 @@
   const mainCodeEditorRef = useTemplateRef('codeEditorElement');
   let mainCodeEditor: EditorView;
 
+  const exampleCodeEditorMain = useTemplateRef('exampleCodeEditorMain');
+  const exampleCodeEditorVariables = useTemplateRef('exampleCodeEditorVariables');
+  const exampleCodeEditorVariableAttribuition = useTemplateRef('exampleCodeEditorVariableAttribuition');
+
   onMounted(() => {
     mainCodeEditor = new EditorView({
       doc: 'main() {\n\tprintf("Hello, Word!");\n}',
@@ -123,6 +160,74 @@
         oneDark,
       ],
       parent: mainCodeEditorRef.value!,
+    });
+
+    new EditorView({
+      doc: 
+`main() {
+  // declarações de váriaveis...
+  
+  // comandos...
+}`,
+      extensions: [
+        basicSetup,
+        cppLanguage,
+        oneDark,
+        EditorState.readOnly.of(true)
+      ],
+      parent: exampleCodeEditorMain.value!
+    });
+
+    new EditorView({
+      doc:
+`// Declaração de váriavel simples
+int var1;
+
+// Declaração de multiplas váriaveis;
+boolean var2, var3;
+
+// Declaração de arrays
+float[5] vet;
+int[7][10] mat;`,
+      extensions: [
+        basicSetup,
+        cppLanguage,
+        oneDark,
+        EditorState.readOnly.of(true)
+      ],
+      parent: exampleCodeEditorVariables.value!
+    });
+
+    new EditorView({
+      doc: 
+`// Declaração de váriaveis
+int n1;
+boolean flag;
+float f1;
+int[5][5] mat;
+
+// Atribuição de constante;
+n1 = 10;
+f1 = -5.2;
+mat[0][1] = 7;
+
+// Atribuição por expressão matemática
+n1 = n1 + f1 * 3;
+flag = 10 > 7;
+
+// Atribuição por valor de um array
+n1 = mat[0][0] + mat[1][0];
+
+// Atribuição por um valor de retorno de função
+n1 = func funcao();
+`,
+      extensions: [
+        basicSetup,
+        cppLanguage,
+        oneDark,
+        EditorState.readOnly.of(true)
+      ],
+      parent: exampleCodeEditorVariableAttribuition.value!
     })
   })
   
