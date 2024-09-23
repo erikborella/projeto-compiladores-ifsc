@@ -22,7 +22,7 @@
         <v-card
           elevation="4"
           title="Função main" 
-          text="A função main é a função por onde o código começará a ser executado, servindo como a porta de entrada para e execução do código."
+          text="A função main é o ponto de entrada da execução de um programa, onde o código inicia sua execução."
         >
           <div ref="exampleCodeEditorMain" class="code-editor"></div>
         </v-card>
@@ -31,31 +31,30 @@
           elevation="4"
           title="Declaração de váriaveis" 
         >
-          <template v-slot:text>
-            <p>As declarações de váriaveis devem vir por primeiro nos blocos de código.</p>
-            <p>Os seguintes tipos de váriaveis são suportados:</p>
+        <template v-slot:text>
+          <p>As declarações de variáveis devem ser feitas antes de seu uso nos blocos de código.</p>
+          <p>Os seguintes tipos de variáveis são suportados:</p>
 
-            <v-card-text>
-              <ul>
-                <li>boolean</li>
-                <li>char</li>
-                <li>int</li>
-                <li>float</li>
-              </ul>
-            </v-card-text>
+          <v-card-text>
+            <ul>
+              <li><code>boolean</code></li>
+              <li><code>char</code></li>
+              <li><code>int</code></li>
+              <li><code>float</code></li>
+            </ul>
+          </v-card-text>
 
-            <p>É possivel declarar várias váriaveis do mesmo tipo na mesma linha separando os nomes por virgula (,).</p>
-            <br>
-            <p>Arrays de tamanho fixo também podem ser declarados adicionando <code>[tamanho_da_dimensão]</code> ao lado do tipo da declaração. Arrays de multiplas dimensões também são permitidas e não possui um limite de dimensões, sendo necessário apenas adicionar mais <code>[tamanho_da_dimensão]</code> ao lado do tipo.</p>
-
-          </template>
+          <p>É possível declarar várias variáveis do mesmo tipo na mesma linha, separando os nomes por vírgula (<code>,</code>).</p>
+          <br>
+          <p>Arrays de tamanho fixo podem ser declarados adicionando <code>[tamanho_da_dimensão]</code> ao lado do tipo. Arrays de múltiplas dimensões também são permitidos, e não há um limite de dimensões; basta adicionar mais <code>[tamanho_da_dimensão]</code> ao lado do tipo.</p>
+        </template>
           <div ref="exampleCodeEditorVariables" class="code-editor"></div>
         </v-card>
 
         <v-card
           elevation="4"
           title="Atribuição de váriaveis"
-          text="É possivel atribuir valores em váriaveis de valores contantes, expressões matemáticas, valores de arrays ou valores de retorno de funções"
+          text="É possível atribuir valores a variáveis utilizando constantes, expressões matemáticas, valores de arrays ou valores retornados por funções"
         >
           <div ref="exampleCodeEditorVariableAttribuition" class="code-editor"></div>
         </v-card>
@@ -219,8 +218,7 @@ flag = 10 > 7;
 n1 = mat[0][0] + mat[1][0];
 
 // Atribuição por um valor de retorno de função
-n1 = func funcao();
-`,
+n1 = func funcao();`,
       extensions: [
         basicSetup,
         cppLanguage,
