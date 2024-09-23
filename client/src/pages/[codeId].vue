@@ -12,9 +12,22 @@
       </template>
 
       <template v-slot:extension>
-        <v-tabs grow>
-          <v-tab :to="{ name: '/[codeId]/llvm' }">LLVM</v-tab>
-          <v-tab :to="{ name: '/[codeId]/asm' }">Assembly</v-tab>
+        <v-tabs align-tabs="center" grow>
+          <v-tab :to="{ name: '/[codeId]/llvm' }">
+            LLVM IR
+          </v-tab>
+          <v-tab :to="{ name: '/[codeId]/asm' }">
+            Assembly
+          </v-tab>
+          <v-tab>
+            Arvore sintática
+          </v-tab>
+          <v-tab>
+            Execução
+          </v-tab>
+          <v-tab>
+            Complexidade de algortimo
+          </v-tab>
         </v-tabs>
       </template>
     </v-app-bar>
@@ -41,7 +54,7 @@
     const currentRoute = route.name;
 
     if (currentRoute === '/[codeId]') {
-      router.push({ name: '/[codeId]/llvm' });
+      router.replace({ name: '/[codeId]/llvm' });
     }
   })
 
