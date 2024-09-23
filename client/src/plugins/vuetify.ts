@@ -7,6 +7,7 @@
 // Styles
 import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
+import { VuetifyResolver } from 'unplugin-vue-components/resolvers';
 
 // Composables
 import { createVuetify } from 'vuetify'

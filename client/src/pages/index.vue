@@ -20,7 +20,9 @@
     <v-navigation-drawer v-model="drawer" width="700">
       <v-container class="d-flex flex-column ga-2">
         <v-card text="Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi, ratione debitis quis est labore voluptatibus! Eaque cupiditate minima, at placeat totam, magni doloremque veniam neque porro libero rerum unde voluptatem!">
-          <div ref="codeEditorElement2" class="code-editor"></div>
+          <!-- <div ref="codeEditorElement2" class="code-editor"></div> -->
+          <!-- <codemirror
+          /> -->
         </v-card>
         <v-card text="Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi, ratione debitis quis est labore voluptatibus! Eaque cupiditate minima, at placeat totam, magni doloremque veniam neque porro libero rerum unde voluptatem!"></v-card>
         <v-card text="Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi, ratione debitis quis est labore voluptatibus! Eaque cupiditate minima, at placeat totam, magni doloremque veniam neque porro libero rerum unde voluptatem!"></v-card>
@@ -89,7 +91,7 @@
 </style>
 
 <script lang="ts" setup>
-  import { onMounted, ref } from 'vue';
+  import { ref, onMounted, useTemplateRef } from 'vue';
   import { useTheme } from 'vuetify';
   import { useRouter } from 'vue-router';
   import { basicSetup, EditorView } from 'codemirror';
@@ -109,26 +111,21 @@
     message: ''
   });
 
-  const codeEditorElement = ref(null);
-  const codeEditorElement2 = ref(null);
-  
+  const mainCodeEditorRef = useTemplateRef('codeEditorElement');
   let mainCodeEditor: EditorView;
 
   onMounted(() => {
     mainCodeEditor = new EditorView({
-      doc: 'main() {\n\tprintf(\"Hello, World!\");\n}',
-      extensions: [basicSetup, oneDark, cppLanguage],
-      parent: codeEditorElement.value!
-    });
-
-    new EditorView({
-      doc: 'Outro código aqui\nDe exemplo\nAqui',
-      extensions: [basicSetup, oneDark, cppLanguage],
-      parent: codeEditorElement2.value!
-    });
-    
-  });
-
+      doc: 'main() {\n\tprintf("Hello, Word!");\n}',
+      extensions: [
+        basicSetup,
+        cppLanguage,
+        oneDark,
+      ],
+      parent: mainCodeEditorRef.value!,
+    })
+  })
+  
   function toggleTheme() {
     theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark';
   }
@@ -144,15 +141,14 @@
 
     try {
       const codeId = await compilerApi.uploadCode(code);
-
+      
       router.push(codeId);
     } catch (error) {
       console.log(error);
       // console.error(`Failed to upload the code: ${code}`);
       showErrorMessage(`Falha ao fazer o upload do código: ${error.message}`);
     }
-    finally {
-      isLoading.value = false;
-    }
+    
+    isLoading.value = false;
   }
 </script>
