@@ -4,12 +4,13 @@
     <v-app-bar color="indigo">
 
       <template v-slot:prepend>
-        <v-app-bar-nav-icon icon="mdi-arrow-left" @click="backRoute() "></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon @click="isConfigMenuOpen = !isConfigMenuOpen"></v-app-bar-nav-icon>
       </template>
-
+      
       <v-app-bar-title>Projeto Compilador</v-app-bar-title>
-
+      
       <template v-slot:append>
+        <v-btn size="x-large" icon="mdi-arrow-left" @click="backRoute()"></v-btn>
         <v-btn size="x-large" :icon="theme.global.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night'"
           @click="toggleTheme"></v-btn>
         <v-btn size="x-large" href="https://github.com/erikborella/projeto-compiladores-ifsc" target="_blank"
@@ -39,7 +40,12 @@
 
 
     <v-main>
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <component 
+          :is="Component"
+          v-model:isConfigMenuOpen="isConfigMenuOpen"
+        />
+      </router-view>
     </v-main>
 
   </v-layout>
@@ -54,6 +60,8 @@
   const theme = useTheme();
   const route = useRoute();
   const router = useRouter();
+
+  const isConfigMenuOpen = ref(true);
 
   onMounted(() => {
     const currentRoute = route.name;

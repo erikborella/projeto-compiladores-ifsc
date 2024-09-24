@@ -1,7 +1,7 @@
 <template>
   <v-layout class="fill-height">
 
-    <v-navigation-drawer v-model="drawer" width="350">
+    <v-navigation-drawer v-model="isConfigMenuOpen" width="350">
       <v-container class="d-flex flex-column ga-2">
         <v-card
           elevation="4"
@@ -11,7 +11,11 @@
             variant="outlined"
             class="pa-3"
             label="Nível de otimização"
-            :items="['Sem otimização']"
+            v-model="optimizationSelected"
+            :items="optimizationLevels"
+            item-title="text"
+            item-value="value"
+            @update:modelValue="test()"
           ></v-select>
         </v-card>
       </v-container>
@@ -33,18 +37,30 @@
 </style>
 
 <script lang='ts' setup>
-  import { ref, onMounted, useTemplateRef } from 'vue';
+  import { ref, toRef, onMounted, useTemplateRef, defineProps, watch, defineEmits } from 'vue';
   import { useRoute } from 'vue-router';
-  import compilerApi from '../../services/compiler/compilerApi';
   import { EditorView, basicSetup } from 'codemirror';
   import { EditorState } from '@codemirror/state';
   import { oneDark } from '@codemirror/theme-one-dark';
   import { cppLanguage } from '@codemirror/lang-cpp';
+  import { OptimizationLevel } from '../../models/OptimizationLevel';
+  import compilerApi from '../../services/compiler/compilerApi';
+
+  const isConfigMenuOpen = defineModel<boolean>('isConfigMenuOpen');
 
   const route = useRoute();
 
   const isLoading = ref(false);
-  const drawer = ref(true);
+
+  const optimizationSelected = ref(OptimizationLevel.o0);
+  const optimizationLevels = [
+    { value: OptimizationLevel.o0, text: 'Sem otimização' },
+    { value: OptimizationLevel.os, text: 'Padrão (os)' },
+    { value: OptimizationLevel.o1, text: 'Leve (o1)' },
+    { value: OptimizationLevel.o2, text: 'Média (o2)' },
+    { value: OptimizationLevel.o3, text: 'Pesada (o3)' },
+    { value: OptimizationLevel.oz, text: 'Tamanho (oz)' },
+  ];
 
   const snackbar = ref({
     show: false,
@@ -52,6 +68,10 @@
   });
 
   const llvmIrCodeEditorElement = useTemplateRef('llvmIrCodeEditorElement');
+
+  function test() {
+    console.log(optimizationSelected);
+  }
 
   onMounted(async () => {
     isLoading.value = true;
