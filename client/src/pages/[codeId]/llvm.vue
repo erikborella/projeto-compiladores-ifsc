@@ -15,7 +15,7 @@
             :items="optimizationLevels"
             item-title="text"
             item-value="value"
-            @update:modelValue="test()"
+            @update:modelValue="changeOptimizationLevel()"
           ></v-select>
         </v-card>
       </v-container>
@@ -78,8 +78,12 @@
 
   const llvmIrCodeEditorElement = useTemplateRef('llvmIrCodeEditorElement');
 
-  function test() {
-    console.log(optimizationSelected);
+  function changeOptimizationLevel() {
+    isLoading.value = true;
+
+    setTimeout(() => {
+      isLoading.value = false
+    }, 1000);
   }
 
   onMounted(async () => {
