@@ -2,6 +2,11 @@
   <v-layout>
 
     <v-app-bar color="indigo">
+
+      <template v-slot:prepend>
+        <v-app-bar-nav-icon icon="mdi-arrow-left" @click="backRoute() "></v-app-bar-nav-icon>
+      </template>
+
       <v-app-bar-title>Projeto Compilador</v-app-bar-title>
 
       <template v-slot:append>
@@ -57,6 +62,10 @@
       router.replace({ name: '/[codeId]/llvm' });
     }
   })
+
+  function backRoute() {
+    router.push('/');
+  }
 
   function toggleTheme() {
     theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark';

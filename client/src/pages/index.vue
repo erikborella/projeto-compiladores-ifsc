@@ -89,7 +89,7 @@
   </v-layout>
 </template>
 
-<style lang="css">
+<style lang="css" scoped>
   .root {
     display: flex;
     flex-direction: column;
@@ -102,27 +102,10 @@
     height: 100%;
     overflow: auto;
   }
-
-  .cm-editor {
-    height: 100%;
-    width: 100%;
-  }
-
-  html, body, #app {
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
-  }
-
-  v-main {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-  }
 </style>
 
 <script lang="ts" setup>
-  import { ref, onMounted, useTemplateRef } from 'vue';
+  import { ref, onMounted, onBeforeUnmount, useTemplateRef } from 'vue';
   import { useTheme } from 'vuetify';
   import { useRouter } from 'vue-router';
   import { basicSetup, EditorView } from 'codemirror';
@@ -131,6 +114,8 @@
   import { cppLanguage } from '@codemirror/lang-cpp';
 
   import compilerApi from '../services/compiler/compilerApi';
+
+  const USER_CACHE_CODE_STORAGE_KEY = 'savedCode';
 
   const drawer = ref(true);
   const theme = useTheme();
@@ -148,11 +133,13 @@
 
   const exampleCodeEditorMain = useTemplateRef('exampleCodeEditorMain');
   const exampleCodeEditorVariables = useTemplateRef('exampleCodeEditorVariables');
-  const exampleCodeEditorVariableAttribuition = useTemplateRef('exampleCodeEditorVariableAttribuition');
+  const exampleCodeEditorVariableAttribution = useTemplateRef('exampleCodeEditorVariableAttribuition');
 
   onMounted(() => {
+    const cachedCode = loadCodeFromLocalStorage() ?? 'main() {\n\tprintf("Hello, Word!");\n}';
+
     mainCodeEditor = new EditorView({
-      doc: 'main() {\n\tprintf("Hello, Word!");\n}',
+      doc: cachedCode,
       extensions: [
         basicSetup,
         cppLanguage,
@@ -186,7 +173,7 @@ int var1;
 boolean var2, var3;
 
 // Declaração de arrays
-float[5] vet;
+float[5] vet;/
 int[7][10] mat;`,
       extensions: [
         basicSetup,
@@ -225,15 +212,28 @@ n1 = func funcao();`,
         oneDark,
         EditorState.readOnly.of(true)
       ],
-      parent: exampleCodeEditorVariableAttribuition.value!
+      parent: exampleCodeEditorVariableAttribution.value!
     })
   })
-  
+
+  onBeforeUnmount(saveCodeToLocalStorage);
+  window.onbeforeunload = saveCodeToLocalStorage;
+
+  function saveCodeToLocalStorage() {
+    const code = mainCodeEditor.state.doc.toString();
+    localStorage.setItem(USER_CACHE_CODE_STORAGE_KEY, code);
+  }
+
+  function loadCodeFromLocalStorage(): string | null {
+    const code = localStorage.getItem(USER_CACHE_CODE_STORAGE_KEY);
+    return code;
+  }
+
   function toggleTheme() {
     theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark';
   }
 
-  function showErrorMessage(message) {
+  function showErrorMessage(message: string) {
     snackbar.value.message = message;
     snackbar.value.show = true;
   }
@@ -247,8 +247,7 @@ n1 = func funcao();`,
       
       router.push(codeId);
     } catch (error) {
-      console.log(error);
-      // console.error(`Failed to upload the code: ${code}`);
+      console.error(error);
       showErrorMessage(`Falha ao fazer o upload do código: ${error.message}`);
     }
     

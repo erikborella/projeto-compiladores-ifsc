@@ -1,6 +1,6 @@
 import axiosInstance from '../axiosInstance';
 
-export const uploadCode = async(code: string): Promise<string> => {
+const uploadCode = async(code: string): Promise<string> => {
     try {
         const response = await axiosInstance.post<string>('/compiler/upload', code, {
             headers: {
@@ -13,4 +13,15 @@ export const uploadCode = async(code: string): Promise<string> => {
     }
 }
 
-export default {uploadCode};
+const getLlvmIrCode = async (codeId: string): Promise<string> => {
+    try {
+        const response = await axiosInstance.get<string>(`/compiler/${codeId}/llvm/ir`);
+
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+export default {uploadCode, getLlvmIrCode};
