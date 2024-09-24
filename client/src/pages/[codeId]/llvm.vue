@@ -47,7 +47,7 @@
 
 <script lang='ts' setup>
   import { ref, toRef, onMounted, useTemplateRef, defineProps, watch, defineEmits } from 'vue';
-  import { useRoute } from 'vue-router';
+  import { useRoute, useRouter } from 'vue-router';
   import { EditorView, basicSetup } from 'codemirror';
   import { EditorState } from '@codemirror/state';
   import { oneDark } from '@codemirror/theme-one-dark';
@@ -58,6 +58,7 @@
   const isConfigMenuOpen = defineModel<boolean>('isConfigMenuOpen');
 
   const route = useRoute();
+  const router = useRouter();
 
   const isLoading = ref(false);
 
@@ -80,6 +81,8 @@
 
   function changeOptimizationLevel() {
     isLoading.value = true;
+
+    router.push({ name: '/[codeId]/llvm', query: { optimization: optimizationSelected.value.toString()} })
 
     setTimeout(() => {
       isLoading.value = false
