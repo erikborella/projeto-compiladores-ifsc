@@ -24,6 +24,15 @@
     <v-main>
       <div ref="llvmIrCodeEditorElement" class="code-editor"></div>
     </v-main>
+
+    <v-overlay v-model="isLoading" :opacity="0.8" persistent class="align-center justify-center">
+        <v-progress-circular
+          indeterminate
+          color="primary"
+          width="10"
+          size="100">
+        </v-progress-circular>
+    </v-overlay>
   </v-layout>
 </template>
 
