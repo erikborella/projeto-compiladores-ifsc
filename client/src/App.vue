@@ -9,6 +9,11 @@
 </script>
 
 <style>
+  .cm-mergeView {
+    height: 100%;
+    width: 100%;
+  }
+
   .cm-editor {
     height: 100%;
     width: 100%;

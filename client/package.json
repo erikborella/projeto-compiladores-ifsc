@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@codemirror/lang-cpp": "^6.0.2",
+    "@codemirror/merge": "^6.7.1",
     "@codemirror/theme-one-dark": "^6.1.2",
     "@mdi/font": "6.2.95",
     "axios": "^1.7.7",
