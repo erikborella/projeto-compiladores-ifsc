@@ -25,6 +25,17 @@ const getLlvmIrCode = async (codeId: string, optimizationLevel: OptimizationLeve
     }
 }
 
+const getAsmCode = async (codeId: string, optimizationLevel: OptimizationLevel): Promise<string> => {
+    try {
+        const requestUrl = buildOptimizationUrlRequest(`/compiler/${codeId}/asm`, optimizationLevel);
+        const response = await axiosInstance.get<string>(requestUrl);
+
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 function buildOptimizationUrlRequest(baseUrl: string, optimizationLevel: OptimizationLevel): string {
     if (optimizationLevel === OptimizationLevel.o0) {
         return baseUrl;
@@ -34,4 +45,4 @@ function buildOptimizationUrlRequest(baseUrl: string, optimizationLevel: Optimiz
 }
 
 
-export default {uploadCode, getLlvmIrCode};
+export default {uploadCode, getLlvmIrCode, getAsmCode};
