@@ -38,13 +38,14 @@
             :items="getOptimizationLevelsToCompare"
             item-title="text"
             item-value="value"
+            @update:modelValue="changeOptimizationLevel()"
           ></v-select>            
         </v-card>
       </v-container>
     </v-navigation-drawer>
 
     <v-main>
-      <div v-if="isMergeEditorVisible" ref="llvmIrCodeMergeElement" class="code-editor one-dark-background"></div>
+      <div v-if="isMergeEditorVisible" ref="llvmIrCodeMergeElement" class="code-editor"></div>
       <div v-else ref="llvmIrCodeEditorElement" class="code-editor"></div>
     </v-main>
 
@@ -64,9 +65,6 @@
  .code-editor {
   height: 100%;
   overflow: auto;
- }
-
- .one-dark-background {
   background-color: #282c34;
  }
 
@@ -76,7 +74,7 @@
   import { ref, onMounted, computed, useTemplateRef, nextTick } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { EditorView, basicSetup } from 'codemirror';
-  import { MergeView, unifiedMergeView } from '@codemirror/merge';
+  import { MergeView } from '@codemirror/merge';
   import { EditorState } from '@codemirror/state';
   import { oneDark } from '@codemirror/theme-one-dark';
   import { cppLanguage } from '@codemirror/lang-cpp';
@@ -122,29 +120,33 @@
   let llvmIrMergeView: MergeView | null;
 
   function getQueryStateOptimizationLevel(): OptimizationLevel {
-    const queryOptimizationLevel = route.query.optimization;
+    const queryOptimizationLevel = route.query.optimizationLevel;
 
     const optimizationLevelConverted = OptimizationLevel[queryOptimizationLevel?.valueOf() as string] as OptimizationLevel | undefined;
     const validOptimizationLevel = optimizationLevelConverted ?? OptimizationLevel.o0;
-
-    if (optimizationLevelConverted === undefined) {
-      updateQueryState('optimization', validOptimizationLevel.toString());
-    }
     
     return validOptimizationLevel;
   }
 
   function getQueryStateIsMergeEditorVisible(): boolean {
-    const queryIsMergeEditorVisible = route.query.mergeEditor;
+    const queryIsMergeEditorVisible = route.query.compareOptimization;
     const hasValidValue = (queryIsMergeEditorVisible === 'true') || (queryIsMergeEditorVisible === 'false');
 
     if (!hasValidValue) {
       const defaultValue = false;
-      updateQueryState('mergeEditor', `${defaultValue}`);
       return defaultValue;
     }
 
     return queryIsMergeEditorVisible === 'true';
+  }
+
+  function getQueryStateOptimizationLevelToCompare(): OptimizationLevel {
+    const queryOptimizationLevel = route.query.optimizationLevelToCompare;
+
+    const optimizationLevelConverted = OptimizationLevel[queryOptimizationLevel?.valueOf() as string] as OptimizationLevel | undefined;
+    const validOptimizationLevel = optimizationLevelConverted ?? getOptimizationLevelsToCompare.value[0].value;
+    
+    return validOptimizationLevel;
   }
 
   function setupQueryStates() {
@@ -153,12 +155,26 @@
 
     const isMergeEditorCurrentlyVisible = getQueryStateIsMergeEditorVisible();
     isMergeEditorVisible.value = isMergeEditorCurrentlyVisible;
+
+    const optimizationLevelToCompare = getQueryStateOptimizationLevelToCompare();
+    optimizationToCompareSelected.value = optimizationLevelToCompare;
+
+    const queryStatesToUpdate = {
+      'optimizationLevel': currentOptimizationLevel,
+      'compareOptimization': isMergeEditorCurrentlyVisible,
+      'optimizationLevelToCompare': optimizationLevelToCompare,
+    };
+
+    updateQueryState(queryStatesToUpdate);
   }
   
   async function changeOptimizationLevel() {
     isLoading.value = true;
 
-    updateQueryState('optimization', optimizationSelected.value.toString());
+    updateQueryState({
+      'optimizationLevel': optimizationSelected.value.toString(),
+      'optimizationLevelToCompare': optimizationToCompareSelected.value.toString(),
+    });
 
     await downloadAndShowIrCode();
   }
@@ -190,56 +206,66 @@
   }
 
   async function downloadAndShowMergeIrCode() {
-    if (llvmIrMergeView === null) {
-      return;
+    isLoading.value = true;
+
+    if (optimizationToCompareSelected.value === optimizationSelected.value) {
+      optimizationToCompareSelected.value = getOptimizationLevelsToCompare.value[0].value;
+      updateQueryState({ 'optimizationLevelToCompare': optimizationToCompareSelected.value });
     }
 
-    isLoading.value = true;
+    llvmIrMergeView?.destroy();
 
     const aIrCode = await downloadIrCode(optimizationSelected.value);
     const bIrCode = await downloadIrCode(optimizationToCompareSelected.value);
 
-    updateEditorStateCode(llvmIrMergeView.a, aIrCode);
-    updateEditorStateCode(llvmIrMergeView.b, bIrCode);
+    const aIrCodeWithIdentification = `// Otimização ${optimizationLevels.find(v => v.value === optimizationSelected.value)?.text}\n\n${aIrCode}`;
+    const bIrCodeWithIdentification = `// Otimização ${optimizationLevels.find(v => v.value === optimizationToCompareSelected.value)?.text}\n\n${bIrCode}`;
 
-    debugger;
-
-    llvmIrMergeView.reconfigure({
+    llvmIrMergeView = new MergeView({
+      parent: llvmIrCodeMergeElement.value!,
       gutter: true,
+      highlightChanges: true,
+      orientation: 'a-b',
+      a: {
+        doc: aIrCodeWithIdentification,
+        extensions: [
+          basicSetup,
+          cppLanguage,
+          oneDark,
+          EditorState.readOnly.of(true),
+        ],
+      },
+      b: {
+        doc: bIrCodeWithIdentification,
+        extensions: [
+          basicSetup,
+          cppLanguage,
+          oneDark,
+          EditorState.readOnly.of(true),
+        ],
+      }
     });
-
+   
     isLoading.value = false;
   }
 
-  function updateEditorStateCode(view: EditorView, newText: string) {
-    const transaction = view.state.update({
-      changes: {
-        from: 0,
-        to: view.state.doc.length,
-        insert: newText
-      }
-    });
-    view.update([transaction]);
-  } 
-
   async function downloadAndShowEditorIrCode() {
-    if (llvmIrEditorView === null) {
-      return;
-    }
-
     isLoading.value = true;
+
+    llvmIrEditorView?.destroy();
 
     const irCode = await downloadIrCode(optimizationSelected.value);
 
-    const transaction = llvmIrEditorView.state.update({
-      changes: {
-        from: 0,
-        to: llvmIrEditorView.state.doc.length,
-        insert: irCode
-      },
-    })
-
-    llvmIrEditorView.update([transaction]);    
+    llvmIrEditorView = new EditorView({
+      parent: llvmIrCodeEditorElement.value!,
+      doc: irCode,
+      extensions: [
+        basicSetup,
+        cppLanguage,
+        oneDark,
+        EditorState.readOnly.of(true),
+      ],
+    });
 
     isLoading.value = false;
   }
@@ -264,17 +290,6 @@
 
     await nextTick();
 
-    llvmIrEditorView = new EditorView({
-      parent: llvmIrCodeEditorElement.value!,
-      doc: 'Carregando...',
-      extensions: [
-        basicSetup,
-        cppLanguage,
-        oneDark,
-        EditorState.readOnly.of(true),
-      ],
-    });
-
     await downloadAndShowIrCode();
   }
 
@@ -284,33 +299,12 @@
 
     await nextTick();
 
-    llvmIrMergeView = new MergeView({
-      parent: llvmIrCodeMergeElement.value!,
-      gutter: true,
-      highlightChanges: true,
-      orientation: 'b-a',
-      a: {
-        doc: 'Carregando...',
-        extensions: [
-          basicSetup,
-          cppLanguage,
-          oneDark,
-          EditorState.readOnly.of(true),
-        ],
-      },
-      b: {
-        doc: 'Carregando...',
-        extensions: [
-          basicSetup,
-          cppLanguage,
-          oneDark,
-          EditorState.readOnly.of(true),
-        ],
-      }
-    });
+    await downloadAndShowMergeIrCode();
   }
 
   async function toggleEditorMode(shouldShowMergeEditor: boolean) {
+    updateQueryState({ 'compareOptimization': shouldShowMergeEditor });
+
     if (shouldShowMergeEditor) {
       await showMergeView();
       return;
@@ -319,11 +313,14 @@
     await showEditorView();
   }
 
-  function updateQueryState(parameter: string, value: string) {
-    router.push({ name: '/[codeId]/llvm', query: {
-        ...route.query,
-        [parameter]: value
-      }});
+  function updateQueryState(newStates: { [key: string]: any }) {
+
+    const updatedQuery = {
+      ...route.query,
+      ...newStates
+    };
+
+    router.push({ name: '/[codeId]/llvm', query: updatedQuery});
   }
 
 </script>
