@@ -28,11 +28,11 @@
           <v-tab>
             Arvore sintática
           </v-tab>
-          <v-tab>
+          <v-tab :to="{ name: '/[codeId]/execution' }">
             Execução
           </v-tab>
           <v-tab>
-            Complexidade de algortimo
+            Complexidade de algoritmo
           </v-tab>
         </v-tabs>
       </template>

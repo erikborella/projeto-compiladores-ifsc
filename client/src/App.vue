@@ -19,6 +19,10 @@
     width: 100%;
   }
 
+  .remove-details > .v-input__details {
+    display: none;
+  }
+
   html, body, #app {
     height: 100%;
     margin: 0;

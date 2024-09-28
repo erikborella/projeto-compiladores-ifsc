@@ -136,7 +136,7 @@
   const exampleCodeEditorVariableAttribution = useTemplateRef('exampleCodeEditorVariableAttribuition');
 
   onMounted(() => {
-    const cachedCode = loadCodeFromLocalStorage() ?? 'main() {\n\tprintf("Hello, Word!");\n}';
+    const cachedCode = loadCodeFromLocalStorage() ?? 'main() {\n\tprintln("Hello, Word!");\n}';
 
     mainCodeEditor = new EditorView({
       doc: cachedCode,

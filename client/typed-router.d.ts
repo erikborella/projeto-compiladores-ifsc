@@ -21,6 +21,7 @@ declare module 'vue-router/auto-routes' {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
     '/[codeId]': RouteRecordInfo<'/[codeId]', '/:codeId', { codeId: ParamValue<true> }, { codeId: ParamValue<false> }>,
     '/[codeId]/asm': RouteRecordInfo<'/[codeId]/asm', '/:codeId/asm', { codeId: ParamValue<true> }, { codeId: ParamValue<false> }>,
+    '/[codeId]/execution': RouteRecordInfo<'/[codeId]/execution', '/:codeId/execution', { codeId: ParamValue<true> }, { codeId: ParamValue<false> }>,
     '/[codeId]/llvm': RouteRecordInfo<'/[codeId]/llvm', '/:codeId/llvm', { codeId: ParamValue<true> }, { codeId: ParamValue<false> }>,
     '/screentest': RouteRecordInfo<'/screentest', '/screentest', Record<never, never>, Record<never, never>>,
   }
