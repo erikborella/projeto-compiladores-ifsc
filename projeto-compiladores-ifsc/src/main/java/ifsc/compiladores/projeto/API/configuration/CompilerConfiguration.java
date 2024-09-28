@@ -13,6 +13,8 @@ public class CompilerConfiguration {
     private String irOptFileNameTemplate;
     private String llvmOptimizer;
 
+    private String executableFileName;
+
     private String asmFileName;
     private String asmOptFileNameTemplate;
     private String clangCompiler;
@@ -89,5 +91,21 @@ public class CompilerConfiguration {
 
     public void setSyntaxTreeFileName(String syntaxTreeFileName) {
         this.syntaxTreeFileName = syntaxTreeFileName;
+    }
+
+    public String getLlvmOptimizer() {
+        return llvmOptimizer;
+    }
+
+    public void setLlvmOptimizer(String llvmOptimizer) {
+        this.llvmOptimizer = llvmOptimizer;
+    }
+
+    public String getExecutableFileName() {
+        return executableFileName;
+    }
+
+    public void setExecutableFileName(String executableFileName) {
+        this.executableFileName = executableFileName;
     }
 }

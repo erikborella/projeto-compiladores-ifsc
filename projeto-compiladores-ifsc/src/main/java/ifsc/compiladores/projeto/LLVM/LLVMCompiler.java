@@ -73,4 +73,16 @@ public class LLVMCompiler {
 
         return asmOptimizeProcess.waitFor() == 0;
     }
+
+    public static boolean compileToExecutable(String clangCompiler, File irCodePath, File destPath) throws IOException, InterruptedException {
+        Process executableCompilingProcess = new ProcessBuilder(
+                clangCompiler,
+                irCodePath.toString(),
+                "-o",
+                destPath.toString()
+        )
+        .start();
+
+        return executableCompilingProcess.waitFor() == 0;
+    }
 }

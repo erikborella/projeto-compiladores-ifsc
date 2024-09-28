@@ -124,4 +124,27 @@ public class LLVMCompilerServiceImpl implements LLVMCompilerService {
 
         return this.codeCacheManager.loadCodeArtifact(codeId, optimizedFileName);
     }
+
+    @Override
+    public Optional<File> getExecutableCodePath(String codeId) throws IOException, InterruptedException {
+        OptLevel optimizationUsed = OptLevel.OS;
+        Optional<String> optimizedCode = this.getOptLLVMIrCode(codeId, optimizationUsed);
+
+        if (optimizedCode.isEmpty()) {
+            return Optional.empty();
+        }
+
+        String optimizedFileName = String.format(this.configuration.getIrOptFileNameTemplate(), optimizationUsed.getStringValue());
+        File optFilePath = this.codeCacheManager.buildFilePath(codeId, optimizedFileName);
+        File executableFilePath = this.codeCacheManager.buildFilePath(codeId, this.configuration.getExecutableFileName());
+
+        boolean elfCompileSuccess = LLVMCompiler.compileToExecutable(this.configuration.getClangCompiler(), optFilePath, executableFilePath);
+
+        if (!elfCompileSuccess) {
+            return Optional.empty();
+        }
+
+        return Optional.of(executableFilePath);
+    }
+
 }

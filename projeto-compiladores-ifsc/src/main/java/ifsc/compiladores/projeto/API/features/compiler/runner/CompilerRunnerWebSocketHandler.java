@@ -1,6 +1,7 @@
 package ifsc.compiladores.projeto.API.features.compiler.runner;
 
 import ifsc.compiladores.projeto.API.configuration.CompilerConfiguration;
+import ifsc.compiladores.projeto.API.features.compiler.domain.LLVMCompilerService;
 import ifsc.compiladores.projeto.API.features.compiler.runner.threads.ProcessExitListenerThread;
 import ifsc.compiladores.projeto.API.features.compiler.runner.threads.ProcessOutputListenerThread;
 import org.springframework.stereotype.Component;
@@ -9,7 +10,11 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -17,18 +22,39 @@ public class CompilerRunnerWebSocketHandler extends TextWebSocketHandler {
 
     private final Map<String, Process> sessions = new ConcurrentHashMap<>();
 
-    private final CompilerConfiguration configuration;
+    private final LLVMCompilerService llvmCompilerService;
 
-    public CompilerRunnerWebSocketHandler(CompilerConfiguration configuration) {
-        this.configuration = configuration;
+    public CompilerRunnerWebSocketHandler(LLVMCompilerService llvmCompilerService) {
+        this.llvmCompilerService = llvmCompilerService;
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        String sessionId = session.getId();
+        if (session.getUri() == null) {
+            session.sendMessage(new TextMessage("-- Erro no servidor: URI não encontrada"));
+            session.close();
+            return;
+        }
 
-        ProcessBuilder processBuilder = new ProcessBuilder("stdbuf", "-o0", "-e0", "./a.out");
-        Process process = processBuilder.start();
+        Optional<String> codeId = this.getCodeIdFromQuery(session.getUri());
+
+        if (codeId.isEmpty()) {
+            session.sendMessage(new TextMessage("-- Erro de cliente: codeId não está presente"));
+            session.close();
+            return;
+        }
+
+        Optional<File> executablePath = this.llvmCompilerService.getExecutableCodePath(codeId.get());
+
+        if (executablePath.isEmpty()) {
+            session.sendMessage(new TextMessage("-- Erro de cliente: código não encontrado."));
+            session.close();
+            return;
+        }
+
+        Process process = this.startProcess(executablePath.get());
+
+        String sessionId = session.getId();
         this.sessions.put(sessionId, process);
 
         startProcessThreads(session, process, sessionId);
@@ -83,4 +109,30 @@ public class CompilerRunnerWebSocketHandler extends TextWebSocketHandler {
             }
         }).start();
     }
+
+    private Optional<String> getCodeIdFromQuery(URI uri) {
+        String uriQuery = uri.getQuery();
+
+        if (uriQuery == null) {
+            return Optional.empty();
+        }
+
+        String[] params = uriQuery.split("&");
+
+        for (String param : params) {
+            String[] pair = param.split("=");
+
+            if (pair.length > 1 && "codeId".equals(pair[0])) {
+                return Optional.ofNullable(pair[1]);
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    private Process startProcess(File executableFile) throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder("stdbuf", "-o0", "-e0", executableFile.getCanonicalPath());
+        return processBuilder.start();
+    }
+
 }
