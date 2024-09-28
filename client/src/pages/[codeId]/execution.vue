@@ -14,6 +14,10 @@
           <v-container>
             <v-btn @click="restartProgram()" block text="reiniciar" append-icon="mdi-restart"></v-btn>
           </v-container>
+          
+          <v-container>
+            <v-btn @click="cleanOutput()" block text="limpar" append-icon="mdi-broom"></v-btn>
+          </v-container>
 
         </v-card>
       </v-container>
@@ -35,9 +39,10 @@
           class="remove-details"
           ref="inputTextField"
           @keyup.enter="sendInput()"
+          :disabled="webSocket === null"
         >
           <template v-slot:append>
-            <v-btn @click="sendInput()" color="primary" text="Enviar" append-icon="mdi-send">
+            <v-btn @click="sendInput()" color="primary" text="Enviar" append-icon="mdi-send" :disabled="webSocket === null">
             </v-btn>
           </template>
         </v-text-field>
@@ -86,7 +91,7 @@
   const outputTextArea = useTemplateRef('outputTextArea');
   const inputTextField = useTemplateRef('inputTextField');
 
-  let webSocket: WebSocket | null = null;
+  let webSocket = ref<WebSocket | null>(null);
 
   onBeforeUnmount(closeSocket);
   window.onbeforeunload = closeSocket;
@@ -100,19 +105,24 @@
   })
 
   function restartProgram() {
-    webSocket?.close();
+    webSocket.value?.close();
     startProgram();
+  }
+
+  function cleanOutput() {
+    outputText.value = '';
   }
 
   function startProgram() {
     const codeId = route.params.codeId as string;
 
-    outputText.value += '-- Iniciando conexão com o servidor\n'
+    outputText.value += '-----------------------------------\n\n';
+    outputText.value += '-- Iniciando conexão com o servidor\n';
 
     const ws = compilerRunner.getRunnerWebSocket(codeId);
 
     ws.onopen = () => {
-      outputText.value += '-- Conexão com o servidor estabelecida\n\n'
+      outputText.value += '-- Conexão com o servidor estabelecida\n\n';
     }
     
     ws.onmessage = (event) => {
@@ -121,18 +131,23 @@
 
     ws.onclose = () => {
       outputText.value += '-- Conexão com o servidor encerrada\n\n';
+      webSocket.value = null;
     }
 
-    webSocket = ws;
+    webSocket.value = ws;
     inputTextField.value?.focus();
   }
 
   function closeSocket() {
-    webSocket?.close();
+    webSocket.value?.close();
+    webSocket.value = null;
   }
 
   function sendInput() {
-    webSocket?.send(inputText.value);
+    if (webSocket.value === null)
+      return;
+
+    webSocket.value.send(inputText.value);
 
     outputText.value += `${inputText.value}\n`;
     inputText.value = '';
