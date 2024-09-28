@@ -84,7 +84,9 @@ public class CompilerRunnerWebSocketHandler extends TextWebSocketHandler {
     private void startProcessThreads(WebSocketSession session, Process process, String sessionId) {
         new ProcessOutputListenerThread(process.getInputStream(), (message) -> {
             try {
-                session.sendMessage(new TextMessage(message));
+                synchronized (session) {
+                    session.sendMessage(new TextMessage(message));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -92,7 +94,9 @@ public class CompilerRunnerWebSocketHandler extends TextWebSocketHandler {
 
         new ProcessOutputListenerThread(process.getErrorStream(), (errorMessage) -> {
             try {
-                session.sendMessage(new TextMessage("Error: " + errorMessage));
+                synchronized (session) {
+                    session.sendMessage(new TextMessage("Error: " + errorMessage));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -100,8 +104,10 @@ public class CompilerRunnerWebSocketHandler extends TextWebSocketHandler {
 
         new ProcessExitListenerThread(process, (exitCode) -> {
             try {
-                session.sendMessage(new TextMessage("\n\n-- Execução do programa finalizado com código de saida: " + exitCode));
-                session.close();
+                synchronized (session) {
+                    session.sendMessage(new TextMessage("\n\n-- Execução do programa finalizado com código de saida: " + exitCode));
+                    session.close();
+                }
 
                 this.sessions.remove(sessionId);
             } catch (Exception e) {
