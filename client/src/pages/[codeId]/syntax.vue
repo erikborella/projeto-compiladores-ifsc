@@ -6,7 +6,7 @@
     </v-navigation-drawer>
 
     <v-main>
-      <div class="treeContainer">
+      <div ref="containerD3Root" class="treeContainer">
         <div ref="containerD3"></div>
       </div>
     </v-main>
@@ -68,6 +68,7 @@
   let referenceCodeEditorView: EditorView;
 
   const containerD3 = useTemplateRef('containerD3');
+  const containerD3Root = useTemplateRef('containerD3Root');
 
   const snackbar = ref({
     show: false,
@@ -103,8 +104,8 @@
     const treeData = treeLayout(family);
 
     const nodeCount = treeData.descendants().length;
-    const rootHeight = nodeCount * 15;
-    const rootWidth = treeData.height * 150;
+    const rootHeight = Math.max(containerD3Root.value?.clientHeight!, nodeCount * 15);
+    const rootWidth = Math.max(containerD3Root.value?.clientWidth!, treeData.height * 150);
 
     const svg = d3.select(containerD3.value)
       .append('svg')
@@ -113,7 +114,7 @@
       .append('g')
       .attr('transform', 'translate(40, 40)');
 
-    treeLayout.size([rootHeight - 100, rootWidth - 100]);
+    treeLayout.size([rootHeight - 100, rootWidth - 150]);
 
     const treeNodes = treeLayout(family);
 
