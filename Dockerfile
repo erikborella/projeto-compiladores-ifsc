@@ -9,7 +9,20 @@ COPY projeto-compiladores-ifsc/src ./src
 
 RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:21-jdk-jammy
+# -----
+
+FROM node:20.17.0 as client_build
+
+WORKDIR /client
+
+COPY client .
+RUN npm install
+
+RUN npm run build
+
+# -----
+
+FROM eclipse-temurin:21-jdk-jammy as final
 
 WORKDIR /app
 
@@ -21,7 +34,8 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     wget \
     software-properties-common \
-    gnupg
+    gnupg \
+    nginx
 
 RUN wget https://apt.llvm.org/llvm.sh
 RUN chmod +x llvm.sh
@@ -30,6 +44,13 @@ RUN ./llvm.sh 16
 RUN rm ./llvm.sh
 RUN rm -rf /var/lib/apt/lists/*
 
-EXPOSE 8080
+COPY --from=client_build /client/dist /var/www/html
 
-CMD [ "java", "-jar", "api.jar", "api" ]
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+COPY docker/start-services.sh ./start-services.sh
+
+RUN chmod u+x ./start-services.sh
+
+EXPOSE 80 8080
+
+CMD ./start-services.sh
