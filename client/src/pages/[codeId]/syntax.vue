@@ -16,6 +16,16 @@
       </v-progress-circular>
     </v-overlay>
 
+    <v-snackbar variant="flat" color="error" v-model="snackbar.show" :timeout="5000" top>
+      {{ snackbar.message }}
+      <template v-slot:actions>
+        <v-btn
+          color="white"
+          variant="text"
+          @click="snackbar.show = false">Fechar</v-btn>
+      </template>
+    </v-snackbar>
+
   </v-layout>
 </template>
 
@@ -82,6 +92,7 @@
       showTree();
     } catch (error) {
       console.error(error);
+      showErrorMessage(`Falha ao fazer o da arvore sintática: ${error.message}`);
     }
   }
 
@@ -166,6 +177,7 @@
 
     } catch (error) {
       console.error(error);
+      showErrorMessage(`Falha ao fazer o download do código: ${error.message}`);
     }
   }
 

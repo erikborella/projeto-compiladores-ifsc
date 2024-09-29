@@ -81,7 +81,7 @@ function buildOptimizationUrlRequest(
   baseUrl: string,
   optimizationLevel: OptimizationLevel
 ): string {
-  if (optimizationLevel === OptimizationLevel.o0) {
+  if (optimizationLevel === OptimizationLevel.no_opt) {
     return baseUrl;
   }
 

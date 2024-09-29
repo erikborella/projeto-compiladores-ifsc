@@ -50,7 +50,6 @@
 
     </v-main>
 
-
   </v-layout>
 </template>
 

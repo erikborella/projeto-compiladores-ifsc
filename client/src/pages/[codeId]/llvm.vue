@@ -57,6 +57,17 @@
           size="100">
         </v-progress-circular>
     </v-overlay>
+
+    <v-snackbar variant="flat" color="error" v-model="snackbar.show" :timeout="5000" top>
+      {{ snackbar.message }}
+      <template v-slot:actions>
+        <v-btn
+          color="white"
+          variant="text"
+          @click="snackbar.show = false">Fechar</v-btn>
+      </template>
+    </v-snackbar>
+    
   </v-layout>
 </template>
 
@@ -89,12 +100,13 @@
   const isLoading = ref(false);
 
   const optimizationLevels = [
-    { value: OptimizationLevel.o0, text: 'Sem otimização' },
-    { value: OptimizationLevel.os, text: 'Padrão (os)' },
-    { value: OptimizationLevel.o1, text: 'Leve (o1)' },
-    { value: OptimizationLevel.o2, text: 'Média (o2)' },
-    { value: OptimizationLevel.o3, text: 'Pesada (o3)' },
-    { value: OptimizationLevel.oz, text: 'Tamanho (oz)' },
+    { value: OptimizationLevel.no_opt, text: 'Sem otimização' },
+    { value: OptimizationLevel.o0, text: 'Sem otimização (O0, tratado pelo LLVM)' },
+    { value: OptimizationLevel.os, text: 'Padrão (Os)' },
+    { value: OptimizationLevel.o1, text: 'Leve (O1)' },
+    { value: OptimizationLevel.o2, text: 'Média (O2)' },
+    { value: OptimizationLevel.o3, text: 'Pesada (O3)' },
+    { value: OptimizationLevel.oz, text: 'Tamanho (Oz)' },
   ];
   const optimizationSelected = ref(optimizationLevels[0].value);
 
