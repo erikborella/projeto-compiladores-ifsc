@@ -110,6 +110,8 @@
   import { useRouter } from 'vue-router';
   import { basicSetup, EditorView } from 'codemirror';
   import { EditorState } from '@codemirror/state';
+  import { keymap } from '@codemirror/view';
+  import { indentWithTab } from '@codemirror/commands';
   import { oneDark } from '@codemirror/theme-one-dark';
   import { cppLanguage } from '@codemirror/lang-cpp';
 
@@ -144,6 +146,9 @@
         basicSetup,
         cppLanguage,
         oneDark,
+        keymap.of([
+          indentWithTab,
+        ])
       ],
       parent: mainCodeEditorRef.value!,
     });

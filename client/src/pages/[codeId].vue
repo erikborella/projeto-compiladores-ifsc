@@ -25,7 +25,7 @@
           <v-tab :to="{ name: '/[codeId]/asm' }">
             Assembly
           </v-tab>
-          <v-tab>
+          <v-tab :to="{ name: '/[codeId]/syntax' }">
             Arvore sintática
           </v-tab>
           <v-tab :to="{ name: '/[codeId]/execution' }">
