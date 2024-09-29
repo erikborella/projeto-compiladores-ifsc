@@ -3,6 +3,7 @@ package ifsc.compiladores.projeto.API.features.compiler.domain;
 import java.util.Optional;
 
 public enum OptLevel {
+    O0("O0"),
     O1("O1"),
     O2("O2"),
     O3("O3"),
