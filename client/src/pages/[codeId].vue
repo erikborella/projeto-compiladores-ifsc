@@ -19,14 +19,14 @@
 
       <template v-slot:extension>
         <v-tabs align-tabs="center" grow>
+          <v-tab :to="{ name: '/[codeId]/syntax' }">
+            Arvore sintática
+          </v-tab>
           <v-tab :to="{ name: '/[codeId]/llvm' }">
             LLVM IR
           </v-tab>
           <v-tab :to="{ name: '/[codeId]/asm' }">
             Assembly
-          </v-tab>
-          <v-tab :to="{ name: '/[codeId]/syntax' }">
-            Arvore sintática
           </v-tab>
           <v-tab :to="{ name: '/[codeId]/execution' }">
             Execução
@@ -67,7 +67,7 @@
     const currentRoute = route.name;
 
     if (currentRoute === '/[codeId]') {
-      router.replace({ name: '/[codeId]/llvm' });
+      router.replace({ name: '/[codeId]/syntax' });
     }
   })
 
