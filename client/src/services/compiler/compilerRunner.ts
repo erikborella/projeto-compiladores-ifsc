@@ -1,4 +1,4 @@
-const WEB_SOCKET_ADDRESS = "ws://localhost:8080/compiler/runner/ws";
+const WEB_SOCKET_ADDRESS = import.meta.env.VITE_WEB_SOCKET_ADDRESS ?? "ws://localhost:8080/compiler/runner/ws";
 
 const getRunnerWebSocket = (codeId: string): WebSocket => {
     const url = new URL(WEB_SOCKET_ADDRESS);

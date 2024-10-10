@@ -1,7 +1,7 @@
-import axios, {AxiosInstance} from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
 const axiosInstance: AxiosInstance = axios.create({
-    baseURL: 'http://localhost:8080',
+    baseURL: import.meta.env.VITE_BASE_URL ?? 'http://localhost:8080',
     timeout: 15000
 });
 
