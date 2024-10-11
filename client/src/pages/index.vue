@@ -178,7 +178,7 @@ int var1;
 boolean var2, var3;
 
 // Declaração de arrays
-float[5] vet;/
+float[5] vet;
 int[7][10] mat;`,
       extensions: [
         basicSetup,
