@@ -16,6 +16,7 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 
 @Component
 public class CompilerRunnerWebSocketHandler extends TextWebSocketHandler {
@@ -82,7 +83,9 @@ public class CompilerRunnerWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void startProcessThreads(WebSocketSession session, Process process, String sessionId) {
-        new ProcessOutputListenerThread(process.getInputStream(), (message) -> {
+        CountDownLatch processThreadsLatch = new CountDownLatch(2);
+
+        new ProcessOutputListenerThread(process.getInputStream(), processThreadsLatch, (message) -> {
             try {
                 synchronized (session) {
                     session.sendMessage(new TextMessage(message));
@@ -92,7 +95,7 @@ public class CompilerRunnerWebSocketHandler extends TextWebSocketHandler {
             }
         }).start();
 
-        new ProcessOutputListenerThread(process.getErrorStream(), (errorMessage) -> {
+        new ProcessOutputListenerThread(process.getErrorStream(), processThreadsLatch, (errorMessage) -> {
             try {
                 synchronized (session) {
                     session.sendMessage(new TextMessage("Error: " + errorMessage));
@@ -102,18 +105,18 @@ public class CompilerRunnerWebSocketHandler extends TextWebSocketHandler {
             }
         }).start();
 
-        new ProcessExitListenerThread(process, (exitCode) -> {
-            try {
-                synchronized (session) {
-                    session.sendMessage(new TextMessage("\n\n-- Execução do programa finalizado com código de saida: " + exitCode));
-                    session.close();
-                }
+         new ProcessExitListenerThread(process, processThreadsLatch, (exitCode) -> {
+             try {
+                 synchronized (session) {
+                     session.sendMessage(new TextMessage("\n\n-- Execução do programa finalizado com código de saida: " + exitCode));
+                     session.close();
+                 }
 
-                this.sessions.remove(sessionId);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
+                 this.sessions.remove(sessionId);
+             } catch (Exception e) {
+                 e.printStackTrace();
+             }
+         }).start();
     }
 
     private Optional<String> getCodeIdFromQuery(URI uri) {
