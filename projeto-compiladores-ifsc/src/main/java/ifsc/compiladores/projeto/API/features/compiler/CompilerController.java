@@ -1,9 +1,6 @@
 package ifsc.compiladores.projeto.API.features.compiler;
 
-import ifsc.compiladores.projeto.API.features.compiler.domain.CodeCacheManager;
-import ifsc.compiladores.projeto.API.features.compiler.domain.LLVMCompilerService;
-import ifsc.compiladores.projeto.API.features.compiler.domain.OptLevel;
-import ifsc.compiladores.projeto.API.features.compiler.domain.SyntaxTreeService;
+import ifsc.compiladores.projeto.API.features.compiler.domain.*;
 import ifsc.compiladores.projeto.API.features.compiler.exceptions.CodeFileNotFoundException;
 import ifsc.compiladores.projeto.API.features.compiler.exceptions.InvalidOptLevelException;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +16,16 @@ public class CompilerController {
     private final CodeCacheManager codeCacheManager;
     private final LLVMCompilerService llvmCompilerService;
     private final SyntaxTreeService syntaxTreeService;
+    private final TokenListService tokenListService;
 
-    public CompilerController(CodeCacheManager codeCacheManager, LLVMCompilerService llvmCompilerService, SyntaxTreeService syntaxTreeService) {
+    public CompilerController(CodeCacheManager codeCacheManager,
+                              LLVMCompilerService llvmCompilerService,
+                              SyntaxTreeService syntaxTreeService,
+                              TokenListService tokenListService) {
         this.codeCacheManager = codeCacheManager;
         this.llvmCompilerService = llvmCompilerService;
         this.syntaxTreeService = syntaxTreeService;
+        this.tokenListService = tokenListService;
     }
 
     @PostMapping("/upload")
@@ -111,6 +113,17 @@ public class CompilerController {
         }
 
         return syntaxTreeResult.get();
+    }
+
+    @GetMapping("{codeId}/token")
+    public String getTokenList(@PathVariable("codeId") String codeId) throws IOException {
+        Optional<String> tokenListResult = this.tokenListService.getTokenList(codeId);
+
+        if (tokenListResult.isEmpty()) {
+            throw CodeFileNotFoundException.inCodeId(codeId);
+        }
+
+        return tokenListResult.get();
     }
 
 }

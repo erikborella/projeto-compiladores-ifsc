@@ -5,7 +5,7 @@ import ifsc.compiladores.projeto.gramatica.ParserGrammarBaseVisitor;
 import ifsc.compiladores.projeto.syntax.syntaxBuilder.definitions.SyntaxTreeFragment;
 import ifsc.compiladores.projeto.syntax.syntaxBuilder.definitions.SyntaxTreeLeaf;
 import ifsc.compiladores.projeto.syntax.syntaxBuilder.definitions.SyntaxTreeNode;
-import ifsc.compiladores.projeto.syntax.syntaxBuilder.definitions.position.TokenPosition;
+import ifsc.compiladores.projeto.common.position.TokenPosition;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;

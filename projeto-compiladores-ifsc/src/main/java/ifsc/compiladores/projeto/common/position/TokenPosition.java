@@ -1,4 +1,4 @@
-package ifsc.compiladores.projeto.syntax.syntaxBuilder.definitions.position;
+package ifsc.compiladores.projeto.common.position;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;

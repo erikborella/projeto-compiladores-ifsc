@@ -1,27 +1,27 @@
-package ifsc.compiladores.projeto.syntax.syntaxBuilder.definitions;
+package ifsc.compiladores.projeto.token.tokenBuilder.definitions;
 
 import ifsc.compiladores.projeto.common.position.TokenPosition;
 
-public abstract class SyntaxTreeFragment {
+public class Token {
     private final TokenPosition position;
-    private final String label;
     private final String type;
+    private final String value;
 
-    public SyntaxTreeFragment(TokenPosition position, String label, String type) {
+    public Token(TokenPosition position, String type, String value) {
         this.position = position;
-        this.label = label;
         this.type = type;
+        this.value = value;
     }
 
     public TokenPosition getPosition() {
         return position;
     }
 
-    public String getLabel() {
-        return label;
-    }
-
     public String getType() {
         return type;
+    }
+
+    public String getValue() {
+        return value;
     }
 }

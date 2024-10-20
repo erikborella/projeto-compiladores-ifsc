@@ -20,6 +20,7 @@ public class CompilerConfiguration {
     private String clangCompiler;
 
     private String syntaxTreeFileName;
+    private String tokenListFileName;
 
     public String getCachePath() {
         return cachePath;
@@ -107,5 +108,13 @@ public class CompilerConfiguration {
 
     public void setExecutableFileName(String executableFileName) {
         this.executableFileName = executableFileName;
+    }
+
+    public String getTokenListFileName() {
+        return tokenListFileName;
+    }
+
+    public void setTokenListFileName(String tokenListFileName) {
+        this.tokenListFileName = tokenListFileName;
     }
 }

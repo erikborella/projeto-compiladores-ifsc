@@ -1,6 +1,6 @@
 package ifsc.compiladores.projeto.syntax.syntaxBuilder.definitions;
 
-import ifsc.compiladores.projeto.syntax.syntaxBuilder.definitions.position.TokenPosition;
+import ifsc.compiladores.projeto.common.position.TokenPosition;
 
 import java.util.List;
 
