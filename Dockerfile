@@ -18,8 +18,11 @@ WORKDIR /client
 COPY client/package*.json ./
 RUN npm install
 
-ENV VITE_BASE_URL=http://localhost
-ENV VITE_WEB_SOCKET_ADDRESS=ws://localhost/compiler/runner/ws
+ARG BASE_URL=http://localhost
+ARG BASE_URL_WEB_SOCKET_ADDRESS=${BASE_URL}/compiler/runnes/ws
+
+ENV VITE_BASE_URL=${BASE_URL}
+ENV VITE_WEB_SOCKET_ADDRESS=${BASE_URL_WEB_SOCKET_ADDRESS}
 
 COPY client .
 RUN npm run build
@@ -47,8 +50,11 @@ RUN rm -rf /var/lib/apt/lists/*
 
 FROM dependencies AS final
 
-ENV spring.application.name="COMPILADORES IFSC"
-ENV cors.allowed-origins=http://localhost
+ARG BASE_URL=http://localhost
+ARG API_APP_NAME="COMPILADORES IFSC"
+
+ENV spring.application.name=${API_APP_NAME}
+ENV cors.allowed-origins=${BASE_URL}
 
 WORKDIR /app
 
