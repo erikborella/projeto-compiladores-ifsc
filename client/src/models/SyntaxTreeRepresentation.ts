@@ -1,12 +1,4 @@
-type Position = {
-  line: number;
-  column: number;
-}
-
-type TokenPosition = {
-  start: Position;
-  end: Position;
-}
+import { TokenPosition } from "./TokenPosition";
 
 type SyntaxTreeFragment = {
   position: TokenPosition;
@@ -24,5 +16,4 @@ type SyntaxTreeNode = SyntaxTreeFragment & {
   children: [SyntaxTreeFragment];
 }
 
-export type { Position, TokenPosition };
 export type SyntaxTreeRepresentation = SyntaxTreeNode | SyntaxTreeLeaf;

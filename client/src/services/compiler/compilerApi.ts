@@ -1,6 +1,7 @@
 import axiosInstance from "../axiosInstance";
 import { OptimizationLevel } from "../../models/OptimizationLevel";
 import { SyntaxTreeRepresentation } from "../../models/SyntaxTreeRepresentation";
+import { Token } from "../../models/TokenRepresentation";
 
 const uploadCode = async (code: string): Promise<string> => {
   try {
@@ -65,6 +66,18 @@ const getSyntaxRepresentation = async (codeId: string): Promise<SyntaxTreeRepres
   }
 };
 
+const getTokenList = async (codeId: string): Promise<Token[]> => {
+  try {
+    const requestUrl = `/compiler/${codeId}/token`;
+
+    const response = await axiosInstance.get<Token[]>(requestUrl);
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
 const getCode = async (codeId: string): Promise<string> => {
   try {
     const requestUrl = `/compiler/${codeId}`;
@@ -93,5 +106,6 @@ export default {
   getLlvmIrCode,
   getAsmCode,
   getSyntaxRepresentation,
+  getTokenList,
   getCode,
 };

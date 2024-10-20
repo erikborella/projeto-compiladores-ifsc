@@ -19,6 +19,9 @@
 
       <template v-slot:extension>
         <v-tabs align-tabs="center" grow>
+          <v-tab :to="{ name: '/[codeId]/token' }">
+            Tokens
+          </v-tab>
           <v-tab :to="{ name: '/[codeId]/syntax' }">
             Arvore sintática
           </v-tab>
@@ -67,7 +70,7 @@
     const currentRoute = route.name;
 
     if (currentRoute === '/[codeId]') {
-      router.replace({ name: '/[codeId]/syntax' });
+      router.replace({ name: '/[codeId]/token' });
     }
   })
 
