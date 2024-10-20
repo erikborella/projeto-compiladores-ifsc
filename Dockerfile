@@ -19,7 +19,7 @@ COPY client/package*.json ./
 RUN npm install
 
 ARG BASE_URL=http://localhost
-ARG BASE_URL_WEB_SOCKET_ADDRESS=${BASE_URL}/compiler/runnes/ws
+ARG BASE_URL_WEB_SOCKET_ADDRESS=${BASE_URL}/compiler/runner/ws
 
 ENV VITE_BASE_URL=${BASE_URL}
 ENV VITE_WEB_SOCKET_ADDRESS=${BASE_URL_WEB_SOCKET_ADDRESS}
