@@ -28,6 +28,12 @@ void merge(int[10] arr, int l, int m, int r) {
         k = k + 1;
     }
 
+    while (i < n1) {
+        arr[k] = L[i];
+        i = i + 1;
+        k = k + 1;
+    }
+
     while (j < n2) {
         arr[k] = R[j];
         j = j + 1;
@@ -44,7 +50,7 @@ void mergeSort(int[10] arr, int l, int r) {
         func mergeSort(arr, l, m);
         func mergeSort(arr, m + 1, r);
 
-        merge(arr, l, m, r);
+        func merge(arr, l, m, r);
     }
 }
 
