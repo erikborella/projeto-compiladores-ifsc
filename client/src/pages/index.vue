@@ -54,9 +54,53 @@
         <v-card
           elevation="4"
           title="Atribuição de váriaveis"
-          text="É possível atribuir valores a variáveis utilizando constantes, expressões matemáticas, valores de arrays ou valores retornados por funções"
         >
+          <template v-slot:text>
+            <p>É possível atribuir valores a variáveis utilizando constantes, expressões matemáticas, valores de arrays ou valores retornados por funções</p>
+            <p>Os seguintes operadores matemáticos são suportados:</p>
+
+            <v-card-text>
+              <ul>
+                <li><code>+</code> para adições</li>
+                <li><code>-</code> para subtrações</li>
+                <li><code>*</code> para multiplicações</li>
+                <li><code>/</code> para divisões</li>
+                <li><code>%</code> para o valor de resto da divisão</li>
+              </ul>
+            </v-card-text>
+          </template>
           <div ref="exampleCodeEditorVariableAttribuition" class="code-editor"></div>
+        </v-card>
+
+        <v-card
+          elevation="4"
+          title="Escrita de valores"
+        >
+          <template v-slot:text>
+            <p>Para escrever dados na tela, é usado os comando <code>print</code>, para colocar o texto na tela sem uma nova linha no final e <code>println</code> para imprimir o texto colocando uma nova linha no final.</p>
+            <br>
+            <p>Para imprimir os valores de variáveis, deve-se os modelos do template:</p>
+
+            <v-card-text>
+              <ul>
+                <li><code>%d</code> para exibir valores inteiros</li>
+                <li><code>%b</code> para exibir valores booleanos</li>
+                <li><code>%f</code> para exibir valores decimais</li>
+                <li><code>%.Nf</code> para exibir valores decimais limitando as casas decimais, onde N é o numero de casas</li>
+              </ul>
+            </v-card-text>
+          </template>
+          <div ref="exampleCodeEditorVariablePrint" class="code-editor"></div>
+        </v-card>
+
+        <v-card
+          elevation="4"
+          title="Leituras de valores"
+        >
+          <template v-slot:text>
+            <p>Para ler valores do usuário pode-se usar o comando <code>scanf</code>, passando a váriavel na qual o valor será salvo para ela.</p>
+          </template>
+          <div ref="exampleCodeEditorVariableScanf" class="code-editor"></div>
         </v-card>
 
       </v-container>
@@ -136,6 +180,8 @@
   const exampleCodeEditorMain = useTemplateRef('exampleCodeEditorMain');
   const exampleCodeEditorVariables = useTemplateRef('exampleCodeEditorVariables');
   const exampleCodeEditorVariableAttribution = useTemplateRef('exampleCodeEditorVariableAttribuition');
+  const exampleCodeEditorVariablePrint = useTemplateRef('exampleCodeEditorVariablePrint');
+  const exampleCodeEditorVariableScanf = useTemplateRef('exampleCodeEditorVariableScanf');
 
   onMounted(() => {
     const cachedCode = loadCodeFromLocalStorage() ?? 'main() {\n\tprintln("Hello, Word!");\n}';
@@ -218,7 +264,47 @@ n1 = func funcao();`,
         EditorState.readOnly.of(true)
       ],
       parent: exampleCodeEditorVariableAttribution.value!
-    })
+    });
+
+    new EditorView({
+      doc:
+`// Escrita de uma mensagem simples
+print("Ola mundo!");
+
+// Escrita de um valor inteiro, com uma nova linha
+println("%d", int1);
+
+// Escrita de um valor inteiro com uma mensagem junto
+pritnln("O valor da variavel eh %d:", int2);
+
+// Escrita de um valor decimal com apenas duas casas decimais
+pritnln("O valor de pi eh %.2f:", pi);
+`,
+      extensions: [
+        basicSetup,
+        cppLanguage,
+        oneDark,
+        EditorState.readOnly.of(true)
+      ],
+      parent: exampleCodeEditorVariablePrint.value!
+    });
+
+    new EditorView({
+      doc: 
+`int valor;
+
+print("Digite um valor: ");
+scanf(valor);
+
+println("O valor digitado foi %d", valor);`,
+      extensions: [
+        basicSetup,
+        cppLanguage,
+        oneDark,
+        EditorState.readOnly.of(true)
+      ],
+      parent: exampleCodeEditorVariableScanf.value!
+    });
   })
 
   onBeforeUnmount(saveCodeToLocalStorage);
