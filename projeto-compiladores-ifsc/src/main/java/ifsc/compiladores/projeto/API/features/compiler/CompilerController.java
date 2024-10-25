@@ -2,6 +2,7 @@ package ifsc.compiladores.projeto.API.features.compiler;
 
 import ifsc.compiladores.projeto.API.features.compiler.domain.*;
 import ifsc.compiladores.projeto.API.features.compiler.exceptions.CodeFileNotFoundException;
+import ifsc.compiladores.projeto.API.features.compiler.exceptions.CompilationException;
 import ifsc.compiladores.projeto.API.features.compiler.exceptions.InvalidOptLevelException;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,9 +33,15 @@ public class CompilerController {
     public String uploadCode(@RequestBody String code) throws IOException, NoSuchAlgorithmException {
         String codeTrimmed = code.trim();
 
-        String codeId = codeCacheManager.saveCodeFile(codeTrimmed);
+        String codeId = this.codeCacheManager.saveCodeFile(codeTrimmed);
 
-        return codeId;
+        Optional<Exception> hasCompilationError = this.llvmCompilerService.checkSuccessfulCompilation(codeId);
+
+        if (hasCompilationError.isEmpty()) {
+            return codeId;
+        }
+
+        throw new CompilationException(hasCompilationError.get().getMessage());
     }
 
     @GetMapping("/{codeId}")

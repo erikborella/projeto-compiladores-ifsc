@@ -338,8 +338,14 @@ println("O valor digitado foi %d", valor);`,
       
       router.push(codeId);
     } catch (error) {
-      console.error(error);
-      showErrorMessage(`Falha ao fazer o upload do código: ${error.message}`);
+
+      if (!!error?.response?.data?.message) {
+        showErrorMessage(`Falha ao fazer o upload do código: ${error.response.data.message}`);
+      }
+      else {
+        showErrorMessage(`Falha ao fazer o upload do código: ${error.message}`);
+      }
+
     }
     
     isLoading.value = false;

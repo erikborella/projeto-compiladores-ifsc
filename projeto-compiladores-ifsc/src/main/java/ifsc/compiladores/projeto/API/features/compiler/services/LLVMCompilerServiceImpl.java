@@ -147,4 +147,15 @@ public class LLVMCompilerServiceImpl implements LLVMCompilerService {
         return Optional.of(executableFilePath);
     }
 
+    @Override
+    public Optional<Exception> checkSuccessfulCompilation(String codeId) {
+        try {
+            this.getLLVMIRCode(codeId);
+            return Optional.empty();
+        }
+        catch (Exception e) {
+            return Optional.of(e);
+        }
+    }
+
 }

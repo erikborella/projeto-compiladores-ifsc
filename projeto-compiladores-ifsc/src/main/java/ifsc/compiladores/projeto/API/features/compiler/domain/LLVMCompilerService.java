@@ -11,4 +11,5 @@ public interface LLVMCompilerService {
     Optional<String> getAsmCode(String codeId) throws IOException, InterruptedException;
     Optional<String> getOptAsmCode(String codeId, OptLevel optLevel) throws IOException, InterruptedException;
     Optional<File> getExecutableCodePath(String codeId) throws IOException, InterruptedException;
+    Optional<Exception> checkSuccessfulCompilation(String codeId);
 }

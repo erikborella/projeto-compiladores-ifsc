@@ -1,6 +1,7 @@
 package ifsc.compiladores.projeto.LLVM;
 
 import ifsc.compiladores.projeto.LLVM.translator.Fragment;
+import ifsc.compiladores.projeto.LLVM.translator.errors.SyntaxErrorListener;
 import ifsc.compiladores.projeto.LLVM.translator.generator.LLVMIRGeneratorVisitor;
 import ifsc.compiladores.projeto.gramatica.LexerGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
@@ -18,7 +19,14 @@ public class LLVMCompiler {
 
         ParserGrammar parser = new ParserGrammar(tokenStream);
 
+        SyntaxErrorListener syntaxErrorListener = new SyntaxErrorListener();
+        parser.addErrorListener(syntaxErrorListener);
+
         ParserGrammar.ProgramaContext programaContext = parser.programa();
+
+        if (!syntaxErrorListener.getSyntaxErrors().isEmpty()) {
+            throw new IllegalStateException(syntaxErrorListener.toString());
+        }
 
         LLVMIRGeneratorVisitor irGenerator = new LLVMIRGeneratorVisitor();
 
@@ -38,7 +46,7 @@ public class LLVMCompiler {
                 "-o",
                 destPath.toString()
         )
-                .start();
+        .start();
 
         return optProcess.waitFor() == 0;
     }
