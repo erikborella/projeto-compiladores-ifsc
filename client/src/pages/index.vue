@@ -11,6 +11,23 @@
 
       <template v-slot:append>
         <v-btn text="Compilar" @click="uploadCodeBtn()" append-icon="mdi-send"></v-btn>
+        <v-menu open-on-hover>
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props">
+              Exemplos
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item
+              v-for='(item, index) in codeExamples'
+              :key='index'
+              :value='index'
+              @click="updateCodeEditorStateCode(item.code)"
+            >
+              <v-list-item-title>{{ item.name }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
         <v-btn size="x-large" :icon="theme.global.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night'" @click="toggleTheme"></v-btn>
         <v-btn size="x-large" href="https://github.com/erikborella/projeto-compiladores-ifsc" target="_blank" icon="mdi-github"></v-btn>
       </template>
@@ -158,6 +175,7 @@
   import { indentWithTab } from '@codemirror/commands';
   import { oneDark } from '@codemirror/theme-one-dark';
   import { cppLanguage } from '@codemirror/lang-cpp';
+  import { codeExamples } from '../models/CodeExamples';
 
   import compilerApi from '../services/compiler/compilerApi';
 
@@ -350,4 +368,15 @@ println("O valor digitado foi %d", valor);`,
     
     isLoading.value = false;
   }
+
+  function updateCodeEditorStateCode(newCode: string) {
+    const transaction = mainCodeEditor.state.update({
+      changes: {
+        from: 0,
+        to: mainCodeEditor.state.doc.length,
+        insert: newCode
+      }
+    });
+    mainCodeEditor.update([transaction]);
+  } 
 </script>
