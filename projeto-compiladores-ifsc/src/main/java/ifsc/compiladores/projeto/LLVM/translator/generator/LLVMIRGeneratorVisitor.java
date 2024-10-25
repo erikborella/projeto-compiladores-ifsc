@@ -236,21 +236,20 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             String variableName = ctx.ID(i).getText();
             Variable variable = new Variable(variableType, variableName);
 
-            if (this.scopeManager.isVariableDeclared(variableName)) {
-                throw new IllegalStateException(String.format("Já existe uma variavel com o nome %s declarada.",
+            if (this.scopeManager.isVariableDeclaredInCurrentScope(variableName)) {
+                throw new IllegalStateException(String.format("Já existe uma variavel com o nome %s declarada no escopo atual.",
                         variableName));
             }
 
-            this.scopeManager.declareVariable(variable);
-            Variable variableWithoutConflit = this.scopeManager.getVariableWithoutNameConflit(variable);
-            String variableNameWithoutConflit = variableWithoutConflit.name();
+            Variable variableWithoutConflict = this.scopeManager.declareVariable(variable);
+            String variableNameWithoutConflict = variableWithoutConflict.getRawNameWithoutConflict();
 
             if (variableType.isArrayType()) {
-                FragmentBlock arrayVariableDeclaration = declareArrayVariable(variableWithoutConflit, variableNameWithoutConflit);
+                FragmentBlock arrayVariableDeclaration = declareArrayVariable(variableWithoutConflict, variableNameWithoutConflict);
                 variableDeclarations.addAll(arrayVariableDeclaration);
             }
             else {
-                Fragment valueVariableDeclaration = declareValueVariable(variableWithoutConflit, variableNameWithoutConflit);
+                Fragment valueVariableDeclaration = declareValueVariable(variableWithoutConflict, variableNameWithoutConflict);
                 variableDeclarations.add(valueVariableDeclaration);
             }
         }

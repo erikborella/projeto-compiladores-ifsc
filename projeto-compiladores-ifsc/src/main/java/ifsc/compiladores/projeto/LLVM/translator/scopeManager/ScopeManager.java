@@ -52,13 +52,18 @@ public class ScopeManager {
         }
     }
 
-    public void declareVariable(Variable variable) {
+    public Variable declareVariable(Variable variable) {
         Scope currentScope = this.getCurrentScope();
 
-        currentScope.getDeclaredVariables().put(variable.name(), variable);
-        
-        int variableNameUseCount = this.declaredVariablesTable.getOrDefault(variable.name(), -1);
-        this.declaredVariablesTable.put(variable.name(), variableNameUseCount + 1);
+        int currentVariableNameUseCount = this.declaredVariablesTable.getOrDefault(variable.name(), -1);
+        int newVariableNameUseCount = currentVariableNameUseCount + 1;
+        this.declaredVariablesTable.put(variable.name(), newVariableNameUseCount);
+
+        Variable withoutNameConflictVariable = new Variable(variable.type(), variable.name(), newVariableNameUseCount);
+
+        currentScope.getDeclaredVariables().put(withoutNameConflictVariable.name(), withoutNameConflictVariable);
+
+        return withoutNameConflictVariable;
     }
 
     public Variable getDeclaredVariable(String variableName) {
@@ -69,7 +74,7 @@ public class ScopeManager {
 
             if (declaredVariables.containsKey(variableName)) {
                 Variable declaredVariable = declaredVariables.get(variableName);
-                return this.getVariableWithoutNameConflit(declaredVariable);
+                return declaredVariable;
             }
             
             scope = scope.getParent();
@@ -77,19 +82,19 @@ public class ScopeManager {
 
         return null;
     }
-    
-    public Variable getVariableWithoutNameConflit(Variable variable) {
-        int varibleNameUseCount = this.declaredVariablesTable.get(variable.name());
-        
-        if (varibleNameUseCount == 0)
-            return variable;
-        
-        String resolvedName = variable.name() + String.valueOf(varibleNameUseCount);
-        return new Variable(variable.type(), resolvedName);
-    }
 
     public boolean isVariableDeclared(String variableName) {
         return getDeclaredVariable(variableName) != null;
+    }
+
+    public boolean isVariableDeclaredInCurrentScope(String variableName) {
+        Scope currentScope = this.getCurrentScope();
+
+        if (currentScope == null) {
+            return false;
+        }
+
+        return currentScope.getDeclaredVariables().containsKey(variableName);
     }
     
     public Function getDeclaredFunction(String functionName) {
