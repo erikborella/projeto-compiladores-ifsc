@@ -4,94 +4,110 @@
     <v-navigation-drawer v-model="isConfigMenuOpen" width="600">
       <div ref="referenceCodeEditor" class="code-editor"></div>
     </v-navigation-drawer>
-    
+
     <v-main>
       <div class="listContainer">
         <v-container>
           <v-row>
             <v-col cols="12" xl="4" xxl="4">
-              <v-card title="Funções" elevation="4">
+              <v-expansion-panels multiple>
+                <v-expansion-panel elevation="4">
 
-                <v-divider></v-divider>
+                  <v-expansion-panel-title>
+                    <h2>Funções</h2>
+                  </v-expansion-panel-title>
 
-                <div 
-                  v-for="(declaredFunction, index) in symbolsTable?.functions"
-                  :key="index">
-                  
-                  <v-card-text>
-                    <h2>
-                      {{ declaredFunction.name }}
-                      <v-btn 
-                        flat 
-                        density="compact" 
-                        icon="mdi-magnify" 
-                        @click="selectPositionInReferenceCodeEditor(referenceCodeEditorView, declaredFunction.position)"
-                      ></v-btn>
-                    </h2>
-                    <br>
-                    Tipo de retorno: <b>{{  declaredFunction.returnType  }}</b>
-                    
-                    <div v-if="declaredFunction.parameters != null">
-                      Parâmetros:
-                      <v-table class="elevation-1">
-                        <thead>
-                          <tr>
-                            <th class="text-left">
-                              Tipo
-                            </th>
-                            <th class="text-left">
-                              Nome
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr 
-                            v-for="(parameter, index) in declaredFunction.parameters" 
-                            :key="index">
-                            <td>{{ parameter.type }}</td>
-                            <td>{{ parameter.name }}</td>
-                          </tr>
-                        </tbody>
-                      </v-table>
-                    </div>
-                  </v-card-text>
-                  <v-divider></v-divider>
-                </div>
+                  <v-expansion-panel-text>
+                    <v-expansion-panels multiple>
+                      <v-expansion-panel v-for="(declaredFunction, index) in symbolsTable?.functions" :key="index">
+                        <v-divider></v-divider>
+                        <v-expansion-panel-title>
+                          <h2>
+                            {{ declaredFunction.name }}
+                            <v-btn flat density="compact" icon="mdi-magnify"
+                            @click.native.stop="selectPositionInReferenceCodeEditor(referenceCodeEditorView, declaredFunction.position)"></v-btn>
+                          </h2>
+                        </v-expansion-panel-title>
+ 
+                        <v-expansion-panel-text>
+                          Tipo de retorno: <b>{{ declaredFunction.returnType }}</b>
 
-              </v-card>
+                          <div v-if="declaredFunction.parameters != null">
+                            Parâmetros:
+                            <v-table class="elevation-1">
+                              <thead>
+                                <tr>
+                                  <th class="text-left">
+                                    Tipo
+                                  </th>
+                                  <th class="text-left">
+                                    Nome
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr v-for="(parameter, index) in declaredFunction.parameters" :key="index">
+                                  <td>{{ parameter.type }}</td>
+                                  <td>{{ parameter.name }}</td>
+                                </tr>
+                              </tbody>
+                            </v-table>
+                          </div>
+                        </v-expansion-panel-text>
+                      </v-expansion-panel>
+                    </v-expansion-panels>
+                  </v-expansion-panel-text>
+                </v-expansion-panel>
+              </v-expansion-panels>
             </v-col>
 
             <v-col cols="12" xl="4" xxl="4">
-              <v-card title="Escopos" elevation="4">
-                
-                <v-divider></v-divider>
+              <v-expansion-panels multiple>
+                <v-expansion-panel elevation="4">
 
-                <ScopeCard 
-                  v-for="(scope, index) in symbolsTable?.scopes" 
-                  :key="index" 
-                  :scope="scope"
-                  :id="(index + 1).toString()"
-                  :editorView="referenceCodeEditorView">
-                </ScopeCard>
+                  <v-expansion-panel-title>
+                    <h2>Escopos</h2>
+                  </v-expansion-panel-title>
 
-              </v-card>
+                  <v-expansion-panel-text>
+                    <v-divider></v-divider>
+
+                    <v-expansion-panels multiple>
+                      <ScopeCard v-for="(scope, index) in symbolsTable?.scopes" :key="index" :scope="scope"
+                        :id="(index + 1).toString()" :editorView="referenceCodeEditorView">
+                      </ScopeCard>
+                    </v-expansion-panels>
+                  </v-expansion-panel-text>
+
+                </v-expansion-panel>
+              </v-expansion-panels>
+
             </v-col>
 
             <v-col cols="12" xl="4" xxl="4">
-              <v-card title="Strings" elevation="4">
+              <v-expansion-panels multiple>
+                <v-expansion-panel elevation="4">
+                  <v-expansion-panel-title>
+                    <h2>Strings</h2>
+                  </v-expansion-panel-title>
 
-                <v-divider></v-divider>
+                  <v-expansion-panel-text >
+                    <v-divider></v-divider>
 
-                <div v-for="(declaredString, index) in symbolsTable?.strings" :key="index">
-                  <v-card-text>
-                    {{ declaredString }}
-                  </v-card-text>
-                  <v-divider></v-divider>
-                </div>
+                    <v-container>
+                      <ul>
+                        <li v-for="(declaredString, index) in symbolsTable?.strings" :key="index">
+                          <p class="text-body-1 mb-2 mt-2">{{ declaredString }}</p>
+                          <v-divider></v-divider>
+                        </li>    
+                      </ul>
+                    </v-container>
+                  </v-expansion-panel-text>
+                </v-expansion-panel>
+              </v-expansion-panels>
 
-              </v-card>
             </v-col>
-          </v-row> 
+          </v-row>
         </v-container>
       </div>
     </v-main>
@@ -104,10 +120,7 @@
     <v-snackbar variant="flat" color="error" v-model="snackbar.show" :timeout="5000" top>
       {{ snackbar.message }}
       <template v-slot:actions>
-        <v-btn
-          color="white"
-          variant="text"
-          @click="snackbar.show = false">Fechar</v-btn>
+        <v-btn color="white" variant="text" @click="snackbar.show = false">Fechar</v-btn>
       </template>
     </v-snackbar>
 
