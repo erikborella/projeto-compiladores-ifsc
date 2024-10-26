@@ -8,6 +8,7 @@ import ifsc.compiladores.projeto.symbolsTable.symbolsTableBuilder.definitions.Va
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Stack;
 
 public class ScopeManagerEmulator {
@@ -17,13 +18,13 @@ public class ScopeManagerEmulator {
     private HashMap<String, Integer> declaredVariablesTable;
 
     public ScopeManagerEmulator() {
-        this.symbolsTable = new SymbolsTable(new ArrayList<>(), new ArrayList<>());
+        this.symbolsTable = new SymbolsTable(new ArrayList<>(), new ArrayList<>(), new HashSet<>());
         this.scopeStack = new Stack<>();
         this.declaredVariablesTable = new HashMap<>();
     }
 
     public void declareFunction(Function function) {
-        this.symbolsTable.declaredFunction().add(function);
+        this.symbolsTable.functions().add(function);
     }
 
     public void startScope(TokenPosition scopePosition) {
@@ -74,6 +75,10 @@ public class ScopeManagerEmulator {
             return null;
 
         return this.scopeStack.peek();
+    }
+
+    public void declareString(String stringDeclaration) {
+        this.symbolsTable.strings().add(stringDeclaration);
     }
 
     public SymbolsTable getSymbolsTable() {

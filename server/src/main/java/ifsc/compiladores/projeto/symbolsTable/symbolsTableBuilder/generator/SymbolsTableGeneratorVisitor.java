@@ -1,5 +1,6 @@
 package ifsc.compiladores.projeto.symbolsTable.symbolsTableBuilder.generator;
 
+import ifsc.compiladores.projeto.LLVM.translator.FragmentBlock;
 import ifsc.compiladores.projeto.common.position.Position;
 import ifsc.compiladores.projeto.common.position.TokenPosition;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
@@ -157,4 +158,40 @@ public class SymbolsTableGeneratorVisitor extends ParserGrammarBaseVisitor<Void>
 
         return null;
     }
+
+    @Override
+    public Void visitComandoLinhaEscritaLn(ParserGrammar.ComandoLinhaEscritaLnContext ctx) {
+        String stringDeclaration = ctx.escritaln().TEXTO().getText();
+
+        this.scopeManagerEmulator.declareString(stringDeclaration);
+
+        for (ParserGrammar.TermoescritaContext termoescritaContext : ctx.escritaln().termoescrita()) {
+            visit(termoescritaContext);
+        }
+
+        return null;
+    }
+
+    @Override
+    public Void visitComandoLinhaEscrita(ParserGrammar.ComandoLinhaEscritaContext ctx) {
+        String stringDeclaration = ctx.escrita().TEXTO().getText();
+
+        this.scopeManagerEmulator.declareString(stringDeclaration);
+
+        for (ParserGrammar.TermoescritaContext termoescritaContext : ctx.escrita().termoescrita()) {
+            visit(termoescritaContext);
+        }
+
+        return null;
+    }
+
+    @Override
+    public Void visitTermoEscritaTexto(ParserGrammar.TermoEscritaTextoContext ctx) {
+        String stringDeclaration = ctx.TEXTO().getText();
+
+        this.scopeManagerEmulator.declareString(stringDeclaration);
+
+        return null;
+    }
+
 }
