@@ -2,10 +2,10 @@ FROM maven:3.9.4-eclipse-temurin-21-alpine AS server_build
 
 WORKDIR /api
 
-COPY projeto-compiladores-ifsc/pom.xml ./
+COPY server/pom.xml ./
 RUN mvn dependency:go-offline
 
-COPY projeto-compiladores-ifsc/src ./src
+COPY server/src ./src
 
 RUN mvn clean package -DskipTests --batch-mode
 
