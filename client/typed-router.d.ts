@@ -23,6 +23,7 @@ declare module 'vue-router/auto-routes' {
     '/[codeId]/asm': RouteRecordInfo<'/[codeId]/asm', '/:codeId/asm', { codeId: ParamValue<true> }, { codeId: ParamValue<false> }>,
     '/[codeId]/execution': RouteRecordInfo<'/[codeId]/execution', '/:codeId/execution', { codeId: ParamValue<true> }, { codeId: ParamValue<false> }>,
     '/[codeId]/llvm': RouteRecordInfo<'/[codeId]/llvm', '/:codeId/llvm', { codeId: ParamValue<true> }, { codeId: ParamValue<false> }>,
+    '/[codeId]/symbol': RouteRecordInfo<'/[codeId]/symbol', '/:codeId/symbol', { codeId: ParamValue<true> }, { codeId: ParamValue<false> }>,
     '/[codeId]/syntax': RouteRecordInfo<'/[codeId]/syntax', '/:codeId/syntax', { codeId: ParamValue<true> }, { codeId: ParamValue<false> }>,
     '/[codeId]/token': RouteRecordInfo<'/[codeId]/token', '/:codeId/token', { codeId: ParamValue<true> }, { codeId: ParamValue<false> }>,
   }

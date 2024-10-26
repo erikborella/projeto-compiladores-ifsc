@@ -131,7 +131,7 @@
       tokens.value = await compilerApi.getTokenList(codeId);
     } catch (error) {
       console.error(error);
-      showErrorMessage(`Falha ao fazer o da list de tokens: ${error.message}`);
+      showErrorMessage(`Falha ao fazer o download da lista de tokens: ${error.message}`);
     }
   }
 

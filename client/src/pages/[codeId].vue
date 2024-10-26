@@ -25,6 +25,9 @@
           <v-tab :to="{ name: '/[codeId]/syntax' }">
             Arvore sintática
           </v-tab>
+          <v-tab :to="{ name: '/[codeId]/symbol' }">
+            Tabela de símbolos
+          </v-tab>
           <v-tab :to="{ name: '/[codeId]/llvm' }">
             LLVM IR
           </v-tab>
