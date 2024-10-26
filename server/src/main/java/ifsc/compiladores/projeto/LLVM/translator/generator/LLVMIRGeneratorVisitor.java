@@ -60,6 +60,8 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         
         this.stringManager = new StringManager();
         this.stringCreator = new LLVMStringCreator(this.stringManager);
+
+        LLVMIRShortCircuitCreator.reinitialize();
     }
 
     @Override

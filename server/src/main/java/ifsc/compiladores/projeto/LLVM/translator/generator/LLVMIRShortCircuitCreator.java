@@ -46,6 +46,10 @@ public class LLVMIRShortCircuitCreator {
         retValCount++;
     }
 
+    public static void reinitialize() {
+        retValCount = 0;
+    }
+
     public LabeledFragmentBlock getTrueBlock() {
         return trueBlock;
     }
