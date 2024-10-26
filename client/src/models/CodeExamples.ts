@@ -3,7 +3,113 @@ type CodeExample = {
   code: string;
 }
 
-export const codeExamples: CodeExample[] = [
+export const basicExamples: CodeExample[] = [
+    {
+        name: 'Olá mundo',
+        code: `main() {
+  println("Ola mundo!");
+}`
+    }
+]
+
+export const sortingExamples: CodeExample[] = [
+  {
+    name: "Merge sort",
+    code: `void merge(int[10] arr, int l, int m, int r) {
+        int i, j, k, n1, n2;
+        int[10] L, R;
+    
+        n1 = m - l + 1;
+        n2 = r - m;
+    
+        for (i = 0; i < n1; i = i + 1) {
+            L[i] = arr[l + i];
+        }
+    
+        for (j = 0; j < n2; j = j + 1) {
+            R[j] = arr[m + 1 + j];
+        }
+    
+        i = 0;
+        j = 0;
+        k = l;
+        while (i < n1 && j < n2) {
+            if (L[i] <= R[j]) {
+                arr[k] = L[i];
+                i = i + 1;
+            }
+            else {
+                arr[k] = R[j];
+                j = j + 1;
+            }
+            k = k + 1;
+        }
+    
+        while (i < n1) {
+            arr[k] = L[i];
+            i = i + 1;
+            k = k + 1;
+        }
+    
+        while (j < n2) {
+            arr[k] = R[j];
+            j = j + 1;
+            k = k + 1;
+        }
+    }
+    
+    void mergeSort(int[10] arr, int l, int r) {
+        if (l < r) {
+            int m;
+    
+            m = l + (r - l) / 2;
+    
+            func mergeSort(arr, l, m);
+            func mergeSort(arr, m + 1, r);
+    
+            func merge(arr, l, m, r);
+        }
+    }
+    
+    void printArray(int[10] A, int size) {
+        int i;
+    
+        for (i = 0; i < size; i = i + 1) {
+            print("%d ", A[i]);
+        }
+        println("");
+    }
+    
+    void initArray(int[10] A, int size) {
+      int i;
+    
+      for (i = 0; i < size; i = i + 1) {
+        int valor;
+    
+        println("Digite o valor da posicao %d: ", i);
+        scanf(valor);
+    
+        A[i] = valor;
+      }
+    }
+    
+    main() {
+        int[10] arr;
+    
+        func initArray(arr, 10);
+    
+        println("Array desordenado: ");
+        func printArray(arr, 10);
+    
+        func mergeSort(arr, 0, 9);
+    
+        println("Array ordenado: ");
+        func printArray(arr, 10);
+    }`,
+  },
+];
+
+export const gamesExample: CodeExample[] = [
   {
     name: 'Jogo da velha',
     code: `void iniciarTabuleiro(int[3][3] tabuleiro) {
@@ -137,100 +243,6 @@ main() {
         }
 
     }
-}`
-  },
-  {
-    name: 'Merge sort',
-    code: `void merge(int[10] arr, int l, int m, int r) {
-    int i, j, k, n1, n2;
-    int[10] L, R;
-
-    n1 = m - l + 1;
-    n2 = r - m;
-
-    for (i = 0; i < n1; i = i + 1) {
-        L[i] = arr[l + i];
-    }
-
-    for (j = 0; j < n2; j = j + 1) {
-        R[j] = arr[m + 1 + j];
-    }
-
-    i = 0;
-    j = 0;
-    k = l;
-    while (i < n1 && j < n2) {
-        if (L[i] <= R[j]) {
-            arr[k] = L[i];
-            i = i + 1;
-        }
-        else {
-            arr[k] = R[j];
-            j = j + 1;
-        }
-        k = k + 1;
-    }
-
-    while (i < n1) {
-        arr[k] = L[i];
-        i = i + 1;
-        k = k + 1;
-    }
-
-    while (j < n2) {
-        arr[k] = R[j];
-        j = j + 1;
-        k = k + 1;
-    }
-}
-
-void mergeSort(int[10] arr, int l, int r) {
-    if (l < r) {
-        int m;
-
-        m = l + (r - l) / 2;
-
-        func mergeSort(arr, l, m);
-        func mergeSort(arr, m + 1, r);
-
-        func merge(arr, l, m, r);
-    }
-}
-
-void printArray(int[10] A, int size) {
-    int i;
-
-    for (i = 0; i < size; i = i + 1) {
-        print("%d ", A[i]);
-    }
-    println("");
-}
-
-void initArray(int[10] A, int size) {
-  int i;
-
-  for (i = 0; i < size; i = i + 1) {
-    int valor;
-
-    println("Digite o valor da posicao %d: ", i);
-    scanf(valor);
-
-    A[i] = valor;
-  }
-}
-
-main() {
-    int[10] arr;
-
-    func initArray(arr, 10);
-
-    println("Array desordenado: ");
-    func printArray(arr, 10);
-
-    func mergeSort(arr, 0, 9);
-
-    println("Array ordenado: ");
-    func printArray(arr, 10);
 }`
   }
 ]

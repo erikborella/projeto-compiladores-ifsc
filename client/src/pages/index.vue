@@ -13,13 +13,36 @@
         <v-btn text="Compilar" @click="uploadCodeBtn()" append-icon="mdi-send"></v-btn>
         <v-menu open-on-hover>
           <template v-slot:activator="{ props }">
-            <v-btn v-bind="props">
+            <v-btn v-bind="props" append-icon="mdi-menu-down">
               Exemplos
             </v-btn>
           </template>
           <v-list>
+            <v-list-subheader>Básico</v-list-subheader>
             <v-list-item
-              v-for='(item, index) in codeExamples'
+              v-for='(item, index) in basicExamples'
+              :key='index'
+              :value='index'
+              @click="updateCodeEditorStateCode(item.code)"
+            >
+              <v-list-item-title>{{ item.name }}</v-list-item-title>
+            </v-list-item>
+            <v-divider></v-divider>
+
+            <v-list-subheader>Ordenação</v-list-subheader>
+            <v-list-item
+              v-for='(item, index) in sortingExamples'
+              :key='index'
+              :value='index'
+              @click="updateCodeEditorStateCode(item.code)"
+            >
+              <v-list-item-title>{{ item.name }}</v-list-item-title>
+            </v-list-item>
+            <v-divider></v-divider>
+
+            <v-list-subheader>Jogos</v-list-subheader>
+            <v-list-item
+              v-for='(item, index) in gamesExample'
               :key='index'
               :value='index'
               @click="updateCodeEditorStateCode(item.code)"
@@ -46,7 +69,7 @@
 
         <v-card 
           elevation="4"
-          title="Declaração de váriaveis" 
+          title="Declaração de variáveis" 
         >
         <template v-slot:text>
           <p>As declarações de variáveis devem ser feitas antes de seu uso nos blocos de código.</p>
@@ -70,7 +93,7 @@
 
         <v-card
           elevation="4"
-          title="Atribuição de váriaveis"
+          title="Atribuição de variáveis"
         >
           <template v-slot:text>
             <p>É possível atribuir valores a variáveis utilizando constantes, expressões matemáticas, valores de arrays ou valores retornados por funções</p>
@@ -115,7 +138,7 @@
           title="Leituras de valores"
         >
           <template v-slot:text>
-            <p>Para ler valores do usuário pode-se usar o comando <code>scanf</code>, passando a váriavel na qual o valor será salvo para ela.</p>
+            <p>Para ler valores do usuário pode-se usar o comando <code>scanf</code>, passando a variável na qual o valor será salvo para ela.</p>
           </template>
           <div ref="exampleCodeEditorVariableScanf" class="code-editor"></div>
         </v-card>
@@ -175,7 +198,7 @@
   import { indentWithTab } from '@codemirror/commands';
   import { oneDark } from '@codemirror/theme-one-dark';
   import { cppLanguage } from '@codemirror/lang-cpp';
-  import { codeExamples } from '../models/CodeExamples';
+  import { gamesExample, basicExamples, sortingExamples } from '../models/CodeExamples';
 
   import compilerApi from '../services/compiler/compilerApi';
 
@@ -220,7 +243,7 @@
     new EditorView({
       doc: 
 `main() {
-  // declarações de váriaveis...
+  // declarações de variáveis...
   
   // comandos...
 }`,
@@ -235,10 +258,10 @@
 
     new EditorView({
       doc:
-`// Declaração de váriavel simples
+`// Declaração de variável simples
 int var1;
 
-// Declaração de multiplas váriaveis;
+// Declaração de múltiplas variáveis;
 boolean var2, var3;
 
 // Declaração de arrays
@@ -255,7 +278,7 @@ int[7][10] mat;`,
 
     new EditorView({
       doc: 
-`// Declaração de váriaveis
+`// Declaração de variáveis
 int n1;
 boolean flag;
 float f1;
