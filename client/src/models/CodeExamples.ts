@@ -206,24 +206,30 @@ void printArray(int[10] A, int size) {
     println("");
 }
 
+void initArray(int[10] A, int size) {
+  int i;
+
+  for (i = 0; i < size; i = i + 1) {
+    int valor;
+
+    println("Digite o valor da posicao %d: ", i);
+    scanf(valor);
+
+    A[i] = valor;
+  }
+}
+
 main() {
     int[10] arr;
 
-    arr[0] = 5;
-    arr[1] = 1;
-    arr[2] = 4;
-    arr[3] = 8;
-    arr[4] = 9;
-    arr[5] = 3;
-    arr[6] = 5;
-    arr[7] = 6;
-    arr[8] = 2;
-    arr[9] = 0;
+    func initArray(arr, 10);
 
+    println("Array desordenado: ");
     func printArray(arr, 10);
 
     func mergeSort(arr, 0, 9);
 
+    println("Array ordenado: ");
     func printArray(arr, 10);
 }`
   }
