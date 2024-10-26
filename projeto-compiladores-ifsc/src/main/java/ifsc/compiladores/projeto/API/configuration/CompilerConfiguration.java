@@ -21,6 +21,7 @@ public class CompilerConfiguration {
 
     private String syntaxTreeFileName;
     private String tokenListFileName;
+    private String symbolsTableFileName;
 
     public String getCachePath() {
         return cachePath;
@@ -116,5 +117,13 @@ public class CompilerConfiguration {
 
     public void setTokenListFileName(String tokenListFileName) {
         this.tokenListFileName = tokenListFileName;
+    }
+
+    public String getSymbolsTableFileName() {
+        return symbolsTableFileName;
+    }
+
+    public void setSymbolsTableFileName(String symbolsTableFileName) {
+        this.symbolsTableFileName = symbolsTableFileName;
     }
 }

@@ -21,16 +21,19 @@ public class CompilerController {
     private final LLVMCompilerService llvmCompilerService;
     private final SyntaxTreeService syntaxTreeService;
     private final TokenListService tokenListService;
+    private final SymbolsTableService symbolsTableService;
 
 
     public CompilerController(CodeCacheManager codeCacheManager,
                               LLVMCompilerService llvmCompilerService,
                               SyntaxTreeService syntaxTreeService,
-                              TokenListService tokenListService) {
+                              TokenListService tokenListService,
+                              SymbolsTableService symbolsTableService) {
         this.codeCacheManager = codeCacheManager;
         this.llvmCompilerService = llvmCompilerService;
         this.syntaxTreeService = syntaxTreeService;
         this.tokenListService = tokenListService;
+        this.symbolsTableService = symbolsTableService;
     }
 
     @PostMapping("/upload")
@@ -153,6 +156,19 @@ public class CompilerController {
         }
 
         return tokenListResult.get();
+    }
+
+    @GetMapping("{codeId}/symbols")
+    public String getSymbolsTable(@PathVariable("codeId") String codeId) throws IOException {
+        log.info("Getting symbols table of code with id {}.", codeId);
+        Optional<String> symbolsTableResult = this.symbolsTableService.getSymbolsTable(codeId);
+
+        if (symbolsTableResult.isEmpty()) {
+            log.warn("Code with id {} was not found.", codeId);
+            throw CodeFileNotFoundException.inCodeId(codeId);
+        }
+
+        return symbolsTableResult.get();
     }
 
 }
