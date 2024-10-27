@@ -11,7 +11,7 @@
 
       <template v-slot:append>
         <v-btn text="Compilar" @click="uploadCodeBtn()" append-icon="mdi-send"></v-btn>
-        <v-menu open-on-hover>
+        <v-menu>
           <template v-slot:activator="{ props }">
             <v-btn v-bind="props" append-icon="mdi-menu-down">
               Exemplos
@@ -21,6 +21,17 @@
             <v-list-subheader>Básico</v-list-subheader>
             <v-list-item
               v-for='(item, index) in basicExamples'
+              :key='index'
+              :value='index'
+              @click="updateCodeEditorStateCode(item.code)"
+            >
+              <v-list-item-title>{{ item.name }}</v-list-item-title>
+            </v-list-item>
+            <v-divider></v-divider>
+
+            <v-list-subheader>Recursivo</v-list-subheader>
+            <v-list-item
+              v-for='(item, index) in recursiveExamples'
               :key='index'
               :value='index'
               @click="updateCodeEditorStateCode(item.code)"
@@ -198,7 +209,7 @@
   import { indentWithTab } from '@codemirror/commands';
   import { oneDark } from '@codemirror/theme-one-dark';
   import { cppLanguage } from '@codemirror/lang-cpp';
-  import { gamesExample, basicExamples, sortingExamples } from '../models/CodeExamples';
+  import { gamesExample, basicExamples, sortingExamples, recursiveExamples } from '../models/CodeExamples';
 
   import compilerApi from '../services/compiler/compilerApi';
 
