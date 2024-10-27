@@ -450,6 +450,9 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         if (scanVariable.type().getBaseType() == BaseType.FLOAT) {
             scanfTemplate = "%lf";
         }
+        else if (scanVariable.type().getBaseType() == BaseType.CHAR) {
+            scanfTemplate = " %c";
+        }
         else {
             scanfTemplate = "%d";
         }
