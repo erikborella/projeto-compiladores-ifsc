@@ -70,7 +70,7 @@ float calcularMedia(float[5] notas) {
 
 main() {
   float[5] notas;
-  int media;
+  float media;
 
   func lerNotas(notas);
   func exibirNotas(notas);
