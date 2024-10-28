@@ -20,7 +20,7 @@ public class StringManager {
             return this.strings.get(str);
         }
         
-        // String length considerating that \\xx is only one char
+        // String length considering that \\xx is only one char
         int irStringLen = str.length() - this.getEscapeCharsOccurence(str) * 2;
         
         Type stringType = new Type(BaseType.CHAR);
