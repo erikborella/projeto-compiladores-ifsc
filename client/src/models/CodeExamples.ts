@@ -27,16 +27,16 @@ export const basicExamples: CodeExample[] = [
 
   println("Raio: %.2f", raio);
   println("Area: %.2f", area);
-  println("Perimetro: %.2f", perimetro);
+  println("Perímetro: %.2f", perimetro);
 }`
     },
     {
         name: 'Média de notas',
-        code: `void lerNotas(int[5] notas) {
+        code: `void lerNotas(float[5] notas) {
   int i;
 
   for (i = 0; i < 5; i = i + 1) {
-    int nota;
+    float nota;
     
     println("Digite a %d nota do aluno:", i + 1);
     scanf(nota);
@@ -45,18 +45,19 @@ export const basicExamples: CodeExample[] = [
   }
 }
 
-void exibirNotas(int[5] notas) {
+void exibirNotas(float[5] notas) {
   int i;
   
-  println("As notas do aluno sao:");
+  println("As notas do aluno são:");
 
   for (i = 0; i < 5; i = i + 1) {
-    println("* %d", notas[i]);
+    println("* %.1f", notas[i]);
   }
 }
 
-int calcularMedia(int[5] notas) {
-  int i, soma;
+float calcularMedia(float[5] notas) {
+  int i;
+  float soma;
 
   soma = 0;
 
@@ -68,7 +69,7 @@ int calcularMedia(int[5] notas) {
 }
 
 main() {
-  int[5] notas;
+  float[5] notas;
   int media;
 
   func lerNotas(notas);
@@ -76,12 +77,12 @@ main() {
 
   media = func calcularMedia(notas);
 
-  println("A media do aluno foi: %d", media);
+  println("A média do aluno foi: %.1f", media);
 
   if (media < 7) {
-    println("O aluno nao antigiu a media 7");
+    println("O aluno não atingiu a média 7");
   } else {
-    println("O aluno antigiu a media 7");
+    println("O aluno atingiu a média 7");
   }
 }`
     }
@@ -106,7 +107,7 @@ void initArray(int[10] arr, int size) {
   for (i = 0; i < size; i = i + 1) {
     int valor;
 
-    println("Digite o valor da posicao %d: ", i);
+    println("Digite o valor da posição %d: ", i);
     scanf(valor);
 
     arr[i] = valor;
@@ -159,7 +160,7 @@ void initArray(int[10] arr, int size) {
   for (i = 0; i < size; i = i + 1) {
     int valor;
 
-    println("Digite o valor da posicao %d: ", i);
+    println("Digite o valor da posição %d: ", i);
     scanf(valor);
 
     arr[i] = valor;
@@ -215,7 +216,7 @@ void initArray(int[10] arr, int size) {
   for (i = 0; i < size; i = i + 1) {
     int valor;
 
-    println("Digite o valor da posicao %d: ", i);
+    println("Digite o valor da posição %d: ", i);
     scanf(valor);
 
     arr[i] = valor;
@@ -274,7 +275,7 @@ void initArray(int[10] arr, int size) {
   for (i = 0; i < size; i = i + 1) {
     int valor;
 
-    println("Digite o valor da posicao %d: ", i);
+    println("Digite o valor da posição %d: ", i);
     scanf(valor);
 
     arr[i] = valor;
@@ -368,7 +369,7 @@ void initArray(int[10] arr, int size) {
   for (i = 0; i < size; i = i + 1) {
     int valor;
 
-    println("Digite o valor da posicao %d: ", i);
+    println("Digite o valor da posição %d: ", i);
     scanf(valor);
 
     arr[i] = valor;
@@ -442,7 +443,7 @@ main() {
   println("Digite um numero para calcular o fatorial:");
   scanf(num);
   
-  println("O fatorial de %d eh %d", num, func fatorial(num));
+  println("O fatorial de %d é %d", num, func fatorial(num));
 }`
     },
     {
@@ -460,7 +461,7 @@ main() {
   println("Digite um numero para calcular o fibonacci:");
   scanf(num);
   
-  println("O fibonacci de %d eh %d", num, func fibonacci(num));
+  println("O fibonacci de %d é %d", num, func fibonacci(num));
 }`
     }
 ]
@@ -688,10 +689,10 @@ main() {
   }
 
   if (acertos == 10) {
-    println("Parabens! Voce adivinhou a palavra: compilador");
+    println("Parabéns! Você adivinhou a palavra: compilador");
   } 
   else {
-    println("Voce perdeu! A palavra era: compilador");
+    println("Você perdeu! A palavra era: compilador");
   }
 }`
     }
