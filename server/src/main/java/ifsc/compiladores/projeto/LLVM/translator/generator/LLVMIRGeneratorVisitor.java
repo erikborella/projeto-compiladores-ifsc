@@ -2,6 +2,7 @@ package ifsc.compiladores.projeto.LLVM.translator.generator;
 
 import ifsc.compiladores.projeto.LLVM.translator.Fragment;
 import ifsc.compiladores.projeto.LLVM.translator.FragmentBlock;
+import ifsc.compiladores.projeto.LLVM.translator.ReturnableFragment;
 import ifsc.compiladores.projeto.LLVM.translator.ReturnableFragmentBlock;
 import ifsc.compiladores.projeto.LLVM.translator.definitions.Alloca;
 import ifsc.compiladores.projeto.LLVM.translator.definitions.GetElementPtr;
@@ -15,6 +16,8 @@ import ifsc.compiladores.projeto.LLVM.translator.definitions.expressions.Constan
 import ifsc.compiladores.projeto.LLVM.translator.definitions.expressions.Operation;
 import ifsc.compiladores.projeto.LLVM.translator.definitions.expressions.OperationType;
 import ifsc.compiladores.projeto.LLVM.translator.definitions.expressions.Return;
+import ifsc.compiladores.projeto.LLVM.translator.definitions.expressions.comparisons.FloatComparison;
+import ifsc.compiladores.projeto.LLVM.translator.definitions.expressions.comparisons.FloatComparisonType;
 import ifsc.compiladores.projeto.LLVM.translator.definitions.expressions.comparisons.IntegerComparison;
 import ifsc.compiladores.projeto.LLVM.translator.definitions.expressions.comparisons.IntegerComparisonType;
 import ifsc.compiladores.projeto.LLVM.translator.definitions.functions.Function;
@@ -761,16 +764,6 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
             ParseTree child = ctx.getChild(i);
             
             if (child instanceof ParserGrammar.Op_relacionalContext opRelacionalContext) {
-                IntegerComparisonType comparisonType = switch (opRelacionalContext.start.getType()) {
-                    case ParserGrammar.OP_IGUAL -> IntegerComparisonType.EQUALS;
-                    case ParserGrammar.OP_DIFERENTE -> IntegerComparisonType.NOT_EQUALS;
-                    case ParserGrammar.OP_MENOR -> IntegerComparisonType.LESS;
-                    case ParserGrammar.OP_MENOR_IGUAL -> IntegerComparisonType.LESS_EQUALS;
-                    case ParserGrammar.OP_MAIOR -> IntegerComparisonType.GREATER;
-                    case ParserGrammar.OP_MAIOR_IGUAL -> IntegerComparisonType.GREATER_EQUALS;
-                    default -> throw new IllegalStateException("Invalid operation type");
-                };
-                
                 ReturnableFragmentBlock op2Expression = (ReturnableFragmentBlock) visit(ctx.getChild(i+1));
                 expression.getFragmentBlock().addAll(op2Expression.getFragmentBlock());
                 i++;
@@ -783,18 +776,26 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
                     op1,
                     op2
                 );
-                
+
                 expression.getFragmentBlock().addAll(variablesConversion.getNormalizationBlock());
-                
-                String returnVariableName = this.singleUseVariablesManager.getNewVariableName();
-                
-                IntegerComparison comparison = new IntegerComparison(
-                        comparisonType,
-                        returnVariableName,
+
+                ReturnableFragment comparison;
+
+                if (variablesConversion.getV1Normalized().type().getBaseType() == BaseType.FLOAT) {
+                    comparison = this.createFloatComparison(
+                        opRelacionalContext,
                         variablesConversion.getV1Normalized(),
                         variablesConversion.getV2Normalized()
-                );
-                
+                    );
+                }
+                else {
+                    comparison = this.createIntegerComparison(
+                        opRelacionalContext,
+                        variablesConversion.getV1Normalized(),
+                        variablesConversion.getV2Normalized()
+                    );
+                }
+
                 expression.getFragmentBlock().add(comparison);
                 expression.setReturnVariable(comparison.getReturnVariable());
                 continue;
@@ -807,6 +808,52 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         }
         
         return expression;
+    }
+
+    private ReturnableFragment createIntegerComparison(ParserGrammar.Op_relacionalContext opRelacionalContext, Variable op1, Variable op2) {
+        IntegerComparisonType comparisonType = switch (opRelacionalContext.start.getType()) {
+            case ParserGrammar.OP_IGUAL -> IntegerComparisonType.EQUALS;
+            case ParserGrammar.OP_DIFERENTE -> IntegerComparisonType.NOT_EQUALS;
+            case ParserGrammar.OP_MENOR -> IntegerComparisonType.LESS;
+            case ParserGrammar.OP_MENOR_IGUAL -> IntegerComparisonType.LESS_EQUALS;
+            case ParserGrammar.OP_MAIOR -> IntegerComparisonType.GREATER;
+            case ParserGrammar.OP_MAIOR_IGUAL -> IntegerComparisonType.GREATER_EQUALS;
+            default -> throw new IllegalStateException("Invalid operation type");
+        };
+
+        String returnVariableName = this.singleUseVariablesManager.getNewVariableName();
+
+        IntegerComparison comparison = new IntegerComparison(
+            comparisonType,
+            returnVariableName,
+            op1,
+            op2
+        );
+
+        return comparison;
+    }
+
+    private ReturnableFragment createFloatComparison(ParserGrammar.Op_relacionalContext opRelacionalContext, Variable op1, Variable op2) {
+        FloatComparisonType comparisonType = switch (opRelacionalContext.start.getType()) {
+            case ParserGrammar.OP_IGUAL -> FloatComparisonType.EQUALS;
+            case ParserGrammar.OP_DIFERENTE -> FloatComparisonType.NOT_EQUALS;
+            case ParserGrammar.OP_MENOR -> FloatComparisonType.LESS;
+            case ParserGrammar.OP_MENOR_IGUAL -> FloatComparisonType.LESS_EQUALS;
+            case ParserGrammar.OP_MAIOR -> FloatComparisonType.GREATER;
+            case ParserGrammar.OP_MAIOR_IGUAL -> FloatComparisonType.GREATER_EQUALS;
+            default -> throw new IllegalStateException("Invalid operation type");
+        };
+
+        String returnVariableName = this.singleUseVariablesManager.getNewVariableName();
+
+        FloatComparison comparison = new FloatComparison(
+            comparisonType,
+            returnVariableName,
+            op1,
+            op2
+        );
+
+        return comparison;
     }
 
     @Override
@@ -875,7 +922,7 @@ public class LLVMIRGeneratorVisitor extends ParserGrammarBaseVisitor<Fragment> {
         
         return expression;
     }
-    
+
     private OperationType getOperationType(ParserRuleContext operatorContext, boolean isFloatOperation) {
         if (isFloatOperation) {
             return switch (operatorContext.start.getType()) {
