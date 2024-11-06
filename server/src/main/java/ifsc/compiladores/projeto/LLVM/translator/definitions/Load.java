@@ -13,7 +13,7 @@ public class Load extends ReturnableFragment {
 
     public Load(String returnVariableName, Variable loadVariable) {
         this.returnVariable = new Variable(loadVariable.type().getNewDeferencePointerOfThis(), returnVariableName);
-        this.loadVariable = new Variable(loadVariable.type(), loadVariable.name());
+        this.loadVariable = loadVariable;
     }
 
     @Override
