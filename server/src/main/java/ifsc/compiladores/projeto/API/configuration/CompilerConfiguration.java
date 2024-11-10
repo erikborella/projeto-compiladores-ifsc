@@ -23,6 +23,8 @@ public class CompilerConfiguration {
     private String tokenListFileName;
     private String symbolsTableFileName;
 
+    private String complexityAnalysisFileName;
+
     public String getCachePath() {
         return cachePath;
     }
@@ -125,5 +127,13 @@ public class CompilerConfiguration {
 
     public void setSymbolsTableFileName(String symbolsTableFileName) {
         this.symbolsTableFileName = symbolsTableFileName;
+    }
+
+    public String getComplexityAnalysisFileName() {
+        return complexityAnalysisFileName;
+    }
+
+    public void setComplexityAnalysisFileName(String complexityAnalysisFileName) {
+        this.complexityAnalysisFileName = complexityAnalysisFileName;
     }
 }

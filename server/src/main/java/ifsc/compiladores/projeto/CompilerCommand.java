@@ -2,7 +2,7 @@ package ifsc.compiladores.projeto;
 
 import ifsc.compiladores.projeto.LLVM.translator.Fragment;
 import ifsc.compiladores.projeto.LLVM.translator.generator.LLVMIRGeneratorVisitor;
-import ifsc.compiladores.projeto.complexity.generator.ComplexityAnalysisGeneratorVisitor;
+import ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.generator.ComplexityAnalysisGeneratorVisitor;
 import ifsc.compiladores.projeto.gramatica.LexerGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
 import org.antlr.v4.gui.TreeViewer;

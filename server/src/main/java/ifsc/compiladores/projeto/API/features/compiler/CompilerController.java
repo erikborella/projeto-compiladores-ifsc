@@ -22,18 +22,21 @@ public class CompilerController {
     private final SyntaxTreeService syntaxTreeService;
     private final TokenListService tokenListService;
     private final SymbolsTableService symbolsTableService;
+    private final ComplexityAnalysisService complexityAnalysisService;
 
 
     public CompilerController(CodeCacheManager codeCacheManager,
                               LLVMCompilerService llvmCompilerService,
                               SyntaxTreeService syntaxTreeService,
                               TokenListService tokenListService,
-                              SymbolsTableService symbolsTableService) {
+                              SymbolsTableService symbolsTableService,
+                              ComplexityAnalysisService complexityAnalysisService) {
         this.codeCacheManager = codeCacheManager;
         this.llvmCompilerService = llvmCompilerService;
         this.syntaxTreeService = syntaxTreeService;
         this.tokenListService = tokenListService;
         this.symbolsTableService = symbolsTableService;
+        this.complexityAnalysisService = complexityAnalysisService;
     }
 
     @PostMapping("/upload")
@@ -169,6 +172,19 @@ public class CompilerController {
         }
 
         return symbolsTableResult.get();
+    }
+
+    @GetMapping("{codeId}/complexity")
+    public String getComplexityAnalysis(@PathVariable("codeId") String codeId) throws IOException {
+        log.info("Getting complexity analysis of code with id {}.", codeId);
+        Optional<String> complexityAnalysisResult = this.complexityAnalysisService.getComplexityAnalysis(codeId);
+
+        if (complexityAnalysisResult.isEmpty()) {
+            log.warn("Code with id {} was not found.", codeId);
+            throw CodeFileNotFoundException.inCodeId(codeId);
+        }
+
+        return complexityAnalysisResult.get();
     }
 
 }
