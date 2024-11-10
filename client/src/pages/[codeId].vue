@@ -37,7 +37,7 @@
           <v-tab :to="{ name: '/[codeId]/execution' }">
             Execução
           </v-tab>
-          <v-tab>
+          <v-tab :to="{ name: '/[codeId]/complexity' }">
             Complexidade de algoritmo
           </v-tab>
         </v-tabs>

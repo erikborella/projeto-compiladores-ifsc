@@ -3,6 +3,7 @@ import { OptimizationLevel } from "../../models/OptimizationLevel";
 import { SyntaxTreeRepresentation } from "../../models/SyntaxTreeRepresentation";
 import { Token } from "../../models/TokenRepresentation";
 import { SymbolsTable } from "../../models/SymbolsTable";
+import { CostResult } from "../../models/CostResult";
 
 const uploadCode = async (code: string): Promise<string> => {
   try {
@@ -103,6 +104,18 @@ const getCode = async (codeId: string): Promise<string> => {
   }
 }
 
+const getComplexityAnalysis = async (codeId: string): Promise<CostResult> => {
+  try {
+    const requestUrl = `/compiler/${codeId}/complexity`;
+
+    const response = await axiosInstance.get<CostResult>(requestUrl);
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 function buildOptimizationUrlRequest(
   baseUrl: string,
   optimizationLevel: OptimizationLevel
@@ -122,4 +135,5 @@ export default {
   getTokenList,
   getSymbolsTable,
   getCode,
+  getComplexityAnalysis,
 };

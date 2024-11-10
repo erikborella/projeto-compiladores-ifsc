@@ -20,4 +20,4 @@ function selectPositionInReferenceCodeEditor(editorView: EditorView, tokenPositi
   });
 }
 
-export { selectPositionInReferenceCodeEditor };
+export { selectPositionInReferenceCodeEditor, posToOffset };
