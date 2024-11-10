@@ -14,14 +14,14 @@
 
             <v-card-text>
               <ul>
-                <li>Definições de funções: <code>T(n) = 0</code></li>
-                <li>Retornos de funções: <code>T(n) = 0</code></li>
-                <li>Declarações de variáveis: <code>T(n) = 0</code></li>
-                <li>Atribuições: <code>T(n) = 1</code></li>
-                <li>Escrita e lida de valores: <code>T(n) = 1</code></li>
-                <li><code>if</code> e <code>else</code>: Considera <code>T(n)</code> do bloco com maior custo</li>
-                <li><code>for</code> Realiza o calculo junto da variável marcada como <code>input</code></li>
-                <li><code>while</code> não é suportado o cálculo ainda</li>
+                <li>Definições de funções: <code>T(n) = 0</code>.</li>
+                <li>Retornos de funções: <code>T(n) = 0</code>.</li>
+                <li>Declarações de variáveis: <code>T(n) = 0</code>.</li>
+                <li>Atribuições: <code>T(n) = 1</code>.</li>
+                <li>Escrita e lida de valores: <code>T(n) = 1</code>.</li>
+                <li><code>if</code> e <code>else</code>: Considera <code>T(n)</code> do bloco com maior custo.</li>
+                <li><code>for</code> Realiza o calculo junto da variável marcada como <code>input</code>.</li>
+                <li><code>while</code> não é suportado para o cálculo ainda.</li>
                 <li>Chamadas de funções não tem o calculo do <code>T(n)</code> suportado ainda.</li>
               </ul>
             </v-card-text>
