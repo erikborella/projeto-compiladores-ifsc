@@ -1,4 +1,4 @@
-package ifsc.compiladores.projeto.complexity.definitions;
+package ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions;
 
 public enum BasicCommandCost  {
     

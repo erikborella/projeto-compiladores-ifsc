@@ -1,18 +1,15 @@
-package ifsc.compiladores.projeto.complexity.generator;
+package ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.generator;
 
-import ifsc.compiladores.projeto.complexity.definitions.*;
-import ifsc.compiladores.projeto.complexity.definitions.position.Position;
-import ifsc.compiladores.projeto.complexity.definitions.position.TokenPosition;
-import ifsc.compiladores.projeto.complexity.variableManager.Variable;
-import ifsc.compiladores.projeto.complexity.variableManager.VariableManager;
+import ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions.*;
+import ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions.position.TokenPosition;
+import ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.variableManager.Variable;
+import ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.variableManager.VariableManager;
 import ifsc.compiladores.projeto.gramatica.ParserGrammar;
 import ifsc.compiladores.projeto.gramatica.ParserGrammarBaseVisitor;
 import java.util.ArrayList;
 
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
 

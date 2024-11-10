@@ -1,4 +1,4 @@
-package ifsc.compiladores.projeto.complexity.definitions.position;
+package ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions.position;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 

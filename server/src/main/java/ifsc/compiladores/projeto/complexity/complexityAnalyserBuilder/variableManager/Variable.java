@@ -1,4 +1,4 @@
-package ifsc.compiladores.projeto.complexity.variableManager;
+package ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.variableManager;
 
 public class Variable {
 

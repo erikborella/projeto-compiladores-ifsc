@@ -1,5 +1,5 @@
-package ifsc.compiladores.projeto.complexity.definitions;
-import ifsc.compiladores.projeto.complexity.definitions.position.TokenPosition;
+package ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions;
+import ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions.position.TokenPosition;
 import java.util.ArrayList;
 
 public class BlockCost implements CostResult {

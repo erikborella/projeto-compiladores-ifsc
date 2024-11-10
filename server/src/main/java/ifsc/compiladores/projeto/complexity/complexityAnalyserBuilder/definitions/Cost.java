@@ -1,6 +1,6 @@
-package ifsc.compiladores.projeto.complexity.definitions;
+package ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions;
 
-import ifsc.compiladores.projeto.complexity.definitions.position.TokenPosition;
+import ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions.position.TokenPosition;
 
 public class Cost implements CostResult {
 
