@@ -91,7 +91,7 @@ main() {
 export const sortingExamples: CodeExample[] = [
     {
         name: "Bubble sort",
-        code: `void printArray(int[10] arr, int size) {
+        code: `void printArray(int[10] arr, input int size) {
     int i;
 
     for (i = 0; i < size; i = i + 1) {
@@ -101,7 +101,7 @@ export const sortingExamples: CodeExample[] = [
 }
     
 
-void initArray(int[10] arr, int size) {
+void initArray(int[10] arr, input int size) {
   int i;
 
   for (i = 0; i < size; i = i + 1) {
@@ -114,7 +114,7 @@ void initArray(int[10] arr, int size) {
   }
 }
 
-void bubbleSort(int[10] arr, int size) {
+void bubbleSort(int[10] arr, input int size) {
   int i, j, temp;
 
   for (i = 0; i < size - 1; i = i + 1) {
@@ -145,7 +145,7 @@ main() {
     },
     {
         name: 'Insertion sort',
-        code: `void printArray(int[10] arr, int size) {
+        code: `void printArray(int[10] arr, input int size) {
     int i;
 
     for (i = 0; i < size; i = i + 1) {
@@ -154,7 +154,7 @@ main() {
     println("");
 }
 
-void initArray(int[10] arr, int size) {
+void initArray(int[10] arr, input int size) {
   int i;
 
   for (i = 0; i < size; i = i + 1) {
@@ -167,7 +167,7 @@ void initArray(int[10] arr, int size) {
   }
 }
 
-void insertionSort(int[10] arr, int size) {
+void insertionSort(int[10] arr, input int size) {
   int i;
 
   for (i = 1; i < size; i = i + 1) {
@@ -201,7 +201,7 @@ main() {
     },
     {
         name: 'Selection sort',
-        code: `void printArray(int[10] arr, int size) {
+        code: `void printArray(int[10] arr, input int size) {
     int i;
 
     for (i = 0; i < size; i = i + 1) {
@@ -210,7 +210,7 @@ main() {
     println("");
 }
 
-void initArray(int[10] arr, int size) {
+void initArray(int[10] arr, input int size) {
   int i;
 
   for (i = 0; i < size; i = i + 1) {
@@ -223,7 +223,7 @@ void initArray(int[10] arr, int size) {
   }
 }
 
-void selectionSort(int[10] arr, int size) {
+void selectionSort(int[10] arr, input int size) {
   int i;
 
   for (i = 0; i < size - 1; i = i + 1) {
@@ -260,7 +260,7 @@ main() {
     },
     {
         name: "Merge sort",
-        code: `void printArray(int[10] arr, int size) {
+        code: `void printArray(int[10] arr, input int size) {
     int i;
 
     for (i = 0; i < size; i = i + 1) {
@@ -269,7 +269,7 @@ main() {
     println("");
 }
 
-void initArray(int[10] arr, int size) {
+void initArray(int[10] arr, input int size) {
   int i;
 
   for (i = 0; i < size; i = i + 1) {
@@ -354,7 +354,7 @@ main() {
     },
     {
         name: 'Quick sort',
-        code: `void printArray(int[10] arr, int size) {
+        code: `void printArray(int[10] arr, input int size) {
     int i;
 
     for (i = 0; i < size; i = i + 1) {
@@ -363,7 +363,7 @@ main() {
     println("");
 }
 
-void initArray(int[10] arr, int size) {
+void initArray(int[10] arr, input int size) {
   int i;
 
   for (i = 0; i < size; i = i + 1) {
