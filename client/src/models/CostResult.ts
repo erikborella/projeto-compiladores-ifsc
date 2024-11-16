@@ -3,6 +3,8 @@ import { TokenPosition } from "./TokenPosition";
 type CostResult = {
   position: TokenPosition;
   value: number;
+  stringRepresentation: string;
+  shouldShowInPlace: boolean;
 }
 
 type BlockCost = CostResult & {

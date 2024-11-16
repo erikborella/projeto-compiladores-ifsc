@@ -75,7 +75,7 @@
   import { syntaxViewSetup } from '../../models/CodemirrorCustomSetups';
   import { cppLanguage } from '@codemirror/lang-cpp';
   import { oneDark } from '@codemirror/theme-one-dark';
-  import { addHint, inlineHints } from '../../models/CodemirrorInlineHintWidget';
+  import { addHint, addPositionHint, inlineHints } from '../../models/CodemirrorInlineHintWidget';
   import { CostResult, isBlockCost, isVariableCost } from '../../models/CostResult';
 
   const route = useRoute();
@@ -130,7 +130,8 @@
   async function downloadAndShowComplexityCosts(codeId: string) {
     try {
       const costResult = await compilerApi.getComplexityAnalysis(codeId);
-      addHintsFromCostResult(costResult);
+
+      costResult.forEach(c => addHintsFromCostResult(c));
     } catch (error) {
       console.error(error);
       showErrorMessage(`Falha ao fazer o download da análise da complexidade do código: ${error.message}`);
@@ -138,10 +139,15 @@
   }
 
   function addHintsFromCostResult(costResult: CostResult) {
-    if (!costResult.position)
-      return;
+    if (costResult.position) {
+      const costValue = `T(n) = ${costResult.stringRepresentation}`;
 
-    addHint(referenceCodeEditorView, costResult.position.start.line, `T(n) = ${costResult.value}`);
+      if (costResult.shouldShowInPlace)
+        addPositionHint(referenceCodeEditorView, costResult.position.end, costValue);
+      else
+        addHint(referenceCodeEditorView, costResult.position.start.line, costValue);
+    }
+
 
     if (isBlockCost(costResult)) {
       for (const cost of costResult.costs) {
@@ -150,7 +156,9 @@
     }
 
     if (isVariableCost(costResult)) {
-      console.log('teste');
+      for (const cost of costResult.blockCost.costs) {
+        addHintsFromCostResult(cost);
+      }
     }
   }
 

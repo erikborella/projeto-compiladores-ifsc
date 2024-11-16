@@ -104,11 +104,11 @@ const getCode = async (codeId: string): Promise<string> => {
   }
 }
 
-const getComplexityAnalysis = async (codeId: string): Promise<CostResult> => {
+const getComplexityAnalysis = async (codeId: string): Promise<CostResult[]> => {
   try {
     const requestUrl = `/compiler/${codeId}/complexity`;
 
-    const response = await axiosInstance.get<CostResult>(requestUrl);
+    const response = await axiosInstance.get<CostResult[]>(requestUrl);
 
     return response.data;
   } catch (error) {

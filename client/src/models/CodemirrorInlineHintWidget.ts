@@ -1,11 +1,10 @@
 import {
   EditorView,
   Decoration,
-  DecorationSet,
   WidgetType,
 } from "@codemirror/view";
-import { EditorState, StateEffect, StateField } from "@codemirror/state";
-import { Position, TokenPosition } from "./TokenPosition";
+import { StateEffect, StateField } from "@codemirror/state";
+import { Position } from "./TokenPosition";
 import { posToOffset } from "../services/editorViewTools";
 
 class InlineHintWidget extends WidgetType {
@@ -20,12 +19,12 @@ class InlineHintWidget extends WidgetType {
     const span = document.createElement("span");
     span.textContent = this.text;
     span.style.padding = "2px 4px";
-    span.style.backgroundColor = "#eee";
+    span.style.backgroundColor = "";
     span.style.border = "1px solid #ccc";
     span.style.borderRadius = "3px";
     span.style.fontSize = "0.8em";
     span.style.marginLeft = "5px";
-    span.style.color = 'black';
+    span.style.color = 'white';
     return span;
   }
 
@@ -34,14 +33,12 @@ class InlineHintWidget extends WidgetType {
   }
 }
 
-// Step 2: Define a state field to manage inline hints
 const addInlineHint = StateEffect.define();
 const inlineHints = StateField.define({
   create() {
     return Decoration.none;
   },
   update(decorations, transaction) {
-    // Apply any added hints
     decorations = decorations.map(transaction.changes);
     for (let effect of transaction.effects) {
       if (effect.is(addInlineHint)) {
@@ -49,7 +46,7 @@ const inlineHints = StateField.define({
           add: [
             Decoration.widget({
               widget: new InlineHintWidget(effect.value.text),
-              side: 1, // Place it at the end of the line
+              side: 1,
             }).range(effect.value.pos),
           ],
         });
@@ -60,9 +57,7 @@ const inlineHints = StateField.define({
   provide: (f) => EditorView.decorations.from(f),
 });
 
-// Step 3: Function to add a hint
 function addHint(view: EditorView, line: number, text: string) {
-  // const pos = posToOffset(view.state.doc, position);
   const pos = view.state.doc.line(line).to;
 
   view.dispatch({
@@ -70,4 +65,12 @@ function addHint(view: EditorView, line: number, text: string) {
   });
 }
 
-export { inlineHints, addHint }
+function addPositionHint(view: EditorView, position: Position, text: string) {
+  const pos = posToOffset(view.state.doc, position);
+
+  view.dispatch({
+    effects: addInlineHint.of({ pos, text }),
+  });
+}
+
+export { inlineHints, addHint, addPositionHint }
