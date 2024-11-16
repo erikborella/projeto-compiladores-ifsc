@@ -34,7 +34,7 @@ dimensao
     ;
 
 parametros
-    : (INPUT)? tipo ID (VIRGULA tipo ID)*
+    : (INPUT)? tipo ID (VIRGULA (INPUT)? tipo ID)*
     ;
 
 principal

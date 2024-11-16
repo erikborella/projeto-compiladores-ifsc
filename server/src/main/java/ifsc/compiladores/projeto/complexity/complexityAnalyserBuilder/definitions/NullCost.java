@@ -1,6 +1,6 @@
 package ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions;
 
-import ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions.position.TokenPosition;
+import ifsc.compiladores.projeto.common.position.TokenPosition;
 
 public class NullCost implements CostResult {
 
@@ -12,6 +12,11 @@ public class NullCost implements CostResult {
     @Override
     public int getValue() {
         return 0;
+    }
+
+    @Override
+    public String getStringRepresentation() {
+        return null;
     }
 
 }

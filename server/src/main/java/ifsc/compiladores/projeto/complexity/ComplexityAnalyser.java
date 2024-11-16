@@ -7,9 +7,11 @@ import ifsc.compiladores.projeto.gramatica.ParserGrammar;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import java.util.List;
+
 public class ComplexityAnalyser {
 
-    public static CostResult analyseCodeComplexity(String sourceCode) {
+    public static List<CostResult> analyseCodeComplexity(String sourceCode) {
         LexerGrammar lexer = new LexerGrammar(CharStreams.fromString(sourceCode));
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 
@@ -19,7 +21,7 @@ public class ComplexityAnalyser {
 
         ComplexityAnalysisGeneratorVisitor complexityAnalysisGeneratorVisitor = new ComplexityAnalysisGeneratorVisitor();
 
-        CostResult programCosts = complexityAnalysisGeneratorVisitor.visitPrograma(programaContext);
+        List<CostResult> programCosts = complexityAnalysisGeneratorVisitor.analyseCode(programaContext);
 
         return programCosts;
     }

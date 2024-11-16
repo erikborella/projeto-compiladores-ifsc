@@ -1,6 +1,6 @@
 package ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions;
 
-import ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions.position.TokenPosition;
+import ifsc.compiladores.projeto.common.position.TokenPosition;
 
 public class VariableCost implements CostResult {
 
@@ -23,5 +23,29 @@ public class VariableCost implements CostResult {
     @Override
     public int getValue() {
         return this.blockCost.getValue();
+    }
+
+    @Override
+    public String getStringRepresentation() {
+        String variableExpression;
+
+        if (this.costRange == 0)
+            variableExpression = variable;
+        else
+            variableExpression = String.format("(%s%d)", this.variable, this.costRange);
+
+        return String.format("%s(%s)", variableExpression, this.blockCost.getStringRepresentation());
+    }
+
+    public String getVariable() {
+        return variable;
+    }
+
+    public int getCostRange() {
+        return costRange;
+    }
+
+    public BlockCost getBlockCost() {
+        return blockCost;
     }
 }

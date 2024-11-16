@@ -9,6 +9,7 @@ import ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definition
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,7 +37,7 @@ public class ComplexityAnalysisServiceImpl implements ComplexityAnalysisService 
             return Optional.empty();
         }
 
-        CostResult programCost = ComplexityAnalyser.analyseCodeComplexity(sourceCodeCacheResult.get());
+        List<CostResult> programCost = ComplexityAnalyser.analyseCodeComplexity(sourceCodeCacheResult.get());
 
         ObjectMapper mapper = new ObjectMapper();
         String programComplexity = mapper.writeValueAsString(programCost);
