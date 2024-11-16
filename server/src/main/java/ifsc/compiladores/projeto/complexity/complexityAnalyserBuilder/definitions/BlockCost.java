@@ -1,7 +1,12 @@
 package ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions;
 import ifsc.compiladores.projeto.common.position.TokenPosition;
+import ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions.expressions.CostExpressionSimplifier;
+import ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions.expressions.lexer.CostExpressionTokenizer;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class BlockCost implements CostResult {
@@ -67,7 +72,13 @@ public class BlockCost implements CostResult {
         if (stringCost.isEmpty())
             return "0";
 
-        return stringCost;
+        String costExpression = CostExpressionSimplifier.simplify(stringCost);
+
+        return costExpression;
+    }
+
+    private boolean isNumeric(String value) {
+        return value.chars().allMatch(Character::isDigit);
     }
 
     public CostResult getBlockCost() {
