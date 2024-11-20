@@ -5,12 +5,10 @@
       <v-container class="d-flex flex-column ga-2">
         <v-card 
           elevation="4"
-          title="Execução"
+          title="Complexidade"
         >
           <template v-slot:text>
-            <v-card-text>
-              Veja o cálculo da complexidade do programa
-            </v-card-text>
+            <p>Veja o cálculo da complexidade do programa</p>
 
             <v-card-text>
               <ul>
@@ -21,12 +19,28 @@
                 <li>Escrita e lida de valores: <code>T(n) = 1</code>.</li>
                 <li><code>if</code> e <code>else</code>: Considera <code>T(n)</code> do bloco com maior custo.</li>
                 <li><code>for</code> Realiza o calculo junto da variável marcada como <code>input</code>.</li>
-                <li><code>while</code> não é suportado para o cálculo ainda.</li>
+                <li><code>while</code> é suportado para casos simples das variáveis marcadas como <code>input</code>.</li>
                 <li>Chamadas de funções não tem o calculo do <code>T(n)</code> suportado ainda.</li>
               </ul>
             </v-card-text>
           </template>
         </v-card>
+
+        <v-card v-if="!!finalCostsResults && finalCostsResults.length > 0" elevation="4" title="Resultados:">
+          <v-divider></v-divider>
+          <div v-for="(finalCost, index) in finalCostsResults" :key="index">
+            <v-card-title>{{ finalCost.costId }}</v-card-title>
+            <v-card-text>
+              <div v-html="renderTex(finalCost.rawExpression)"></div>
+              <br>
+              <div v-html="renderTex('\\downarrow \\text{simplificação}')"></div>
+              <br>
+              <div v-html="renderTex(finalCost.finalExpression)"></div>
+            </v-card-text>
+            <v-divider></v-divider>
+          </div>
+        </v-card>
+
       </v-container>
     </v-navigation-drawer>
 
@@ -67,7 +81,7 @@
 </style>
 
 <script lang="ts" setup>
-  import { ref, useTemplateRef, onMounted } from 'vue';
+  import { ref, useTemplateRef, onMounted, computed } from 'vue';
   import { useRoute } from 'vue-router';
   import compilerApi from '../../services/compiler/compilerApi';
   import { EditorView } from 'codemirror';
@@ -77,6 +91,9 @@
   import { oneDark } from '@codemirror/theme-one-dark';
   import { addHint, addPositionHint, inlineHints } from '../../models/CodemirrorInlineHintWidget';
   import { CostResult, isBlockCost, isVariableCost } from '../../models/CostResult';
+  import katex from 'katex';
+  import 'katex/dist/katex.min.css';
+  import * as mathjs from 'mathjs';
 
   const route = useRoute();
 
@@ -89,9 +106,27 @@
     message: ''
   });
 
+  const finalCostsResults = ref<any>([]);
+
   const referenceCodeEditor = useTemplateRef('referenceCodeEditor');
   const referenceCode = ref<string>();
   let referenceCodeEditorView: EditorView;
+
+  // const renderTex = computed((tex: string) => {
+  //   try {
+  //     return katex.renderToString()
+  //   } catch (e) {
+  //     return `Ocorreu um erro ao exibir a formula matemática`;
+  //   }
+  // });
+
+  function renderTex(tex: string) {
+    try {
+      return katex.renderToString(tex);
+    } catch (e) {
+      return `Ocorreu um erro ao exibir a formula matemática`;
+    }
+  }
 
   onMounted(async () => {
     isLoading.value = true;
@@ -139,18 +174,32 @@
   }
 
   function addHintsFromCostResult(costResult: CostResult) {
+    const isTopLevelBlock = isBlockCost(costResult) && costResult.topLevel;
+
     if (costResult.position) {
-      const costValue = `T(n) = ${costResult.stringRepresentation}`;
+      const prefix = (isTopLevelBlock) ? "T(n)" : "Custo";
+      const costValue = (isTopLevelBlock) ? 
+        simplifyCost(costResult.stringRepresentation)
+        : costResult.stringRepresentation;
+
+      const costRepresentation = `${prefix} = ${costValue}`;
 
       if (costResult.shouldShowInPlace)
-        addPositionHint(referenceCodeEditorView, costResult.position.end, costValue);
+        addPositionHint(referenceCodeEditorView, costResult.position.end, costRepresentation);
       else
-        addHint(referenceCodeEditorView, costResult.position.start.line, costValue);
+        addHint(referenceCodeEditorView, costResult.position.start.line, costRepresentation);
     }
 
+    if (isBlockCost(costResult)) {{
+      if (isTopLevelBlock) {
+        finalCostsResults.value.push({
+          rawExpression: `T(n) = ${mathjs.parse(costResult.stringRepresentation).toTex()}`,
+          finalExpression: `T(n) = ${mathjs.simplify(costResult.stringRepresentation).toTex()}`,
+          costId: costResult.topLevelId,
+        });
+      }
 
-    if (isBlockCost(costResult)) {
-      for (const cost of costResult.costs) {
+      for (const cost of costResult.costs) 
         addHintsFromCostResult(cost);
       }
     }
@@ -160,6 +209,11 @@
         addHintsFromCostResult(cost);
       }
     }
+  }
+
+  function simplifyCost(cost: string): string {
+    var costSimplified = mathjs.simplify(cost).toString();
+    return costSimplified;
   }
 
   function showErrorMessage(message: string) {

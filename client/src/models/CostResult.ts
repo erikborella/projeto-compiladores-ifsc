@@ -10,6 +10,8 @@ type CostResult = {
 type BlockCost = CostResult & {
   blockCost: CostResult;
   costs: CostResult[];
+  topLevel: boolean;
+  topLevelId: string;
 }
 
 type VariableCost = CostResult & {
