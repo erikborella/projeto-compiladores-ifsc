@@ -1,32 +1,39 @@
 package ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions;
 import ifsc.compiladores.projeto.common.position.TokenPosition;
-import ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions.expressions.CostExpressionSimplifier;
-import ifsc.compiladores.projeto.complexity.complexityAnalyserBuilder.definitions.expressions.lexer.CostExpressionTokenizer;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class BlockCost implements CostResult {
     
     private final CostResult blockCost;
     private final ArrayList<CostResult> costs;
-
-    public BlockCost(CostResult blockCost) {
-        this.blockCost = blockCost;
-        this.costs = new ArrayList<>();
-    }
+    private final boolean isTopLevel;
+    private final String topLevelId;
 
     public BlockCost(CostResult blockCost, ArrayList<CostResult> costs) {
         this.blockCost = blockCost;
         this.costs = costs;
+        this.isTopLevel = false;
+        this.topLevelId = null;
     }
 
     public BlockCost(ArrayList<CostResult> costs) {
         this.blockCost = new NullCost();
         this.costs = costs;
+        this.isTopLevel = false;
+        this.topLevelId = null;
+    }
+
+    private BlockCost(CostResult blockCost, ArrayList<CostResult> costs, boolean isTopLevel, String topLevelId) {
+        this.blockCost = blockCost;
+        this.costs = costs;
+        this.isTopLevel = isTopLevel;
+        this.topLevelId = topLevelId;
+    }
+
+    public BlockCost asTopLevel(String topLeveId) {
+        return new BlockCost(this.blockCost, this.costs, true, topLeveId);
     }
 
     @Override
@@ -43,13 +50,15 @@ public class BlockCost implements CostResult {
     public String getStringRepresentation() {
         ArrayList<String> expressionParts = new ArrayList<>();
 
-        int invariablePart = this.costs.stream()
+        String invariablePart = this.costs.stream()
                 .filter(c -> c instanceof Cost)
                 .map(CostResult::getValue)
-                .reduce(0, Integer::sum);
+                .filter(v -> v > 0)
+                .map(String::valueOf)
+                .collect(Collectors.joining(" + "));
 
-        if (invariablePart > 0)
-            expressionParts.add(String.valueOf(invariablePart));
+        if (!invariablePart.isEmpty())
+            expressionParts.add(invariablePart);
 
         String variablePart = this.costs.stream()
                 .filter(c -> c instanceof VariableCost)
@@ -72,13 +81,7 @@ public class BlockCost implements CostResult {
         if (stringCost.isEmpty())
             return "0";
 
-        String costExpression = CostExpressionSimplifier.simplify(stringCost);
-
-        return costExpression;
-    }
-
-    private boolean isNumeric(String value) {
-        return value.chars().allMatch(Character::isDigit);
+        return stringCost;
     }
 
     public CostResult getBlockCost() {
@@ -87,5 +90,13 @@ public class BlockCost implements CostResult {
 
     public ArrayList<CostResult> getCosts() {
         return costs;
+    }
+
+    public boolean isTopLevel() {
+        return isTopLevel;
+    }
+
+    public String getTopLevelId() {
+        return topLevelId;
     }
 }

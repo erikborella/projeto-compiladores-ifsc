@@ -78,7 +78,10 @@ public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor
             }
         }
 
-        return visitBloco(ctx.bloco());
+        String functionName = ctx.ID().getText();
+        BlockCost blockCost = visitBloco(ctx.bloco()).asTopLevel(functionName);
+
+        return blockCost;
     }
 
     public BlockCost visitBloco(ParserGrammar.BlocoContext ctx) {

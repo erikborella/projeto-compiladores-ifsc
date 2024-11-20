@@ -27,14 +27,7 @@ public class VariableCost implements CostResult {
 
     @Override
     public String getStringRepresentation() {
-        String variableExpression;
-
-        if (this.costRange == 0)
-            variableExpression = variable;
-        else
-            variableExpression = String.format("(%s%d)", this.variable, this.costRange);
-
-        return String.format("%s(%s)", variableExpression, this.blockCost.getStringRepresentation());
+        return String.format("n*(%s)", this.blockCost.getStringRepresentation());
     }
 
     public String getVariable() {
