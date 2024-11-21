@@ -104,7 +104,7 @@ public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor
             blockTotalCostsValue += c.getValue();
         }
         
-        TokenPosition blockTotalCostPosition = TokenPosition.fromToken(ctx.CHAVE_ABRE().getSymbol());
+        TokenPosition blockTotalCostPosition = TokenPosition.fromContext(ctx);
         Cost blockTotalCost = new Cost(blockTotalCostPosition, blockTotalCostsValue);
 
         return new BlockCost(blockTotalCost, costs);
@@ -164,7 +164,12 @@ public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor
     @Override
     public CostResult visitPara(ParserGrammar.ParaContext ctx) {
         String forExpressionSizeVariableId = ctx.expressao().expr_ou().expr_e(0).expr_relacional(0).expr_aditiva(1).getText();
-        Variable forExpressionSizeVariable = this.variableManager.getVariable(forExpressionSizeVariableId);
+        Variable forExpressionSizeVariable;
+
+        if (isInteger(forExpressionSizeVariableId))
+            forExpressionSizeVariable = new Variable(forExpressionSizeVariableId, null, true);
+        else
+            forExpressionSizeVariable = this.variableManager.getVariable(forExpressionSizeVariableId);
 
         if (forExpressionSizeVariable == null || !forExpressionSizeVariable.isInput())
             return visitBloco(ctx.bloco());
@@ -182,6 +187,9 @@ public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor
         int costRange = initialVariableValue * -1;
         BlockCost forBlockCost = visitBloco(ctx.bloco());
 
+        Cost forInsideExpressionCost = new Cost(null, forExpressionCost.getValue());
+        forBlockCost.getCosts().add(forInsideExpressionCost);
+
         VariableCost forVariableCost = new VariableCost(forExpressionSizeVariableId, costRange, forBlockCost);
         costs.add(forVariableCost);
 
@@ -191,7 +199,12 @@ public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor
     @Override
     public CostResult visitEnquanto(ParserGrammar.EnquantoContext ctx) {
         String whileExpressionSizeVariableId = ctx.expressao().expr_ou().expr_e(0).expr_relacional(0).expr_aditiva(1).getText();
-        Variable whileExpressionSizeVariable = this.variableManager.getVariable(whileExpressionSizeVariableId);
+        Variable whileExpressionSizeVariable;
+
+        if (isInteger(whileExpressionSizeVariableId))
+            whileExpressionSizeVariable = new Variable(whileExpressionSizeVariableId, null, true);
+        else
+            whileExpressionSizeVariable = this.variableManager.getVariable(whileExpressionSizeVariableId);
 
         if (whileExpressionSizeVariable == null || !whileExpressionSizeVariable.isInput())
             return visitBloco(ctx.bloco());
@@ -205,6 +218,9 @@ public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor
         costs.add(whileExpressionCost);
 
         BlockCost whileBlockCost = visitBloco(ctx.bloco());
+
+        Cost whileInsideExpressionCost = new Cost(null, whileExpressionCost.getValue());
+        whileBlockCost.getCosts().add(whileInsideExpressionCost);
 
         VariableCost whileVariableCost = new VariableCost(whileExpressionSizeVariableId, 0, whileBlockCost);
         costs.add(whileVariableCost);
@@ -237,5 +253,14 @@ public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor
         }
 
         return result;
+    }
+
+    private boolean isInteger(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

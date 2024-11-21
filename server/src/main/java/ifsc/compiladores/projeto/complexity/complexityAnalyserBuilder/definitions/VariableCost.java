@@ -27,7 +27,8 @@ public class VariableCost implements CostResult {
 
     @Override
     public String getStringRepresentation() {
-        return String.format("n*(%s)", this.blockCost.getStringRepresentation());
+        String variableValue = (isInteger(this.variable)) ? String.valueOf(this.variable) : "n";
+        return String.format("%s*(%s)", variableValue, this.blockCost.getStringRepresentation());
     }
 
     public String getVariable() {
@@ -40,5 +41,14 @@ public class VariableCost implements CostResult {
 
     public BlockCost getBlockCost() {
         return blockCost;
+    }
+
+    private boolean isInteger(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

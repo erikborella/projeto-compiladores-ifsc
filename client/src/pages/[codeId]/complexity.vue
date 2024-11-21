@@ -111,15 +111,7 @@
   const referenceCodeEditor = useTemplateRef('referenceCodeEditor');
   const referenceCode = ref<string>();
   let referenceCodeEditorView: EditorView;
-
-  // const renderTex = computed((tex: string) => {
-  //   try {
-  //     return katex.renderToString()
-  //   } catch (e) {
-  //     return `Ocorreu um erro ao exibir a formula matemática`;
-  //   }
-  // });
-
+  
   function renderTex(tex: string) {
     try {
       return katex.renderToString(tex);
@@ -187,7 +179,7 @@
       if (costResult.shouldShowInPlace)
         addPositionHint(referenceCodeEditorView, costResult.position.end, costRepresentation);
       else
-        addHint(referenceCodeEditorView, costResult.position.start.line, costRepresentation);
+        addHint(referenceCodeEditorView, costResult.position.end.line, costRepresentation);
     }
 
     if (isBlockCost(costResult)) {{
