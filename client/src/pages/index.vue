@@ -72,15 +72,15 @@
       <v-container class="d-flex flex-column ga-2">
         <v-card
           elevation="4"
-          title="Função main" 
+          title="Função main"
           text="A função main é o ponto de entrada da execução de um programa, onde o código inicia sua execução."
         >
           <div ref="exampleCodeEditorMain" class="code-editor"></div>
         </v-card>
 
-        <v-card 
+        <v-card
           elevation="4"
-          title="Declaração de variáveis" 
+          title="Declaração de variáveis"
         >
         <template v-slot:text>
           <p>As declarações de variáveis devem ser feitas antes de seu uso nos blocos de código.</p>
@@ -152,6 +152,93 @@
             <p>Para ler valores do usuário pode-se usar o comando <code>scanf</code>, passando a variável na qual o valor será salvo para ela.</p>
           </template>
           <div ref="exampleCodeEditorVariableScanf" class="code-editor"></div>
+        </v-card>
+
+        <v-card
+          elevation="4"
+          title="Declaração de funções"
+        >
+          <template v-slot:text>
+            <p>As declarações de funções devem ser feitas antes da função. Inicia-se especificando o tipo de retorno da função, podendo ser qualquer um dos tipos suportados, ou <code>void</code> caso a função não retorne nenhum valor.</p>
+            <p>Após o tipo de retorno, deve ser especificado um nome único para função.</p>
+            <p>Entre parêntesis, são definidos os parâmetros que a função recebe, especificando primeiro o seu tipo e depois o seu nome, separando cada parâmetro por virgula.</p>
+            <p>Após, deve-se colocar entre chaves o código que será executado pela função.</p>
+            <br>
+            <p>Use o comando <code>return</code> para retornar os valores das funções.</p>
+          </template>
+          <div ref="exampleCodeEditorVariableFunctionDeclaration" class="code-editor"></div>
+        </v-card>
+
+        <v-card
+          elevation="4"
+          title="Chamada de funções"
+        >
+          <template v-slot:text>
+            <p>Para chamar as funções declaradas, deve-se usar primeiro a palavra reservada <code>func</code> seguido do nome da função, seguido de parêntesis.</p>
+            <p>Caso a função receba argumentos, eles devem ser especificados entre os parêntesis.</p>
+            <br>
+            <p>Caso a função tenha um valor de retorno, ele poderá ser atribuído em uma variável ou usado como qualquer outro valor, como em uma expressão matemática ou em uma expressão condicional.</p>
+          </template>
+          <div ref="exampleCodeEditorVariableFunctionCall" class="code-editor"></div>
+        </v-card>
+
+        <v-card
+          elevation="4"
+          title="Bloco condicional if"
+        >
+          <template v-slot:text>
+            <p>Use o bloco condiciona <code>if</code> para controlar o fluxo de execução do seu programa.</p>
+            <br>
+            <p>A sua estrutura é definida primeiro especificando a palavra reservada <code>if</code> e entre parêntesis deve ser passada uma expressão condicional, que caso seja verdadeira, o bloco de código definido em sequencia por chaves será executado.</p>
+            <p>Opcionalmente pode-se definir um bloco <code>else</code> ao final do <code>if</code>, que será executado apenas se a condição do <code>if</code> for falsa.</p>
+            <br>
+            <p>Os seguintes operadores condicionais são suportados:</p>
+
+            <v-card-text>
+              <ul>
+                <li><code> > </code>: Maior</li>
+                <li><code> >= </code>: Maior ou igual</li>
+                <li><code> < </code>: Menor</li>
+                <li><code> <= </code>: Menor ou igual</li>
+                <li><code> == </code>: Igual</li>
+                <li><code> != </code>: Diferente</li>
+              </ul>
+            </v-card-text>
+
+            <p>Para juntar expressões condicionais, pode-se ser usado os seguintes operadores, onde são computados usando curto-circuito:</p>
+
+            <v-card-text>
+              <li><code> && </code>: Operador AND</li>
+              <li><code> || </code>: Operador OR</li>
+              <li><code> ! </code>: Operador de negação</li>
+            </v-card-text>
+          </template>
+          <div ref="exampleCodeEditorVariableIf" class="code-editor"></div>
+        </v-card>
+
+
+        <v-card
+          elevation="4"
+          title="Loop while"
+        >
+          <template v-slot:text>
+            <p>Utilize o <code>while</code> para criar loops de repetição no código.</p>
+            <br>
+            <p>A sua estrutura é parecida com a do <code>if</code>, iniciando com a palavra chave <code>while</code>, seguido da expressão condicional entre parêntesis e após o bloco de código que será executado em loop enquanto que a condição permanecer verdadeira.</p>
+          </template>
+          <div ref="exampleCodeEditorVariableWhile" class="code-editor"></div>
+        </v-card>
+
+        <v-card
+          elevation="4"
+          title="Loop for"
+        >
+          <template v-slot:text>
+            <p>Utilize o comando de repetição <code>for</code> caso tenha um numero bem definido de repetições a serem feitas</p>
+            <br>
+            <p>A sua estrutura é semelhante com a do bloco <code>while</code>, com a diferença de que no parêntesis, primeiro deve-se definir a inicialização de uma variável de controle seguido por um ponto e virgula. Após vem a expressão condicional, terminada também por um ponto e virgula. E por fim deve-se definir o passo da variável de controle.</p>
+          </template>
+          <div ref="exampleCodeEditorVariableFor" class="code-editor"></div>
         </v-card>
 
       </v-container>
@@ -234,6 +321,11 @@
   const exampleCodeEditorVariableAttribution = useTemplateRef('exampleCodeEditorVariableAttribuition');
   const exampleCodeEditorVariablePrint = useTemplateRef('exampleCodeEditorVariablePrint');
   const exampleCodeEditorVariableScanf = useTemplateRef('exampleCodeEditorVariableScanf');
+  const exampleCodeEditorVariableFunctionDeclaration = useTemplateRef('exampleCodeEditorVariableFunctionDeclaration');
+  const exampleCodeEditorVariableFunctionCall = useTemplateRef('exampleCodeEditorVariableFunctionCall');
+  const exampleCodeEditorVariableIf = useTemplateRef('exampleCodeEditorVariableIf');
+  const exampleCodeEditorVariableWhile = useTemplateRef('exampleCodeEditorVariableWhile');
+  const exampleCodeEditorVariableFor = useTemplateRef('exampleCodeEditorVariableFor');
 
   onMounted(() => {
     const cachedCode = loadCodeFromLocalStorage() ?? 'main() {\n\tprintln("Hello, Word!");\n}';
@@ -252,10 +344,10 @@
     });
 
     new EditorView({
-      doc: 
+      doc:
 `main() {
   // declarações de variáveis...
-  
+
   // comandos...
 }`,
       extensions: [
@@ -288,7 +380,7 @@ int[7][10] mat;`,
     });
 
     new EditorView({
-      doc: 
+      doc:
 `// Declaração de variáveis
 int n1;
 boolean flag;
@@ -342,7 +434,7 @@ pritnln("O valor de pi eh %.2f:", pi);
     });
 
     new EditorView({
-      doc: 
+      doc:
 `int valor;
 
 print("Digite um valor: ");
@@ -357,6 +449,98 @@ println("O valor digitado foi %d", valor);`,
       ],
       parent: exampleCodeEditorVariableScanf.value!
     });
+
+    new EditorView({
+      doc:
+`// Declaração de uma função nomeada "somar" que recebe um int e um float e retorna um int
+int somar(int n1, float n2) {
+    // Código da função
+    var resultado;
+
+    resultado = n1 + n2;
+
+    // Retorno do valor da função
+    return resultado;
+}`,
+      extensions: [
+        basicSetup,
+        cppLanguage,
+        oneDark,
+        EditorState.readOnly.of(true)
+      ],
+      parent: exampleCodeEditorVariableFunctionDeclaration.value!
+    });
+
+    new EditorView({
+      doc:
+`// Chamada de função sem valor de retorno e sem argumentos
+func funcao1();
+
+// Chamada de função com argumentos
+func funcao2(10, 2);
+
+// Chamada de função com argumentos e salvando o seu retorno em uma variável
+resultado = func funcao3(n1, n2);
+
+// Uso do valor de uma função em uma expressão matemática
+resultado = 2 * func fatorial(10);`,
+      extensions: [
+        basicSetup,
+        cppLanguage,
+        oneDark,
+        EditorState.readOnly.of(true)
+      ],
+      parent: exampleCodeEditorVariableFunctionCall.value!
+    });
+
+    new EditorView({
+      doc:
+`if (a == 10 || b == 10) {
+    // Código a ser executado caso a condição seja verdadeira
+}
+else {
+    // Código a ser executado caso a condição do if tenha sido falsa
+}`,
+      extensions: [
+        basicSetup,
+        cppLanguage,
+        oneDark,
+        EditorState.readOnly.of(true)
+      ],
+      parent: exampleCodeEditorVariableIf.value!
+    });
+
+    new EditorView({
+      doc:
+`while (a > 10) {
+    // Bloco de código que será executado enquanto a condição permanecer verdadeira.
+}`,
+      extensions: [
+        basicSetup,
+        cppLanguage,
+        oneDark,
+        EditorState.readOnly.of(true)
+      ],
+      parent: exampleCodeEditorVariableWhile.value!
+    });
+
+    new EditorView({
+      doc:
+`// i = 0 | Inicialização da variável de controle
+// i < 10 | Expressão condicional
+// i = i + 1 | Passo de incremento de 1 a cada loop
+for (i = 0; i < 10; i = i + 1) {
+  // Bloco de código que será executado enquanto a condição permanecer verdadeira.
+}`,
+      extensions: [
+        basicSetup,
+        cppLanguage,
+        oneDark,
+        EditorState.readOnly.of(true)
+      ],
+      parent: exampleCodeEditorVariableFor.value!
+    });
+
   })
 
   onBeforeUnmount(saveCodeToLocalStorage);
@@ -387,7 +571,7 @@ println("O valor digitado foi %d", valor);`,
 
     try {
       const codeId = await compilerApi.uploadCode(code);
-      
+
       router.push(codeId);
     } catch (error) {
 
@@ -399,7 +583,7 @@ println("O valor digitado foi %d", valor);`,
       }
 
     }
-    
+
     isLoading.value = false;
   }
 
@@ -412,5 +596,5 @@ println("O valor digitado foi %d", valor);`,
       }
     });
     mainCodeEditor.update([transaction]);
-  } 
+  }
 </script>
