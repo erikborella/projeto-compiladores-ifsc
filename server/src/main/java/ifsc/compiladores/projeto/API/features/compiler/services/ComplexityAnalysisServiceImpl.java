@@ -42,7 +42,7 @@ public class ComplexityAnalysisServiceImpl implements ComplexityAnalysisService 
         ObjectMapper mapper = new ObjectMapper();
         String programComplexity = mapper.writeValueAsString(programCost);
 
-        // this.codeCacheManager.saveCodeArtifact(codeId, this.configuration.getComplexityAnalysisFileName(), programComplexity);
+        this.codeCacheManager.saveCodeArtifact(codeId, this.configuration.getComplexityAnalysisFileName(), programComplexity);
 
         return Optional.of(programComplexity);
     }
