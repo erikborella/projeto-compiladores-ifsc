@@ -147,18 +147,28 @@ public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor
 
     @Override
     public CostResult visitSelecao(ParserGrammar.SelecaoContext ctx) {
-        CostResult ifBlockCost = visitBloco(ctx.bloco());
-        
+        ArrayList<CostResult> ifCosts = new ArrayList<>();
+
+        Cost ifExpressionConst = Cost.inPlace(TokenPosition.fromContext(ctx.expressao()), BasicCommandCost.EXPRESSION.getCost());
+        ifCosts.add(ifExpressionConst);
+
+        BlockCost ifBlockCost = visitBloco(ctx.bloco());
+        ifCosts.addAll(ifBlockCost.getCosts());
+
+        Cost ifCostMark = new Cost(TokenPosition.fromContext(ctx.bloco()), 0);
+
+        BlockCost ifCost = new BlockCost(ifCostMark, ifCosts);
+
         if (ctx.senao() == null)
-            return ifBlockCost;
-        
+            return ifCost;
+
         CostResult elseBlockCost = visitBloco(ctx.senao().bloco());
-                
+
         // Returns the block with the greatest costs
         if (elseBlockCost.getValue() > ifBlockCost.getValue())
             return elseBlockCost;
         
-        return ifBlockCost;
+        return ifCost;
     }
 
     @Override
@@ -179,18 +189,14 @@ public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor
 
         ArrayList<CostResult> costs = new ArrayList<>();
 
-        Cost forExpressionCost = Cost.inPlace(TokenPosition.fromContext(ctx.expressao()), BasicCommandCost.EXPRESSION.getCost());
-        costs.add(forExpressionCost);
-
         int initialVariableValue = Integer.parseInt(ctx.atribuicaoInicio.atribuicao(0).complemento().getText());
 
         int costRange = initialVariableValue * -1;
         BlockCost forBlockCost = visitBloco(ctx.bloco());
 
-        Cost forInsideExpressionCost = new Cost(null, forExpressionCost.getValue());
-        forBlockCost.getCosts().add(forInsideExpressionCost);
+        Cost forExpressionCost = Cost.inPlace(TokenPosition.fromContext(ctx.expressao()), BasicCommandCost.EXPRESSION.getCost());
 
-        VariableCost forVariableCost = new VariableCost(forExpressionSizeVariableId, costRange, forBlockCost);
+        VariableCost forVariableCost = new VariableCost(forExpressionSizeVariableId, costRange, forExpressionCost, forBlockCost);
         costs.add(forVariableCost);
 
         return new BlockCost(costs);
@@ -214,15 +220,11 @@ public class ComplexityAnalysisGeneratorVisitor extends ParserGrammarBaseVisitor
 
         ArrayList<CostResult> costs = new ArrayList<>();
 
-        Cost whileExpressionCost = Cost.inPlace(TokenPosition.fromContext(ctx.expressao()), BasicCommandCost.EXPRESSION.getCost());
-        costs.add(whileExpressionCost);
-
         BlockCost whileBlockCost = visitBloco(ctx.bloco());
 
-        Cost whileInsideExpressionCost = new Cost(null, whileExpressionCost.getValue());
-        whileBlockCost.getCosts().add(whileInsideExpressionCost);
+        Cost whileExpressionCost = Cost.inPlace(TokenPosition.fromContext(ctx.expressao()), BasicCommandCost.EXPRESSION.getCost());
 
-        VariableCost whileVariableCost = new VariableCost(whileExpressionSizeVariableId, 0, whileBlockCost);
+        VariableCost whileVariableCost = new VariableCost(whileExpressionSizeVariableId, 0, whileExpressionCost, whileBlockCost);
         costs.add(whileVariableCost);
 
         return new BlockCost(costs);

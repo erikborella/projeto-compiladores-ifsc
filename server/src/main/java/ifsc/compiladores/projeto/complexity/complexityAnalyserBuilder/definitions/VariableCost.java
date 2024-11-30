@@ -6,12 +6,14 @@ public class VariableCost implements CostResult {
 
     private final String variable;
     private final int costRange;
+    private final CostResult additionalCost;
 
     private final BlockCost blockCost;
 
-    public VariableCost(String variable, int costRange, BlockCost blockCost) {
+    public VariableCost(String variable, int costRange, CostResult additionalCost, BlockCost blockCost) {
         this.variable = variable;
         this.costRange = costRange;
+        this.additionalCost = additionalCost;
         this.blockCost = blockCost;
     }
 
@@ -28,7 +30,7 @@ public class VariableCost implements CostResult {
     @Override
     public String getStringRepresentation() {
         String variableValue = (isInteger(this.variable)) ? String.valueOf(this.variable) : "n";
-        return String.format("%s*(%s)", variableValue, this.blockCost.getStringRepresentation());
+        return String.format("(%s + %s)*(%s)", variableValue, this.additionalCost.getStringRepresentation(), this.blockCost.getStringRepresentation());
     }
 
     public String getVariable() {
@@ -37,6 +39,10 @@ public class VariableCost implements CostResult {
 
     public int getCostRange() {
         return costRange;
+    }
+
+    public CostResult getAdditionalCost() {
+        return additionalCost;
     }
 
     public BlockCost getBlockCost() {
