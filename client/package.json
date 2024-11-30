@@ -17,7 +17,7 @@
     "core-js": "^3.34.0",
     "d3": "^7.9.0",
     "katex": "^0.16.11",
-    "mathjs": "^13.2.2",
+    "nerdamer": "^1.1.13",
     "roboto-fontface": "*",
     "vue": "^3.5.8",
     "vuetify": "^3.5.8"

@@ -36,6 +36,10 @@
               <div v-html="renderTex('\\downarrow \\text{simplificação}')"></div>
               <br>
               <div v-html="renderTex(finalCost.finalExpression)"></div>
+              <br>
+              <div v-html="renderTex('\\downarrow \\text{notação assintótica}')"></div>
+              <br>
+              <div v-html="renderTex(finalCost.bigO)"></div>
             </v-card-text>
             <v-divider></v-divider>
           </div>
@@ -93,7 +97,7 @@
   import { CostResult, isBlockCost, isVariableCost } from '../../models/CostResult';
   import katex from 'katex';
   import 'katex/dist/katex.min.css';
-  import * as mathjs from 'mathjs';
+  import nerdamer from 'nerdamer/all';
 
   const route = useRoute();
 
@@ -185,8 +189,9 @@
     if (isBlockCost(costResult)) {{
       if (isTopLevelBlock) {
         finalCostsResults.value.push({
-          rawExpression: `T(n) = ${mathjs.parse(costResult.stringRepresentation).toTex()}`,
-          finalExpression: `T(n) = ${mathjs.simplify(costResult.stringRepresentation).toTex()}`,
+          rawExpression: `T(n) = ${nerdamer.convertToLaTeX(costResult.stringRepresentation)}`,
+          finalExpression: `T(n) = ${nerdamer(costResult.stringRepresentation).expand().toTeX()}`,
+          bigO: `O(${getBigOValue(costResult.stringRepresentation)})`,
           costId: costResult.topLevelId,
         });
       }
@@ -204,8 +209,20 @@
   }
 
   function simplifyCost(cost: string): string {
-    var costSimplified = mathjs.simplify(cost).toString();
-    return costSimplified;
+    const costSimplified = nerdamer(cost).expand().toString();
+
+    const costSpaced = costSimplified.replace(/([^\d\s])|(?<=\d)(?=[^\d\s])/g, ' $1 ').replace(/\s+/g, ' ').trim();
+
+    return costSpaced;
+  }
+
+  function getBigOValue(cost: string): string {
+    const highestPower = nerdamer.deg(nerdamer.expand(cost)).toString();
+
+    if (highestPower == 1)
+      return `n`;
+
+    return `n^${highestPower}`;
   }
 
   function showErrorMessage(message: string) {
