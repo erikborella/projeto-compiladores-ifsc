@@ -19,6 +19,10 @@
     width: 100%;
   }
 
+  .cm-selectionLayer .cm-selectionBackground {
+    border: 1px solid white;
+  }
+
   .remove-details > .v-input__details {
     display: none;
   }
