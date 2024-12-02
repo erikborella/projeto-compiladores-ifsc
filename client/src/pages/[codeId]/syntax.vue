@@ -31,10 +31,13 @@
 
 <style scoped>
   .treeContainer {
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: white
+    cursor: move;
+    cursor: grab;
+  }
+
+  .treeContainer:active {
+    cursor: move;
+    cursor: grabbing;
   }
 
   .code-editor {
@@ -49,7 +52,7 @@
   import { useRoute } from 'vue-router';
   import * as d3 from 'd3';
   import compilerApi from '../../services/compiler/compilerApi';
-  import { basicSetup, EditorView } from 'codemirror';
+  import { EditorView } from 'codemirror';
   import { EditorState, Text, EditorSelection } from '@codemirror/state';
   import { cppLanguage } from '@codemirror/lang-cpp';
   import { oneDark } from '@codemirror/theme-one-dark';
@@ -96,7 +99,7 @@
       showErrorMessage(`Falha ao fazer o da arvore sintática: ${error.message}`);
     }
   }
-
+  
   function showTree() {
     const family = d3.hierarchy(syntax.value);
 
@@ -104,46 +107,50 @@
     const treeData = treeLayout(family);
 
     const nodeCount = treeData.descendants().length;
-    const rootHeight = Math.max(containerD3Root.value?.clientHeight!, nodeCount * 15);
-    const rootWidth = Math.max(containerD3Root.value?.clientWidth!, treeData.height * 150);
+    const rootHeight = Math.max(containerD3Root.value?.clientHeight!, nodeCount * 70);
+    const rootWidth = Math.max(containerD3Root.value?.clientWidth!, treeData.height * 100);
 
+    // Create the SVG element
     const svg = d3.select(containerD3.value)
       .append('svg')
       .attr('width', rootWidth)
-      .attr('height', rootHeight)
-      .append('g')
+      .attr('height', rootHeight);
+
+    // Add a group for the tree
+    const g = svg.append('g')
       .attr('transform', 'translate(40, 40)');
 
-    treeLayout.size([rootHeight - 100, rootWidth - 150]);
+    treeLayout.size([rootHeight, rootWidth]);
+    treeLayout.nodeSize([150, 150]);
 
+    // Create the links
     const treeNodes = treeLayout(family);
 
-    svg.selectAll('.link')
+    g.selectAll('.link')
       .data(treeNodes.links())
       .enter()
       .append('path')
       .attr('class', 'link')
-      .attr('d', d3.linkHorizontal()
-        .x((d: any) => d.y)
-        .y((d: any) => d.x) as any)
+      .attr('d', d3.linkVertical()
+        .x((d: any) => d.x)
+        .y((d: any) => d.y) as any)
       .style('fill', 'none')
       .style('stroke', '#ccc')
       .style('stroke-width', '2px');
 
-    const node = svg.selectAll('.node')
+    // Create the nodes
+    const node = g.selectAll('.node')
       .data(treeNodes.descendants())
       .enter()
       .append('g')
       .attr('class', 'node')
-      .attr('transform', d => `translate(${d.y}, ${d.x})`)
+      .attr('transform', d => `translate(${d.x}, ${d.y})`)
       .on('mouseover', (event, d: any) => { selectTokenInReferenceCodeEditor(d.data.position) });
 
     node.append('circle')
       .attr('r', 5)
       .style('fill', (d: any) => {
-        if (d.data.type === 'leaf')
-          return '#ff6347';
-
+        if (d.data.type === 'leaf') return '#ff6347';
         return '#69b3a2';
       });
 
@@ -158,6 +165,16 @@
       .attr('text-anchor', 'middle')
       .style('font-size', '15px')
       .text((d: any) => d.data.value);
+
+    // Add zoom behavior
+    const zoom = d3.zoom()
+      .scaleExtent([0.5, 5]) // Set zoom scale limits
+      .on("zoom", (event) => {
+        g.attr("transform", event.transform); // Apply zoom and pan transformation
+      });
+
+    // Apply zoom behavior to the SVG
+    svg.call(zoom);
   }
 
   async function downloadAndShowReferenceCode(codeId: string) {
