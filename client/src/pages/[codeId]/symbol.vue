@@ -2,7 +2,7 @@
   <v-layout class="fill-height">
 
     <v-navigation-drawer v-model="isConfigMenuOpen" width="600">
-      <div ref="referenceCodeEditor" class="code-editor"></div>
+      <div ref="referenceCodeEditor" class="code-editor highlight-selection"></div>
     </v-navigation-drawer>
 
     <v-main>

@@ -19,7 +19,7 @@
     width: 100%;
   }
 
-  .cm-selectionLayer .cm-selectionBackground {
+  .highlight-selection .cm-selectionLayer .cm-selectionBackground {
     border: 1px solid white;
   }
 
