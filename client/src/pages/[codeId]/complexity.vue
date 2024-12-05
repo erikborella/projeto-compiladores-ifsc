@@ -3,7 +3,7 @@
 
     <v-navigation-drawer v-model="isConfigMenuOpen" width="350">
       <v-container class="d-flex flex-column ga-2">
-        <v-card 
+        <v-card
           elevation="4"
           title="Complexidade"
         >
@@ -115,7 +115,7 @@
   const referenceCodeEditor = useTemplateRef('referenceCodeEditor');
   const referenceCode = ref<string>();
   let referenceCodeEditorView: EditorView;
-  
+
   function renderTex(tex: string) {
     try {
       return katex.renderToString(tex);
@@ -174,7 +174,7 @@
 
     if (costResult.position) {
       const prefix = (isTopLevelBlock) ? "T(n)" : "Custo";
-      const costValue = (isTopLevelBlock) ? 
+      const costValue = (isTopLevelBlock) ?
         simplifyCost(costResult.stringRepresentation)
         : costResult.stringRepresentation;
 
@@ -196,7 +196,7 @@
         });
       }
 
-      for (const cost of costResult.costs) 
+      for (const cost of costResult.costs)
         addHintsFromCostResult(cost);
       }
     }
@@ -218,6 +218,9 @@
 
   function getBigOValue(cost: string): string {
     const highestPower = nerdamer.deg(nerdamer.expand(cost)).toString();
+
+    if (highestPower == 0)
+      return `1`;
 
     if (highestPower == 1)
       return `n`;
