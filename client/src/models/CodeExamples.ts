@@ -18,7 +18,7 @@ export const basicExamples: CodeExample[] = [
   float area, perimetro;
 
   pi = 3.141592;
-  
+
   println("Digite o raio do seu circulo: ");
   scanf(raio);
 
@@ -37,7 +37,7 @@ export const basicExamples: CodeExample[] = [
 
   for (i = 0; i < 5; i = i + 1) {
     float nota;
-    
+
     println("Digite a %d nota do aluno:", i + 1);
     scanf(nota);
 
@@ -47,7 +47,7 @@ export const basicExamples: CodeExample[] = [
 
 void exibirNotas(float[5] notas) {
   int i;
-  
+
   println("As notas do aluno são:");
 
   for (i = 0; i < 5; i = i + 1) {
@@ -85,6 +85,72 @@ main() {
     println("O aluno atingiu a média 7");
   }
 }`
+    },
+    {
+      name: "Matrizes",
+      code: `void multiplicar(int[5][5] a, int[5][5] b, int[5][5] c, input int m, input int n) {
+  int i, j, k;
+
+  for (i = 0; i < m; i = i + 1) {
+    for (j = 0; j < n; j = j + 1) {
+      c[i][j] = 0;
+
+      for (k = 0; k < m; k = k + 1) {
+        c[i][j] = c[i][j] + (a[i][k] * b[k][j]);
+      }
+    }
+  }
+}
+
+void iniciarMatriz(int[5][5] matriz, input int n, input int m, int mult) {
+  int i, j;
+
+  for (i = 0; i < n; i = i + 1) {
+    for (j = 0; j < m; j = j + 1) {
+      int val;
+
+      val = (i + j) * mult;
+      matriz[i][j] = val;
+    }
+  }
+}
+
+void imprimirMatriz(int[5][5] matriz, input int n, input int m) {
+  int i, j;
+
+  for (i = 0; i < n; i = i + 1) {
+    for (j = 0; j < m; j = j + 1) {
+      print(" %d |", matriz[i][j]);
+    }
+
+    println("");
+  }
+
+}
+
+main() {
+  int[5][5] a;
+  int[5][5] b;
+  int[5][5] c;
+
+  func iniciarMatriz(a, 5, 5, 2);
+  func iniciarMatriz(b, 5, 5, 3);
+
+  println("Matriz A:");
+  func imprimirMatriz(a, 5, 5);
+
+  println("");
+
+  println("Matriz B:");
+  func imprimirMatriz(b, 5, 5);
+
+  func multiplicar(a, b, c, 5, 5);
+
+  println("");
+
+  println("Matriz C (a * b):");
+  func imprimirMatriz(c, 5, 5);
+}`
     }
 ]
 
@@ -99,7 +165,7 @@ export const sortingExamples: CodeExample[] = [
     }
     println("");
 }
-    
+
 
 void initArray(int[10] arr, input int size) {
   int i;
@@ -131,9 +197,9 @@ void bubbleSort(int[10] arr, input int size) {
 main() {
   int[10] arr;
   int i;
-  
+
   func initArray(arr, 10);
-  
+
   println("Array desordenado: ");
   func printArray(arr, 10);
 
@@ -175,12 +241,12 @@ void insertionSort(int[10] arr, input int size) {
 
     key = arr[i];
     j = i - 1;
-    
+
     while (j >= 0 && arr[j] > key) {
       arr[j + 1] = arr[j];
       j = j - 1;
     }
-    
+
     arr[j + 1] = key;
   }
 }
@@ -384,9 +450,9 @@ int partition(int[10] arr, int low, int high) {
   i = low - 1;
 
   for (j = low; j <= high - 1; j = j + 1) {
-    if (arr[j] < pivot) {      
+    if (arr[j] < pivot) {
       i = i + 1;
-      
+
       temp = arr[i];
       arr[i] = arr[j];
       arr[j] = temp;
@@ -403,9 +469,9 @@ int partition(int[10] arr, int low, int high) {
 void quickSort(int[10] arr, int low, int high) {
   if (low < high) {
     int pi;
-    
+
     pi = func partition(arr, low, high);
-    
+
     func quickSort(arr, low, pi - 1);
     func quickSort(arr, pi + 1, high);
   }
@@ -442,7 +508,7 @@ main() {
   int num;
   println("Digite um numero para calcular o fatorial:");
   scanf(num);
-  
+
   println("O fatorial de %d é %d", num, func fatorial(num));
 }`
     },
@@ -460,7 +526,7 @@ main() {
   int num;
   println("Digite um numero para calcular o fibonacci:");
   scanf(num);
-  
+
   println("O fibonacci de %d é %d", num, func fibonacci(num));
 }`
     }
@@ -538,9 +604,9 @@ int verificarGanhador(int[3][3] tabuleiro) {
         tabuleiro[0][1] == 1 && tabuleiro[1][1] == 1 && tabuleiro[2][1] == 1 ||
         tabuleiro[0][2] == 1 && tabuleiro[1][2] == 1 && tabuleiro[2][2] == 1 ||
         tabuleiro[0][0] == 1 && tabuleiro[1][1] == 1 && tabuleiro[2][2] == 1 ||
-        tabuleiro[0][2] == 1 && tabuleiro[1][1] == 1 && tabuleiro[2][0] == 1) 
+        tabuleiro[0][2] == 1 && tabuleiro[1][1] == 1 && tabuleiro[2][0] == 1)
     {
-        return 1;   
+        return 1;
     }
 
     if (tabuleiro[0][0] == -1 && tabuleiro[0][1] == -1 && tabuleiro[0][2] == -1 ||
@@ -550,7 +616,7 @@ int verificarGanhador(int[3][3] tabuleiro) {
         tabuleiro[0][1] == -1 && tabuleiro[1][1] == -1 && tabuleiro[2][1] == -1 ||
         tabuleiro[0][2] == -1 && tabuleiro[1][2] == -1 && tabuleiro[2][2] == -1 ||
         tabuleiro[0][0] == -1 && tabuleiro[1][1] == -1 && tabuleiro[2][2] == -1 ||
-        tabuleiro[0][2] == -1 && tabuleiro[1][1] == -1 && tabuleiro[2][0] == -1) 
+        tabuleiro[0][2] == -1 && tabuleiro[1][1] == -1 && tabuleiro[2][0] == -1)
     {
         return -1;
     }
@@ -572,13 +638,13 @@ main() {
         int estado;
 
         func imprimeTabuleiro(tabuleiro);
-        
+
         if (jogadorTurno1 == true) {
             println("Jogador X digite aonde deseja jogar: ");
         } else {
             println("Jogador O digite aonde deseja jogar: ");
         }
-        
+
         scanf(posicao);
 
         posicao = posicao - 1;
@@ -593,7 +659,7 @@ main() {
             println("X ganhou!!!");
             jogoEstaFinalizado = true;
         }
-        
+
         if (estado == -1) {
             println("O ganhou!!!");
             jogoEstaFinalizado = true;
@@ -690,7 +756,7 @@ main() {
 
   if (acertos == 10) {
     println("Parabéns! Você adivinhou a palavra: compilador");
-  } 
+  }
   else {
     println("Você perdeu! A palavra era: compilador");
   }
