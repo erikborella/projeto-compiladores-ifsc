@@ -133,8 +133,19 @@ main() {
   int[5][5] b;
   int[5][5] c;
 
-  func iniciarMatriz(a, 5, 5, 2);
-  func iniciarMatriz(b, 5, 5, 3);
+  int valorInicialA;
+  int valorInicialB;
+
+  println("Digite o valor inicial da matriz A:");
+  scanf(valorInicialA);
+
+  println("Digite o valor inicial da matriz B:");
+  scanf(valorInicialB);
+
+  func iniciarMatriz(a, 5, 5, valorInicialA);
+  func iniciarMatriz(b, 5, 5, valorInicialB);
+
+  println("");
 
   println("Matriz A:");
   func imprimirMatriz(a, 5, 5);
@@ -150,7 +161,7 @@ main() {
 
   println("Matriz C (a * b):");
   func imprimirMatriz(c, 5, 5);
-}`
+}`,
     }
 ]
 
