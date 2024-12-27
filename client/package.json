@@ -20,6 +20,7 @@
     "nerdamer": "^1.1.13",
     "roboto-fontface": "*",
     "vue": "^3.5.8",
+    "vue-i18n": "^9.14.2",
     "vuetify": "^3.5.8"
   },
   "devDependencies": {
