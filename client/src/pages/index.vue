@@ -7,14 +7,14 @@
         <v-app-bar-nav-icon icon="mdi-file-code-outline" @click="drawer = !drawer"></v-app-bar-nav-icon>
       </template>
 
-      <v-app-bar-title>Projeto Compilador</v-app-bar-title>
+      <v-app-bar-title>{{ t('index.title') }}</v-app-bar-title>
 
       <template v-slot:append>
-        <v-btn text="Compilar" @click="uploadCodeBtn()" append-icon="mdi-send"></v-btn>
+        <v-btn :text="t('index.compile')" @click="uploadCodeBtn()" append-icon="mdi-send"></v-btn>
         <v-menu>
           <template v-slot:activator="{ props }">
             <v-btn v-bind="props" append-icon="mdi-menu-down">
-              Exemplos
+              {{ t('index.examples') }}
             </v-btn>
           </template>
           <v-list>
@@ -63,6 +63,7 @@
           </v-list>
         </v-menu>
         <v-btn size="x-large" :icon="theme.global.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night'" @click="toggleTheme"></v-btn>
+        <LanguageSelector />
         <v-btn size="x-large" href="https://github.com/erikborella/projeto-compiladores-ifsc" target="_blank" icon="mdi-github"></v-btn>
       </template>
 
@@ -72,51 +73,61 @@
       <v-container class="d-flex flex-column ga-2">
         <v-card
           elevation="4"
-          title="Função main"
-          text="A função main é o ponto de entrada da execução de um programa, onde o código inicia sua execução."
+          :title="t('index.exampleMain.title')"
+          :text="t('index.exampleMain.text')"
         >
           <div ref="exampleCodeEditorMain" class="code-editor"></div>
         </v-card>
 
         <v-card
           elevation="4"
-          title="Declaração de variáveis"
+          :title="t('index.exampleVariables.title')"
         >
-        <template v-slot:text>
-          <p>As declarações de variáveis devem ser feitas antes de seu uso nos blocos de código.</p>
-          <p>Os seguintes tipos de variáveis são suportados:</p>
+          <template v-slot:text>
+            <p>{{ t('index.exampleVariables.description') }}</p>
+            <p>{{ t('index.exampleVariables.variablesTypes') }}</p>
 
-          <v-card-text>
-            <ul>
-              <li><code>boolean</code></li>
-              <li><code>char</code></li>
-              <li><code>int</code></li>
-              <li><code>float</code></li>
-            </ul>
-          </v-card-text>
+            <v-card-text>
+              <ul>
+                <li><code>boolean</code></li>
+                <li><code>char</code></li>
+                <li><code>int</code></li>
+                <li><code>float</code></li>
+              </ul>
+            </v-card-text>
 
-          <p>É possível declarar várias variáveis do mesmo tipo na mesma linha, separando os nomes por vírgula (<code>,</code>).</p>
-          <br>
-          <p>Arrays de tamanho fixo podem ser declarados adicionando <code>[tamanho_da_dimensão]</code> ao lado do tipo. Arrays de múltiplas dimensões também são permitidos, e não há um limite de dimensões; basta adicionar mais <code>[tamanho_da_dimensão]</code> ao lado do tipo.</p>
-        </template>
+            <i18n-t keypath="index.exampleVariables.inlineVariables" tag="p">
+              <template v-slot:comma>
+                <code>,</code>
+              </template>
+            </i18n-t>
+
+            <br>
+
+            <i18n-t keypath="index.exampleVariables.arrayVariables" tag="p">
+              <template v-slot:dimensionSize>
+                <code>{{ t('index.exampleVariables.dimensionSize') }}</code>
+              </template>
+            </i18n-t>
+          </template>
           <div ref="exampleCodeEditorVariables" class="code-editor"></div>
         </v-card>
 
         <v-card
           elevation="4"
-          title="Atribuição de variáveis"
+          :title="t('index.exampleAttribuition.title')"
         >
           <template v-slot:text>
-            <p>É possível atribuir valores a variáveis utilizando constantes, expressões matemáticas, valores de arrays ou valores retornados por funções</p>
-            <p>Os seguintes operadores matemáticos são suportados:</p>
+            <p>{{ t('index.exampleAttribuition.description') }}</p>
+            <p>{{ t('index.exampleAttribuition.operatorsDescription') }}</p>
 
             <v-card-text>
               <ul>
-                <li><code>+</code> para adições</li>
-                <li><code>-</code> para subtrações</li>
-                <li><code>*</code> para multiplicações</li>
-                <li><code>/</code> para divisões</li>
-                <li><code>%</code> para o valor de resto da divisão</li>
+                <li><code>+</code> {{ t('index.exampleAttribuition.operators.add') }}</li>
+                <li><code>-</code> {{ t('index.exampleAttribuition.operators.sub') }}</li>
+                <li><code>*</code> {{ t('index.exampleAttribuition.operators.mul') }}</li>
+                <li><code>/</code> {{ t('index.exampleAttribuition.operators.div') }}</li>
+                <li><code>%</code> {{ t('index.exampleAttribuition.operators.mod') }}</li>
               </ul>
             </v-card-text>
           </template>
@@ -125,19 +136,26 @@
 
         <v-card
           elevation="4"
-          title="Escrita de valores"
+          :title="t('index.exampleVariablePrint.title')"
         >
           <template v-slot:text>
-            <p>Para escrever dados na tela, é usado os comando <code>print</code>, para colocar o texto na tela sem uma nova linha no final e <code>println</code> para imprimir o texto colocando uma nova linha no final.</p>
+            <i18n-t keypath="index.exampleVariablePrint.description" tag="p">
+              <template v-slot:print>
+                <code>print</code>
+              </template>
+              <template v-slot:println>
+                <code>println</code>
+              </template>
+            </i18n-t>
             <br>
-            <p>Para imprimir os valores de variáveis, deve-se os modelos do template:</p>
+            <p>{{ t('index.exampleVariablePrint.modelsDescription') }}</p>
 
             <v-card-text>
               <ul>
-                <li><code>%d</code> para exibir valores inteiros</li>
-                <li><code>%b</code> para exibir valores booleanos</li>
-                <li><code>%f</code> para exibir valores decimais</li>
-                <li><code>%.Nf</code> para exibir valores decimais limitando as casas decimais, onde N é o numero de casas</li>
+                <li><code>%d</code> {{ t('index.exampleVariablePrint.models.int') }}</li>
+                <li><code>%b</code> {{ t('index.exampleVariablePrint.models.boolean') }}</li>
+                <li><code>%f</code> {{ t('index.exampleVariablePrint.models.float') }}</li>
+                <li><code>%.Nf</code> {{ t('index.exampleVariablePrint.models.floatLimited') }}</li>
               </ul>
             </v-card-text>
           </template>
@@ -146,71 +164,111 @@
 
         <v-card
           elevation="4"
-          title="Leituras de valores"
+          :title="t('index.exampleVariableScan.title')"
         >
           <template v-slot:text>
-            <p>Para ler valores do usuário pode-se usar o comando <code>scanf</code>, passando a variável na qual o valor será salvo para ela.</p>
+            <i18n-t keypath="index.exampleVariableScan.description" tag="p">
+              <template v-slot:scanf>
+                <code>scanf</code>
+              </template>
+            </i18n-t>
           </template>
+
           <div ref="exampleCodeEditorVariableScanf" class="code-editor"></div>
         </v-card>
 
         <v-card
           elevation="4"
-          title="Declaração de funções"
+          :title="t('index.exampleFunctionDeclaration.title')"
         >
           <template v-slot:text>
-            <p>As declarações de funções devem ser feitas antes da função. Inicia-se especificando o tipo de retorno da função, podendo ser qualquer um dos tipos suportados, ou <code>void</code> caso a função não retorne nenhum valor.</p>
-            <p>Após o tipo de retorno, deve ser especificado um nome único para função.</p>
-            <p>Entre parêntesis, são definidos os parâmetros que a função recebe, especificando primeiro o seu tipo e depois o seu nome, separando cada parâmetro por virgula.</p>
-            <p>Após, deve-se colocar entre chaves o código que será executado pela função.</p>
+            <i18n-t keypath="index.exampleFunctionDeclaration.descriptionStructure" tag="p">
+              <template v-slot:void>
+                <code>void</code>
+              </template>
+            </i18n-t>
+            <p>{{ t('index.exampleFunctionDeclaration.descriptionName') }}</p>
+            <p>{{ t('index.exampleFunctionDeclaration.descriptionParameters') }}</p>
+            <p>{{ t('index.exampleFunctionDeclaration.descriptionBlock') }}</p>
             <br>
-            <p>Use o comando <code>return</code> para retornar os valores das funções.</p>
+            <i18n-t keypath="index.exampleFunctionDeclaration.descriptionReturn" tag="p">
+              <template v-slot:return>
+                <code>return</code>
+              </template>
+            </i18n-t>
           </template>
           <div ref="exampleCodeEditorVariableFunctionDeclaration" class="code-editor"></div>
         </v-card>
 
         <v-card
           elevation="4"
-          title="Chamada de funções"
+          :title="t('index.exampleFunctionCall.title')"
         >
           <template v-slot:text>
-            <p>Para chamar as funções declaradas, deve-se usar primeiro a palavra reservada <code>func</code> seguido do nome da função, seguido de parêntesis.</p>
-            <p>Caso a função receba argumentos, eles devem ser especificados entre os parêntesis.</p>
+            <!-- <p>Para chamar as funções declaradas, deve-se usar primeiro a palavra reservada <code>func</code> seguido do nome da função, seguido de parêntesis.</p> -->
+            <i18n-t keypath="index.exampleFunctionCall.descriptionCall" tag="p">
+              <template v-slot:func>
+                <code>func</code>
+              </template>
+            </i18n-t>
+
+            <p>{{ t('index.exampleFunctionCall.descriptionParameters') }}</p>
             <br>
-            <p>Caso a função tenha um valor de retorno, ele poderá ser atribuído em uma variável ou usado como qualquer outro valor, como em uma expressão matemática ou em uma expressão condicional.</p>
+            <p>{{ t('index.exampleFunctionCall.descriptionReturn') }}</p>
           </template>
           <div ref="exampleCodeEditorVariableFunctionCall" class="code-editor"></div>
         </v-card>
 
         <v-card
           elevation="4"
-          title="Bloco condicional if"
+          :title="t('index.exampleIf.title')"
         >
           <template v-slot:text>
-            <p>Use o bloco condiciona <code>if</code> para controlar o fluxo de execução do seu programa.</p>
+            <i18n-t keypath="index.exampleIf.description" tag="p">
+              <template v-slot:if>
+                <code>if</code>
+              </template>
+            </i18n-t>
+
             <br>
-            <p>A sua estrutura é definida primeiro especificando a palavra reservada <code>if</code> e entre parêntesis deve ser passada uma expressão condicional, que caso seja verdadeira, o bloco de código definido em sequencia por chaves será executado.</p>
-            <p>Opcionalmente pode-se definir um bloco <code>else</code> ao final do <code>if</code>, que será executado apenas se a condição do <code>if</code> for falsa.</p>
+
+            <i18n-t keypath="index.exampleIf.descriptionStructure" tag="p">
+              <template v-slot:if>
+                <code>if</code>
+              </template>
+            </i18n-t>
+
+            <i18n-t keypath="index.exampleIf.descriptionElse" tag="p">
+              <template v-slot:if>
+                <code>if</code>
+              </template>
+              <template v-slot:else>
+                <code>else</code>
+              </template>
+            </i18n-t>
+
             <br>
-            <p>Os seguintes operadores condicionais são suportados:</p>
+            <p>{{ t('index.exampleIf.descriptionOperators') }}</p>
 
             <v-card-text>
               <ul>
-                <li><code> > </code>: Maior</li>
-                <li><code> >= </code>: Maior ou igual</li>
-                <li><code> < </code>: Menor</li>
-                <li><code> <= </code>: Menor ou igual</li>
-                <li><code> == </code>: Igual</li>
-                <li><code> != </code>: Diferente</li>
+                <li><code> > </code>: {{ t('index.exampleIf.operators.greater') }}</li>
+                <li><code> >= </code>: {{ t('index.exampleIf.operators.greaterEqual') }}</li>
+                <li><code> < </code>: {{ t('index.exampleIf.operators.less') }}</li>
+                <li><code> <= </code>: {{ t('index.exampleIf.operators.lessEqual') }}</li>
+                <li><code> == </code>: {{ t('index.exampleIf.operators.equal') }}</li>
+                <li><code> != </code>: {{ t('index.exampleIf.operators.notEqual') }}</li>
               </ul>
             </v-card-text>
 
-            <p>Para juntar expressões condicionais, pode-se ser usado os seguintes operadores, onde são computados usando curto-circuito:</p>
+            <p>{{ t('index.exampleIf.descriptionConditionalOperators') }}</p>
 
             <v-card-text>
-              <li><code> && </code>: Operador AND</li>
-              <li><code> || </code>: Operador OR</li>
-              <li><code> ! </code>: Operador de negação</li>
+              <ul>
+                <li><code> && </code>: {{ t('index.exampleIf.conditionalOperators.and') }}</li>
+                <li><code> || </code>: {{ t('index.exampleIf.conditionalOperators.or') }}</li>
+                <li><code> ! </code>: {{ t('index.exampleIf.conditionalOperators.not') }}</li>
+              </ul>
             </v-card-text>
           </template>
           <div ref="exampleCodeEditorVariableIf" class="code-editor"></div>
@@ -219,24 +277,47 @@
 
         <v-card
           elevation="4"
-          title="Loop while"
+          :title="t('index.exampleWhile.title')"
         >
           <template v-slot:text>
-            <p>Utilize o <code>while</code> para criar loops de repetição no código.</p>
+            <i18n-t keypath="index.exampleWhile.description" tag="p">
+              <template v-slot:while>
+                <code>while</code>
+              </template>
+            </i18n-t>
+
             <br>
-            <p>A sua estrutura é parecida com a do <code>if</code>, iniciando com a palavra chave <code>while</code>, seguido da expressão condicional entre parêntesis e após o bloco de código que será executado em loop enquanto que a condição permanecer verdadeira.</p>
+
+            <i18n-t keypath="index.exampleWhile.descriptionStructure" tag="p">
+              <template v-slot:while>
+                <code>while</code>
+              </template>
+              <template v-slot:if>
+                <code>if</code>
+              </template>
+            </i18n-t>
           </template>
           <div ref="exampleCodeEditorVariableWhile" class="code-editor"></div>
         </v-card>
 
         <v-card
           elevation="4"
-          title="Loop for"
+          :title="t('index.exampleFor.title')"
         >
           <template v-slot:text>
-            <p>Utilize o comando de repetição <code>for</code> caso tenha um numero bem definido de repetições a serem feitas</p>
+            <i18n-t keypath="index.exampleFor.description" tag="p">
+              <template v-slot:for>
+                <code>for</code>
+              </template>
+            </i18n-t>
+
             <br>
-            <p>A sua estrutura é semelhante com a do bloco <code>while</code>, com a diferença de que no parêntesis, primeiro deve-se definir a inicialização de uma variável de controle seguido por um ponto e virgula. Após vem a expressão condicional, terminada também por um ponto e virgula. E por fim deve-se definir o passo da variável de controle.</p>
+
+            <i18n-t keypath="index.exampleFor.descriptionStructure" tag="p">
+              <template v-slot:while>
+                <code>while</code>
+              </template>
+            </i18n-t>
           </template>
           <div ref="exampleCodeEditorVariableFor" class="code-editor"></div>
         </v-card>
@@ -287,9 +368,10 @@
 </style>
 
 <script lang="ts" setup>
-  import { ref, onMounted, onBeforeUnmount, useTemplateRef } from 'vue';
+  import { ref, onMounted, onBeforeUnmount, useTemplateRef, watch } from 'vue';
   import { useTheme } from 'vuetify';
   import { useRouter } from 'vue-router';
+  import { useTranslate } from '../locales/index.ts';
   import { basicSetup, EditorView } from 'codemirror';
   import { EditorState } from '@codemirror/state';
   import { keymap } from '@codemirror/view';
@@ -297,6 +379,9 @@
   import { oneDark } from '@codemirror/theme-one-dark';
   import { cppLanguage } from '@codemirror/lang-cpp';
   import { gamesExample, basicExamples, sortingExamples, recursiveExamples } from '../models/CodeExamples';
+  import { setContentInCodeEditor } from '../services/editorViewTools.ts';
+
+  import LanguageSelector from '../components/LanguageSelector.vue';
 
   import compilerApi from '../services/compiler/compilerApi';
 
@@ -305,6 +390,7 @@
   const drawer = ref(true);
   const theme = useTheme();
   const router = useRouter();
+  const { translate: t, locale } = useTranslate();
 
   const isLoading = ref(false);
 
@@ -317,15 +403,34 @@
   let mainCodeEditor: EditorView;
 
   const exampleCodeEditorMain = useTemplateRef('exampleCodeEditorMain');
+  let exampleCodeEditorMainView: EditorView;
+
   const exampleCodeEditorVariables = useTemplateRef('exampleCodeEditorVariables');
+  let exampleCodeEditorVariablesView: EditorView;
+
   const exampleCodeEditorVariableAttribution = useTemplateRef('exampleCodeEditorVariableAttribuition');
+  let exampleCodeEditorVariableAttributionView: EditorView;
+
   const exampleCodeEditorVariablePrint = useTemplateRef('exampleCodeEditorVariablePrint');
+  let exampleCodeEditorVariablePrintView: EditorView;
+
   const exampleCodeEditorVariableScanf = useTemplateRef('exampleCodeEditorVariableScanf');
+  let exampleCodeEditorVariableScanfView: EditorView;
+
   const exampleCodeEditorVariableFunctionDeclaration = useTemplateRef('exampleCodeEditorVariableFunctionDeclaration');
+  let exampleCodeEditorVariableFunctionDeclarationView: EditorView;
+
   const exampleCodeEditorVariableFunctionCall = useTemplateRef('exampleCodeEditorVariableFunctionCall');
+  let exampleCodeEditorVariableFunctionCallView: EditorView;
+
   const exampleCodeEditorVariableIf = useTemplateRef('exampleCodeEditorVariableIf');
+  let exampleCodeEditorVariableIfView: EditorView;
+
   const exampleCodeEditorVariableWhile = useTemplateRef('exampleCodeEditorVariableWhile');
+  let exampleCodeEditorVariableWhileView: EditorView;
+
   const exampleCodeEditorVariableFor = useTemplateRef('exampleCodeEditorVariableFor');
+  let exampleCodeEditorVariableForView: EditorView;
 
   onMounted(() => {
     const cachedCode = loadCodeFromLocalStorage() ?? 'main() {\n\tprintln("Hello, Word!");\n}';
@@ -343,13 +448,7 @@
       parent: mainCodeEditorRef.value!,
     });
 
-    new EditorView({
-      doc:
-`main() {
-  // declarações de variáveis...
-
-  // comandos...
-}`,
+    exampleCodeEditorMainView = new EditorView({
       extensions: [
         basicSetup,
         cppLanguage,
@@ -359,17 +458,7 @@
       parent: exampleCodeEditorMain.value!
     });
 
-    new EditorView({
-      doc:
-`// Declaração de variável simples
-int var1;
-
-// Declaração de múltiplas variáveis;
-boolean var2, var3;
-
-// Declaração de arrays
-float[5] vet;
-int[7][10] mat;`,
+    exampleCodeEditorVariablesView = new EditorView({
       extensions: [
         basicSetup,
         cppLanguage,
@@ -379,28 +468,7 @@ int[7][10] mat;`,
       parent: exampleCodeEditorVariables.value!
     });
 
-    new EditorView({
-      doc:
-`// Declaração de variáveis
-int n1;
-boolean flag;
-float f1;
-int[5][5] mat;
-
-// Atribuição de constante;
-n1 = 10;
-f1 = -5.2;
-mat[0][1] = 7;
-
-// Atribuição por expressão matemática
-n1 = n1 + f1 * 3;
-flag = 10 > 7;
-
-// Atribuição por valor de um array
-n1 = mat[0][0] + mat[1][0];
-
-// Atribuição por um valor de retorno de função
-n1 = func funcao();`,
+    exampleCodeEditorVariableAttributionView = new EditorView({
       extensions: [
         basicSetup,
         cppLanguage,
@@ -410,20 +478,7 @@ n1 = func funcao();`,
       parent: exampleCodeEditorVariableAttribution.value!
     });
 
-    new EditorView({
-      doc:
-`// Escrita de uma mensagem simples
-print("Ola mundo!");
-
-// Escrita de um valor inteiro, com uma nova linha
-println("%d", int1);
-
-// Escrita de um valor inteiro com uma mensagem junto
-pritnln("O valor da variavel eh %d:", int2);
-
-// Escrita de um valor decimal com apenas duas casas decimais
-pritnln("O valor de pi eh %.2f:", pi);
-`,
+    exampleCodeEditorVariablePrintView = new EditorView({
       extensions: [
         basicSetup,
         cppLanguage,
@@ -433,14 +488,7 @@ pritnln("O valor de pi eh %.2f:", pi);
       parent: exampleCodeEditorVariablePrint.value!
     });
 
-    new EditorView({
-      doc:
-`int valor;
-
-print("Digite um valor: ");
-scanf(valor);
-
-println("O valor digitado foi %d", valor);`,
+    exampleCodeEditorVariableScanfView = new EditorView({
       extensions: [
         basicSetup,
         cppLanguage,
@@ -450,18 +498,7 @@ println("O valor digitado foi %d", valor);`,
       parent: exampleCodeEditorVariableScanf.value!
     });
 
-    new EditorView({
-      doc:
-`// Declaração de uma função nomeada "somar" que recebe um int e um float e retorna um int
-int somar(int n1, float n2) {
-    // Código da função
-    var resultado;
-
-    resultado = n1 + n2;
-
-    // Retorno do valor da função
-    return resultado;
-}`,
+    exampleCodeEditorVariableFunctionDeclarationView = new EditorView({
       extensions: [
         basicSetup,
         cppLanguage,
@@ -471,19 +508,7 @@ int somar(int n1, float n2) {
       parent: exampleCodeEditorVariableFunctionDeclaration.value!
     });
 
-    new EditorView({
-      doc:
-`// Chamada de função sem valor de retorno e sem argumentos
-func funcao1();
-
-// Chamada de função com argumentos
-func funcao2(10, 2);
-
-// Chamada de função com argumentos e salvando o seu retorno em uma variável
-resultado = func funcao3(n1, n2);
-
-// Uso do valor de uma função em uma expressão matemática
-resultado = 2 * func fatorial(10);`,
+    exampleCodeEditorVariableFunctionCallView = new EditorView({
       extensions: [
         basicSetup,
         cppLanguage,
@@ -493,14 +518,7 @@ resultado = 2 * func fatorial(10);`,
       parent: exampleCodeEditorVariableFunctionCall.value!
     });
 
-    new EditorView({
-      doc:
-`if (a == 10 || b == 10) {
-    // Código a ser executado caso a condição seja verdadeira
-}
-else {
-    // Código a ser executado caso a condição do if tenha sido falsa
-}`,
+    exampleCodeEditorVariableIfView = new EditorView({
       extensions: [
         basicSetup,
         cppLanguage,
@@ -510,11 +528,7 @@ else {
       parent: exampleCodeEditorVariableIf.value!
     });
 
-    new EditorView({
-      doc:
-`while (a > 10) {
-    // Bloco de código que será executado enquanto a condição permanecer verdadeira.
-}`,
+    exampleCodeEditorVariableWhileView = new EditorView({
       extensions: [
         basicSetup,
         cppLanguage,
@@ -524,14 +538,7 @@ else {
       parent: exampleCodeEditorVariableWhile.value!
     });
 
-    new EditorView({
-      doc:
-`// i = 0 | Inicialização da variável de controle
-// i < 10 | Expressão condicional
-// i = i + 1 | Passo de incremento de 1 a cada loop
-for (i = 0; i < 10; i = i + 1) {
-  // Bloco de código que será executado enquanto a condição permanecer verdadeira.
-}`,
+    exampleCodeEditorVariableForView = new EditorView({
       extensions: [
         basicSetup,
         cppLanguage,
@@ -541,10 +548,28 @@ for (i = 0; i < 10; i = i + 1) {
       parent: exampleCodeEditorVariableFor.value!
     });
 
-  })
+    updateExamplesCode();
+  });
 
   onBeforeUnmount(saveCodeToLocalStorage);
   window.onbeforeunload = saveCodeToLocalStorage;
+
+  watch(locale, () => {
+    updateExamplesCode();
+  });
+
+  function updateExamplesCode() {
+    setContentInCodeEditor(exampleCodeEditorMainView, t('index.exampleMain.code'));
+    setContentInCodeEditor(exampleCodeEditorVariablesView, t('index.exampleVariables.code'));
+    setContentInCodeEditor(exampleCodeEditorVariableAttributionView, t('index.exampleAttribuition.code'));
+    setContentInCodeEditor(exampleCodeEditorVariablePrintView, t('index.exampleVariablePrint.code'));
+    setContentInCodeEditor(exampleCodeEditorVariableScanfView, t('index.exampleVariableScan.code'));
+    setContentInCodeEditor(exampleCodeEditorVariableFunctionDeclarationView, t('index.exampleFunctionDeclaration.code'));
+    setContentInCodeEditor(exampleCodeEditorVariableFunctionCallView, t('index.exampleFunctionCall.code'));
+    setContentInCodeEditor(exampleCodeEditorVariableIfView, t('index.exampleIf.code'));
+    setContentInCodeEditor(exampleCodeEditorVariableWhileView, t('index.exampleWhile.code'));
+    setContentInCodeEditor(exampleCodeEditorVariableForView, t('index.exampleFor.code'));
+  }
 
   function saveCodeToLocalStorage() {
     const code = mainCodeEditor.state.doc.toString();
@@ -588,13 +613,6 @@ for (i = 0; i < 10; i = i + 1) {
   }
 
   function updateCodeEditorStateCode(newCode: string) {
-    const transaction = mainCodeEditor.state.update({
-      changes: {
-        from: 0,
-        to: mainCodeEditor.state.doc.length,
-        insert: newCode
-      }
-    });
-    mainCodeEditor.update([transaction]);
+    setContentInCodeEditor(mainCodeEditor, newCode);
   }
 </script>
