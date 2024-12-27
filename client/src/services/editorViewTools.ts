@@ -20,4 +20,14 @@ function selectPositionInReferenceCodeEditor(editorView: EditorView, tokenPositi
   });
 }
 
-export { selectPositionInReferenceCodeEditor, posToOffset };
+function setContentInCodeEditor(editorView: EditorView, content: string) {
+  editorView.dispatch({
+    changes: {
+      from: 0,
+      to: editorView.state.doc.length,
+      insert: content,
+    },
+  });
+}
+
+export { selectPositionInReferenceCodeEditor, setContentInCodeEditor, posToOffset };
