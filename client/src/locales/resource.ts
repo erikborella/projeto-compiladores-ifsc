@@ -98,6 +98,14 @@ export type ResourceValues = {
       code: string;
     };
   };
+  examples: {
+    sections: {
+      basic: string;
+      recursive: string;
+      sorting: string;
+      games: string;
+    };
+  };
 };
 
 type NestedKeys<T> = T extends object

@@ -1,5 +1,3 @@
-import { ResourceValues } from "./resource";
-
 const exampleMain = {
   title: "Main function",
   text: "The main function is the entry point of a program, where the code begins its execution.",
@@ -179,23 +177,20 @@ const exampleFor = {
 for (i = 0; i < 10; i = i + 1) {
   // Code block to be executed while the condition remains true.
 }`,
-}
-
-export const en: ResourceValues = {
-  index: {
-    title: "Compiler Project",
-    compile: "Compile",
-    examples: "Examples",
-    exampleMain,
-    exampleVariables,
-    exampleAttribuition,
-    exampleVariablePrint,
-    exampleVariableScan,
-    exampleFunctionDeclaration,
-    exampleFunctionCall,
-    exampleIf,
-    exampleWhile,
-    exampleFor,
-  }
 };
 
+export const indexResources = {
+  title: "Compiler Project",
+  compile: "Compile",
+  examples: "Examples",
+  exampleMain,
+  exampleVariables,
+  exampleAttribuition,
+  exampleVariablePrint,
+  exampleVariableScan,
+  exampleFunctionDeclaration,
+  exampleFunctionCall,
+  exampleIf,
+  exampleWhile,
+  exampleFor,
+};
