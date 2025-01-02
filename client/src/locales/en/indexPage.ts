@@ -1,11 +1,11 @@
 const exampleMain = {
   title: "Main function",
   text: "The main function is the entry point of a program, where the code begins its execution.",
-  code: `main() {
+  code: `main() {'{'}
   // variable declarations...
 
   // commands...
-}`,
+{'}'}`,
 };
 
 const exampleVariables = {
@@ -101,7 +101,7 @@ const exampleFunctionDeclaration = {
   descriptionBlock: "Then, place the code to be executed by the function inside curly braces.",
   descriptionReturn: "Use the {return} command to return the function's values.",
   code: `// Declaration of a function named "add" that takes an int and a float and returns an int
-int add(int n1, float n2) {
+int add(int n1, float n2) {'{'}
   // Function code
   var result;
 
@@ -109,7 +109,7 @@ int add(int n1, float n2) {
 
   // Return the function value
   return result;
-}`,
+{'}'}`,
 }
 
 const exampleFunctionCall = {
@@ -150,33 +150,33 @@ const exampleIf = {
     or: "OR Operator",
     not: "Negation Operator"
   },
-  code: `if (a == 10 || b == 10) {
+  code: `if (a == 10 {'||'} b == 10) {'{'}
   // Code to be executed if the condition is true
-}
-else {
+{'}'}
+else {'{'}
   // Code to be executed if the "if" condition was false
-}`,
+{'}'}`,
 }
 
 const exampleWhile = {
   title: "While Loop",
   description: "Use {while} to create repetition loops in the code.",
   descriptionStructure: "Its structure is similar to {if}, starting with the {while} keyword, followed by the conditional expression within parentheses, and then the code block that will be executed in a loop while the condition remains true.",
-  code: `while (a > 10) {
+  code: `while (a > 10) {'{'}
   // Code block to be executed while the condition remains true.
-}`,
+{'}'}`,
 };
 
 const exampleFor = {
   title: "For Loop",
   description: "Use the {for} loop command if there is a well-defined number of repetitions to be performed.",
   descriptionStructure: "Its structure is similar to the {while} block, except that within the parentheses, you first define the initialization of a control variable followed by a semicolon. Then comes the conditional expression, also ending with a semicolon. Finally, the step of the control variable must be defined.",
-  code: `// i = 0 | Initialization of the control variable
-// i < 10 | Conditional expression
-// i = i + 1 | Increment step of 1 per loop
-for (i = 0; i < 10; i = i + 1) {
+  code: `// i = 0 {'|'} Initialization of the control variable
+// i < 10 {'|'} Conditional expression
+// i = i + 1 {'|'} Increment step of 1 per loop
+for (i = 0; i < 10; i = i + 1) {'{'}
   // Code block to be executed while the condition remains true.
-}`,
+{'}'}`,
 };
 
 export const indexResources = {

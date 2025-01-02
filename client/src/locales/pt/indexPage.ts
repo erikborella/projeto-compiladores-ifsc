@@ -1,11 +1,11 @@
 const exampleMain = {
   title: "Função main",
   text: "A função main é o ponto de entrada da execução de um programa, onde o código inicia sua execução.",
-  code: `main() {
+  code: `main() {'{'}
   // declarações de variáveis...
 
   // comandos...
-}`,
+{'}'}`,
 };
 
 const exampleVariables = {
@@ -101,7 +101,7 @@ const exampleFunctionDeclaration = {
   descriptionBlock: "Após, deve-se colocar entre chaves o código que será executado pela função.",
   descriptionReturn: "Use o comando {return} para retornar os valores das funções.",
   code: `// Declaração de uma função nomeada "somar" que recebe um int e um float e retorna um int
-int somar(int n1, float n2) {
+int somar(int n1, float n2) {'{'}
   // Código da função
   var resultado;
 
@@ -109,7 +109,7 @@ int somar(int n1, float n2) {
 
   // Retorno do valor da função
   return resultado;
-}`,
+{'}'}`,
 }
 
 const exampleFunctionCall = {
@@ -150,33 +150,33 @@ const exampleIf = {
     or: "Operador OR",
     not: "Operador de negação"
   },
-  code: `if (a == 10 || b == 10) {
+  code: `if (a == 10 {'||'} b == 10) {'{'}
   // Código a ser executado caso a condição seja verdadeira
-}
-else {
+{'}'}
+else {'{'}
   // Código a ser executado caso a condição do if tenha sido falsa
-}`,
+{'}'}`,
 }
 
 const exampleWhile = {
   title: "Loop while",
   description: "Utilize o {while} para criar loops de repetição no código.",
   descriptionStructure: "A sua estrutura é parecida com a do {if}, iniciando com a palavra chave {while}, seguido da expressão condicional entre parêntesis e após o bloco de código que será executado em loop enquanto que a condição permanecer verdadeira.",
-  code: `while (a > 10) {
+  code: `while (a > 10) {'{'}
   // Bloco de código que será executado enquanto a condição permanecer verdadeira.
-}`,
+{'}'}`,
 };
 
 const exampleFor = {
   title: "Loop for",
   description: "Utilize o comando de repetição {for} caso tenha um numero bem definido de repetições a serem feitas",
   descriptionStructure: "A sua estrutura é semelhante com a do bloco {while}, com a diferença de que no parêntesis, primeiro deve-se definir a inicialização de uma variável de controle seguido por um ponto e virgula. Após vem a expressão condicional, terminada também por um ponto e virgula. E por fim deve-se definir o passo da variável de controle.",
-  code: `// i = 0 | Inicialização da variável de controle
-// i < 10 | Expressão condicional
-// i = i + 1 | Passo de incremento de 1 a cada loop
-for (i = 0; i < 10; i = i + 1) {
+  code: `// i = 0 {'|'} Inicialização da variável de controle
+// i < 10 {'|'} Expressão condicional
+// i = i + 1 {'|'} Passo de incremento de 1 a cada loop
+for (i = 0; i < 10; i = i + 1) {'{'}
   // Bloco de código que será executado enquanto a condição permanecer verdadeira.
-}`,
+{'}'}`,
 };
 
 export const indexResources = {

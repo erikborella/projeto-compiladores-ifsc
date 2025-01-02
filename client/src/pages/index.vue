@@ -18,18 +18,18 @@
             </v-btn>
           </template>
           <v-list>
-            <v-list-subheader>Básico</v-list-subheader>
+            <v-list-subheader>{{ t('examples.sections.basic') }}</v-list-subheader>
             <v-list-item
               v-for='(item, index) in basicExamples'
               :key='index'
               :value='index'
-              @click="updateCodeEditorStateCode(item.code)"
+              @click="updateCodeEditorStateCode(t(item.code))"
             >
-              <v-list-item-title>{{ item.name }}</v-list-item-title>
+              <v-list-item-title>{{ t(item.name) }}</v-list-item-title>
             </v-list-item>
             <v-divider></v-divider>
 
-            <v-list-subheader>Recursivo</v-list-subheader>
+            <v-list-subheader>{{ t('examples.sections.recursive') }}</v-list-subheader>
             <v-list-item
               v-for='(item, index) in recursiveExamples'
               :key='index'
@@ -40,18 +40,18 @@
             </v-list-item>
             <v-divider></v-divider>
 
-            <v-list-subheader>Ordenação</v-list-subheader>
+            <v-list-subheader>{{ t('examples.sections.sorting') }}</v-list-subheader>
             <v-list-item
               v-for='(item, index) in sortingExamples'
               :key='index'
               :value='index'
-              @click="updateCodeEditorStateCode(item.code)"
+              @click="updateCodeEditorStateCode(t(item.code))"
             >
-              <v-list-item-title>{{ item.name }}</v-list-item-title>
+              <v-list-item-title>{{ t(item.name) }}</v-list-item-title>
             </v-list-item>
             <v-divider></v-divider>
 
-            <v-list-subheader>Jogos</v-list-subheader>
+            <v-list-subheader>{{ t('examples.sections.games') }}</v-list-subheader>
             <v-list-item
               v-for='(item, index) in gamesExample'
               :key='index'

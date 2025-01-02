@@ -105,6 +105,12 @@ export type ResourceValues = {
       sorting: string;
       games: string;
     };
+    codes: {
+      [key: string]: {
+        name: string;
+        code: string;
+      };
+    };
   };
 };
 
@@ -112,4 +118,4 @@ type NestedKeys<T> = T extends object
   ? { [K in keyof T]: `${K & string}` | `${K & string}.${NestedKeys<T[K]>}` }[keyof T]
   : never;
 
-export type Resource = NestedKeys<ResourceValues>;
+export type Resource = NestedKeys<ResourceValues> | (string & Record<never, never>);

@@ -1,14 +1,8 @@
 import { ResourceValues } from "../resource";
 import { indexResources } from "./indexPage";
+import { examplesResources } from "./examples";
 
 export const en: ResourceValues = {
   index: indexResources,
-  examples: {
-    sections: {
-      basic: "Basic",
-      recursive: "Recursive",
-      sorting: "Sorting",
-      games: "Games"
-    }
-  }
+  examples: examplesResources,
 };
