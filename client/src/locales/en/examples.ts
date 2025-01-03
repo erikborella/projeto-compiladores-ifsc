@@ -474,6 +474,261 @@ main() {'{'}
   func printArray(arr, 10);
 {'}'}`;
 
+const factorialCode = `int factorial(int n) {'{'}
+  if (n <= 1) {'{'}
+    return 1;
+  {'}'} else {'{'}
+    return n * func factorial(n - 1);
+  {'}'}
+{'}'}
+
+main() {'{'}
+  int num;
+  println("Enter a number to calculate the factorial:");
+  scanf(num);
+
+  println("The factorial of %d is %d", num, func factorial(num));
+{'}'}`;
+
+const fibonacciCode = `int fibonacci(int n) {'{'}
+  if (n < 2) {'{'}
+    return n;
+  {'}'}
+
+  return func fibonacci(n - 1) + func fibonacci(n - 2);
+{'}'}
+
+main() {'{'}
+  int num;
+  println("Enter a number to calculate the Fibonacci:");
+  scanf(num);
+
+  println("The Fibonacci of %d is %d", num, func fibonacci(num));
+{'}'}`;
+
+const tictactoeCode = `void initializeBoard(int[3][3] board) {'{'}
+  int i, j;
+
+  for (i = 0; i < 3; i = i + 1) {'{'}
+    for (j = 0; j < 3; j = j + 1) {'{'}
+      board[i][j] = 0;
+    {'}'}
+  {'}'}
+{'}'}
+
+void printBoard(int[3][3] board) {'{'}
+  int i, j, count;
+
+  count = 1;
+
+  for (i = 0; i < 3; i = i + 1) {'{'}
+    for (j = 0; j < 3; j = j + 1) {'{'}
+      int cell;
+
+      cell = board[i][j];
+
+      if (cell == 0) {'{'}
+        print(" %d", count);
+      {'}'}
+      else {'{'}
+        if (cell == 1) {'{'}
+          print(" x");
+        {'}'}
+        else {'{'}
+          print(" o");
+        {'}'}
+      {'}'}
+
+      if (j < 2) {'{'}
+        print(" {'|'}");
+      {'}'}
+
+      count = count + 1;
+    {'}'}
+
+    println("");
+  {'}'}
+{'}'}
+
+void playMove(int[3][3] board, boolean isPlayer1Turn, int position) {'{'}
+  int i, j, piece;
+
+  i = position / 3;
+  j = position % 3;
+
+  if (isPlayer1Turn == true) {'{'}
+    piece = 1;
+  {'}'}
+  else {'{'}
+    piece = -1;
+  {'}'}
+
+  board[i][j] = piece;
+{'}'}
+
+int checkWinner(int[3][3] board) {'{'}
+  if (board[0][0] == 1 && board[0][1] == 1 && board[0][2] == 1 {'||'}
+    board[1][0] == 1 && board[1][1] == 1 && board[1][2] == 1 {'||'}
+    board[2][0] == 1 && board[2][1] == 1 && board[2][2] == 1 {'||'}
+    board[0][0] == 1 && board[1][0] == 1 && board[2][0] == 1 {'||'}
+    board[0][1] == 1 && board[1][1] == 1 && board[2][1] == 1 {'||'}
+    board[0][2] == 1 && board[1][2] == 1 && board[2][2] == 1 {'||'}
+    board[0][0] == 1 && board[1][1] == 1 && board[2][2] == 1 {'||'}
+    board[0][2] == 1 && board[1][1] == 1 && board[2][0] == 1)
+  {'{'}
+    return 1;
+  {'}'}
+
+  if (board[0][0] == -1 && board[0][1] == -1 && board[0][2] == -1 {'||'}
+    board[1][0] == -1 && board[1][1] == -1 && board[1][2] == -1 {'||'}
+    board[2][0] == -1 && board[2][1] == -1 && board[2][2] == -1 {'||'}
+    board[0][0] == -1 && board[1][0] == -1 && board[2][0] == -1 {'||'}
+    board[0][1] == -1 && board[1][1] == -1 && board[2][1] == -1 {'||'}
+    board[0][2] == -1 && board[1][2] == -1 && board[2][2] == -1 {'||'}
+    board[0][0] == -1 && board[1][1] == -1 && board[2][2] == -1 {'||'}
+    board[0][2] == -1 && board[1][1] == -1 && board[2][0] == -1)
+  {'{'}
+    return -1;
+  {'}'}
+
+  return 0;
+{'}'}
+
+main() {'{'}
+  int[3][3] board;
+  boolean isPlayer1Turn, gameIsOver;
+  int position;
+
+  isPlayer1Turn = true;
+  gameIsOver = false;
+
+  func initializeBoard(board);
+
+  while (gameIsOver != true) {'{'}
+    int gameState;
+
+    func printBoard(board);
+
+    if (isPlayer1Turn == true) {'{'}
+      println("Player X, enter the position to play:");
+    {'}'} else {'{'}
+      println("Player O, enter the position to play:");
+    {'}'}
+
+    scanf(position);
+
+    position = position - 1;
+
+    func playMove(board, isPlayer1Turn, position);
+
+    isPlayer1Turn = !isPlayer1Turn;
+
+    gameState = func checkWinner(board);
+
+    if (gameState == 1) {'{'}
+      println("X wins!!!");
+      gameIsOver = true;
+    {'}'}
+
+    if (gameState == -1) {'{'}
+      println("O wins!!!");
+      gameIsOver = true;
+    {'}'}
+
+  {'}'}
+{'}'}`;
+
+const hangmanCode = `void initializeSecretWord(char[9] secretWord) {'{'}
+  // Letters must be expressed in ASCII
+  secretWord[0] = 99;  // c
+  secretWord[1] = 111; // o
+  secretWord[2] = 109; // m
+  secretWord[3] = 112; // p
+  secretWord[4] = 105; // i
+  secretWord[5] = 108; // l
+  secretWord[6] = 101; // e
+  secretWord[7] = 114; // r
+  secretWord[8] = 115; // s
+{'}'}
+
+void initializeGuessedWord(char[9] guessedWord) {'{'}
+  int i;
+
+  for (i = 0; i < 9; i = i + 1) {'{'}
+    guessedWord[i] = 95; // _
+  {'}'}
+{'}'}
+
+void printText(char[9] word) {'{'}
+  int i;
+
+  for (i = 0; i < 9; i = i + 1) {'{'}
+    print("%c", word[i]);
+  {'}'}
+
+  println("");
+{'}'}
+
+void printGuessedText(char[9] word) {'{'}
+  int i;
+
+  for (i = 0; i < 9; i = i + 1) {'{'}
+    print("%c ", word[i]);
+  {'}'}
+
+  println("");
+{'}'}
+
+main() {'{'}
+  char[9] secretWord;
+  char[9] guessedWord;
+  int attempts, correctGuesses, i;
+  char letter;
+  boolean isCorrect;
+
+  attempts = 10;
+  correctGuesses = 0;
+
+  func initializeSecretWord(secretWord);
+  func initializeGuessedWord(guessedWord);
+
+  println("Welcome to Hangman!");
+  println("The secret word has 9 letters and %d attempts.", attempts);
+
+  while (attempts > 0 && correctGuesses < 9) {'{'}
+    print("Word: ");
+    func printGuessedText(guessedWord);
+
+    println("Enter a letter: ");
+    scanf(letter);
+
+    isCorrect = 0;
+
+    for (i = 0; i < 9; i = i + 1) {'{'}
+      if (secretWord[i] == letter && guessedWord[i] == 95) {'{'}
+        guessedWord[i] = letter;
+        correctGuesses = correctGuesses + 1;
+        isCorrect = true;
+      {'}'}
+    {'}'}
+
+    if (!isCorrect) {'{'}
+      attempts = attempts - 1;
+      println("Wrong letter! Remaining attempts: %d", attempts);
+    {'}'}
+    else {'{'}
+      println("Correct letter!");
+    {'}'}
+  {'}'}
+
+  if (correctGuesses == 9) {'{'}
+    println("Congratulations! You guessed the word: compilers");
+  {'}'}
+  else {'{'}
+    println("You lost! The word was: compilers");
+  {'}'}
+{'}'}`;
+
 export const examplesResources = {
   sections: {
     basic: "Basic",
@@ -517,6 +772,22 @@ export const examplesResources = {
     "quickSort": {
       name: 'Quick sort',
       code: quickSortCode,
+    },
+    "factorial": {
+      name: 'Factorial',
+      code: factorialCode,
+    },
+    "fibonacci": {
+      name: 'Fibonacci',
+      code: fibonacciCode,
+    },
+    "tictactoe": {
+      name: 'Tic Tac Toe',
+      code: tictactoeCode,
+    },
+    "hangman": {
+      name: 'Hangman Game',
+      code: hangmanCode,
     },
   },
 };

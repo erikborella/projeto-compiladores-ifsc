@@ -34,9 +34,9 @@
               v-for='(item, index) in recursiveExamples'
               :key='index'
               :value='index'
-              @click="updateCodeEditorStateCode(item.code)"
+              @click="updateCodeEditorStateCode(t(item.code))"
             >
-              <v-list-item-title>{{ item.name }}</v-list-item-title>
+              <v-list-item-title>{{ t(item.name) }}</v-list-item-title>
             </v-list-item>
             <v-divider></v-divider>
 
@@ -56,9 +56,9 @@
               v-for='(item, index) in gamesExample'
               :key='index'
               :value='index'
-              @click="updateCodeEditorStateCode(item.code)"
+              @click="updateCodeEditorStateCode(t(item.code))"
             >
-              <v-list-item-title>{{ item.name }}</v-list-item-title>
+              <v-list-item-title>{{ t(item.name) }}</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
