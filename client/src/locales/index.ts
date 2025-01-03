@@ -3,6 +3,8 @@ import { en } from './en';
 import { useI18n } from 'vue-i18n';
 import { Resource } from './resource';
 
+export const LANGUAGE_STORAGE_KEY = 'language';
+
 export const resources = {
   pt,
   en

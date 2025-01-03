@@ -23,11 +23,12 @@
 
 <script lang="ts" setup>
   import { useI18n } from 'vue-i18n';
-  import { languages } from '../locales';
+  import { languages, LANGUAGE_STORAGE_KEY } from '../locales';
 
   const { locale } = useI18n();
 
   function switchLanguage(lang: string) {
-     locale.value = lang;
+    locale.value = lang;
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
   }
 </script>
