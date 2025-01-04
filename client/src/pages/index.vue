@@ -7,7 +7,7 @@
         <v-app-bar-nav-icon icon="mdi-file-code-outline" @click="drawer = !drawer"></v-app-bar-nav-icon>
       </template>
 
-      <v-app-bar-title>{{ t('index.title') }}</v-app-bar-title>
+      <v-app-bar-title>{{ t('projectTitle') }}</v-app-bar-title>
 
       <template v-slot:append>
         <v-btn :text="t('index.compile')" @click="uploadCodeBtn()" append-icon="mdi-send"></v-btn>

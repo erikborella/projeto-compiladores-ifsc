@@ -1,6 +1,6 @@
 export type ResourceValues = {
+  projectTitle: string;
   index: {
-    title: string;
     compile: string;
     examples: string;
     exampleMain: {
@@ -112,10 +112,19 @@ export type ResourceValues = {
       };
     };
   };
+  codeId: {
+    tokens: string;
+    syntaxTree: string;
+    symbolsTable: string;
+    llvmIr: string;
+    assembly: string;
+    execution: string;
+    algorithmsComplexity: string;
+  };
 };
 
 type NestedKeys<T> = T extends object
-  ? { [K in keyof T]: `${K & string}` | `${K & string}.${NestedKeys<T[K]>}` }[keyof T]
-  : never;
+? { [K in keyof T]: `${K & string}` | `${K & string}.${NestedKeys<T[K]>}` }[keyof T]
+: never;
 
 export type Resource = NestedKeys<ResourceValues> | (string & Record<never, never>);

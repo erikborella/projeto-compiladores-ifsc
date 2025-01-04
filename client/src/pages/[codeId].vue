@@ -6,13 +6,14 @@
       <template v-slot:prepend>
         <v-app-bar-nav-icon @click="isConfigMenuOpen = !isConfigMenuOpen"></v-app-bar-nav-icon>
       </template>
-      
-      <v-app-bar-title>Projeto Compilador</v-app-bar-title>
-      
+
+      <v-app-bar-title>{{ t('projectTitle') }}</v-app-bar-title>
+
       <template v-slot:append>
         <v-btn size="x-large" icon="mdi-arrow-left" @click="backRoute()"></v-btn>
         <v-btn size="x-large" :icon="theme.global.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night'"
           @click="toggleTheme"></v-btn>
+        <LanguageSelector />
         <v-btn size="x-large" href="https://github.com/erikborella/projeto-compiladores-ifsc" target="_blank"
           icon="mdi-github"></v-btn>
       </template>
@@ -20,25 +21,25 @@
       <template v-slot:extension>
         <v-tabs align-tabs="center" grow>
           <v-tab :to="{ name: '/[codeId]/token' }">
-            Tokens
+            {{ t('codeId.tokens') }}
           </v-tab>
           <v-tab :to="{ name: '/[codeId]/syntax' }">
-            Arvore sintática
+            {{ t('codeId.syntaxTree') }}
           </v-tab>
           <v-tab :to="{ name: '/[codeId]/symbol' }">
-            Tabela de símbolos
+            {{ t('codeId.symbolsTable') }}
           </v-tab>
           <v-tab :to="{ name: '/[codeId]/llvm' }">
-            LLVM IR
+            {{ t('codeId.llvmIr') }}
           </v-tab>
           <v-tab :to="{ name: '/[codeId]/asm' }">
-            Assembly
+            {{ t('codeId.assembly') }}
           </v-tab>
           <v-tab :to="{ name: '/[codeId]/execution' }">
-            Execução
+            {{ t('codeId.execution') }}
           </v-tab>
           <v-tab :to="{ name: '/[codeId]/complexity' }">
-            Complexidade de algoritmo
+            {{ t('codeId.algorithmsComplexity') }}
           </v-tab>
         </v-tabs>
       </template>
@@ -47,7 +48,7 @@
 
     <v-main>
       <router-view v-slot="{ Component }">
-        <component 
+        <component
           :is="Component"
           v-model:isConfigMenuOpen="isConfigMenuOpen"
         />
@@ -62,6 +63,11 @@
   import { ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { useTheme } from 'vuetify';
+  import { useTranslate } from '../locales';
+
+  import LanguageSelector from '../components/LanguageSelector.vue';
+
+  const { translate: t } = useTranslate();
 
   const theme = useTheme();
   const route = useRoute();
