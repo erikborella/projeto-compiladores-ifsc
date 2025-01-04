@@ -601,10 +601,10 @@
     } catch (error) {
 
       if (!!error?.response?.data?.message) {
-        showErrorMessage(`Falha ao fazer o upload do código: ${error.response.data.message}`);
+        showErrorMessage(`${t('error.uploadError')}: ${error.response.data.message}`);
       }
       else {
-        showErrorMessage(`Falha ao fazer o upload do código: ${error.message}`);
+        showErrorMessage(`${t('error.uploadError')}: ${error.message}`);
       }
 
     }

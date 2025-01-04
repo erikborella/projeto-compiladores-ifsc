@@ -11,16 +11,16 @@
           <thead>
             <tr>
               <th class="text-left">
-                Tipo
+                {{ t('token.type') }}
               </th>
               <th class="text-left">
-                Valor
+                {{ t('token.value') }}
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr 
-              v-for="(token, index) in tokens" 
+            <tr
+              v-for="(token, index) in tokens"
               :key="index"
               @mouseover="selectTokenInReferenceCodeEditor(token.position)">
               <td>{{ token.type }}</td>
@@ -74,7 +74,9 @@
   import { oneDark } from '@codemirror/theme-one-dark';
   import { Token } from '../../models/TokenRepresentation';
   import { Position, TokenPosition } from '../../models/TokenPosition';
-  
+  import { useTranslate } from '../../locales';
+
+  const { translate: t } = useTranslate();
 
   const isConfigMenuOpen = defineModel<boolean>('isConfigMenuOpen');
 
@@ -100,7 +102,7 @@
 
     await downloadAndShowReferenceCode(codeId);
     await downloadAndShowTokenList(codeId);
-    
+
     isLoading.value = false;
   });
 
@@ -122,16 +124,16 @@
 
     } catch (error) {
       console.error(error);
-      showErrorMessage(`Falha ao fazer o download do código: ${error.message}`);
+      showErrorMessage(`${t('error.downloadCodeError')}: ${error.message}`);
     }
-  } 
+  }
 
   async function downloadAndShowTokenList(codeId: string) {
     try {
       tokens.value = await compilerApi.getTokenList(codeId);
     } catch (error) {
       console.error(error);
-      showErrorMessage(`Falha ao fazer o download da lista de tokens: ${error.message}`);
+      showErrorMessage(`${t('error.downloadTokenError')}: ${error.message}`);
     }
   }
 

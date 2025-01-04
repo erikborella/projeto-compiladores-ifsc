@@ -1,5 +1,10 @@
 export type ResourceValues = {
   projectTitle: string;
+  error: {
+    uploadError: string;
+    downloadCodeError: string;
+    downloadTokenError: string;
+  };
   index: {
     compile: string;
     examples: string;
@@ -120,6 +125,10 @@ export type ResourceValues = {
     assembly: string;
     execution: string;
     algorithmsComplexity: string;
+  };
+  token: {
+    type: string;
+    value: string;
   };
 };
 
