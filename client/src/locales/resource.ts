@@ -129,6 +129,9 @@ export type ResourceValues = {
   token: {
     type: string;
     value: string;
+    types: {
+      [key: string]: string;
+    };
   };
 };
 

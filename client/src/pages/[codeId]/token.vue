@@ -23,7 +23,7 @@
               v-for="(token, index) in tokens"
               :key="index"
               @mouseover="selectTokenInReferenceCodeEditor(token.position)">
-              <td>{{ token.type }}</td>
+              <td>{{ t(`token.types.${token.type}`) }}</td>
               <td>{{ token.value }}</td>
             </tr>
           </tbody>
@@ -64,7 +64,7 @@
 </style>
 
 <script lang="ts" setup>
-  import { defineModel, onMounted, ref, useTemplateRef } from 'vue';
+  import { computed, defineModel, onMounted, ref, useTemplateRef } from 'vue';
   import { useRoute } from 'vue-router';
   import compilerApi from '../../services/compiler/compilerApi';
   import { EditorView } from 'codemirror';
@@ -88,6 +88,12 @@
   let referenceCodeEditorView: EditorView;
 
   const tokens = ref<Token[]>();
+  // const translatedTokens = ref<Token[]>();
+
+  const translateToken = (type) => {
+    console.log("teste");
+    return t(`token.types.${type}`);
+  };
 
   const snackbar = ref({
     show: false,
