@@ -48,7 +48,7 @@
 </style>
 
 <script lang="ts" setup>
-  import { defineModel, onMounted, ref, useTemplateRef } from 'vue';
+  import { defineModel, onMounted, ref, useTemplateRef, watch } from 'vue';
   import { useRoute } from 'vue-router';
   import * as d3 from 'd3';
   import compilerApi from '../../services/compiler/compilerApi';
@@ -58,6 +58,10 @@
   import { oneDark } from '@codemirror/theme-one-dark';
   import { Position, TokenPosition } from '../../models/TokenPosition';
   import { syntaxViewSetup } from '../../models/CodemirrorCustomSetups';
+  import { useTranslate } from '../../locales';
+  import { SyntaxTreeRepresentation } from '../../models/SyntaxTreeRepresentation';
+
+  const { translate: t, locale } = useTranslate();
 
   const isConfigMenuOpen = defineModel<boolean>('isConfigMenuOpen');
 
@@ -90,17 +94,23 @@
     isLoading.value = false;
   });
 
+  watch(locale, () => {
+    showTree();
+  });
+
   async function downloadAndShowTree(codeId: string) {
     try {
       syntax.value = await compilerApi.getSyntaxRepresentation(codeId);
       showTree();
     } catch (error) {
       console.error(error);
-      showErrorMessage(`Falha ao fazer o da arvore sintática: ${error.message}`);
+      showErrorMessage(`${t('error.downloadSyntaxTreeError')}: ${error.message}`);
     }
   }
-  
+
   function showTree() {
+    d3.select(containerD3.value).select("svg").remove();
+
     const family = d3.hierarchy(syntax.value);
 
     const treeLayout = d3.tree();
@@ -157,7 +167,7 @@
     node.append('text')
       .attr('dy', -10)
       .attr('text-anchor', 'middle')
-      .text((d: any) => d.data.label);
+      .text((d: any) => getTranslatedLabel(d.data));
 
     node.filter((d: any) => d.data.type === 'leaf')
       .append('text')
@@ -195,7 +205,7 @@
 
     } catch (error) {
       console.error(error);
-      showErrorMessage(`Falha ao fazer o download do código: ${error.message}`);
+      showErrorMessage(`${t('error.downloadCodeError')}: ${error.message}`);
     }
   }
 
@@ -220,5 +230,12 @@
       selection: editorSelection,
       scrollIntoView: true,
     });
+  }
+
+  function getTranslatedLabel(node: SyntaxTreeRepresentation) {
+    if (node.type === "node")
+      return t(`syntax.labels.${node.label}`);
+
+    return t(`token.types.${node.label}`);
   }
 </script>

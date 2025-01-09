@@ -4,6 +4,7 @@ import { indexResources } from "./indexPage";
 import { examplesResources } from "./examples";
 import { codeIdResources } from "./codeId";
 import { tokenResources } from "./token";
+import { syntaxResources } from "./syntax";
 
 export const pt: ResourceValues = {
   projectTitle: "Projeto Compilador",
@@ -12,4 +13,5 @@ export const pt: ResourceValues = {
   examples: examplesResources,
   codeId: codeIdResources,
   token: tokenResources,
+  syntax: syntaxResources,
 };

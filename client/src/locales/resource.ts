@@ -4,6 +4,7 @@ export type ResourceValues = {
     uploadError: string;
     downloadCodeError: string;
     downloadTokenError: string;
+    downloadSyntaxTreeError: string;
   };
   index: {
     compile: string;
@@ -130,6 +131,11 @@ export type ResourceValues = {
     type: string;
     value: string;
     types: {
+      [key: string]: string;
+    };
+  };
+  syntax: {
+    labels: {
       [key: string]: string;
     };
   };
