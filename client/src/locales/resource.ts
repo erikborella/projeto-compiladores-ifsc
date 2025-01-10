@@ -5,6 +5,7 @@ export type ResourceValues = {
     downloadCodeError: string;
     downloadTokenError: string;
     downloadSyntaxTreeError: string;
+    downloadSymbolsTableError: string;
   };
   index: {
     compile: string;
@@ -139,6 +140,19 @@ export type ResourceValues = {
       [key: string]: string;
     };
   };
+  symbolsTable: {
+    functions: string;
+    returnType: string;
+    parameters: string;
+    scopes: string;
+    strings: string;
+    scope: string;
+    variables: string;
+    type: string;
+    name: string;
+    scopeDoesNotHaveNewVariables: string;
+    insideScopes: string;
+  }
 };
 
 type NestedKeys<T> = T extends object

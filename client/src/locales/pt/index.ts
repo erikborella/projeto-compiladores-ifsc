@@ -5,13 +5,15 @@ import { examplesResources } from "./examples";
 import { codeIdResources } from "./codeId";
 import { tokenResources } from "./token";
 import { syntaxResources } from "./syntax";
+import { symbolsTableResources } from "./symbolsTable";
 
 export const pt: ResourceValues = {
-  projectTitle: "Projeto Compilador",
-  error: errorResources,
-  index: indexResources,
-  examples: examplesResources,
-  codeId: codeIdResources,
-  token: tokenResources,
-  syntax: syntaxResources,
+    projectTitle: "Projeto Compilador",
+    error: errorResources,
+    index: indexResources,
+    examples: examplesResources,
+    codeId: codeIdResources,
+    token: tokenResources,
+    syntax: syntaxResources,
+    symbolsTable: symbolsTableResources,
 };

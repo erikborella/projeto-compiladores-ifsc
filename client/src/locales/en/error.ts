@@ -3,4 +3,5 @@ export const errorResources = {
   downloadCodeError: "Failed to download the code",
   downloadTokenError: "Failed to download the token list",
   downloadSyntaxTreeError: "Failed to download the syntax tree",
+  downloadSymbolsTableError: "Failed to donwload the symbols table",
 }

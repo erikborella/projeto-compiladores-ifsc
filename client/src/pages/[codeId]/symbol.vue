@@ -14,7 +14,7 @@
                 <v-expansion-panel elevation="4">
 
                   <v-expansion-panel-title>
-                    <h2>Funções</h2>
+                    <h2>{{ t('symbolsTable.functions') }}</h2>
                   </v-expansion-panel-title>
 
                   <v-expansion-panel-text>
@@ -28,20 +28,20 @@
                             @click.native.stop="selectPositionInReferenceCodeEditor(referenceCodeEditorView, declaredFunction.position)"></v-btn>
                           </h2>
                         </v-expansion-panel-title>
- 
+
                         <v-expansion-panel-text>
-                          Tipo de retorno: <b>{{ declaredFunction.returnType }}</b>
+                          {{ t('symbolsTable.returnType') }}: <b>{{ declaredFunction.returnType }}</b>
 
                           <div v-if="declaredFunction.parameters != null">
-                            Parâmetros:
+                            {{ t('symbolsTable.parameters') }}:
                             <v-table class="elevation-1">
                               <thead>
                                 <tr>
                                   <th class="text-left">
-                                    Tipo
+                                    {{ t('symbolsTable.type') }}
                                   </th>
                                   <th class="text-left">
-                                    Nome
+                                    {{ t('symbolsTable.name') }}
                                   </th>
                                 </tr>
                               </thead>
@@ -66,7 +66,7 @@
                 <v-expansion-panel elevation="4">
 
                   <v-expansion-panel-title>
-                    <h2>Escopos</h2>
+                    <h2>{{ t('symbolsTable.scopes') }}</h2>
                   </v-expansion-panel-title>
 
                   <v-expansion-panel-text>
@@ -88,7 +88,7 @@
               <v-expansion-panels multiple>
                 <v-expansion-panel elevation="4">
                   <v-expansion-panel-title>
-                    <h2>Strings</h2>
+                    <h2>{{ t('symbolsTable.strings') }}</h2>
                   </v-expansion-panel-title>
 
                   <v-expansion-panel-text >
@@ -99,7 +99,7 @@
                         <li v-for="(declaredString, index) in symbolsTable?.strings" :key="index">
                           <p class="text-body-1 mb-2 mt-2">{{ declaredString }}</p>
                           <v-divider></v-divider>
-                        </li>    
+                        </li>
                       </ul>
                     </v-container>
                   </v-expansion-panel-text>
@@ -153,6 +153,9 @@
   import { oneDark } from '@codemirror/theme-one-dark';
   import { selectPositionInReferenceCodeEditor } from '../../services/editorViewTools';
   import ScopeCard from '../../components/ScopeCard.vue';
+  import { useTranslate } from '../../locales';
+
+  const { translate: t } = useTranslate();
 
   const isConfigMenuOpen = defineModel<boolean>('isConfigMenuOpen');
 
@@ -199,7 +202,7 @@
 
     } catch (error) {
       console.error(error);
-      showErrorMessage(`Falha ao fazer o download do código: ${error.message}`);
+      showErrorMessage(`${t('error.downloadCodeError')}: ${error.message}`);
     }
   }
 
@@ -208,7 +211,7 @@
       symbolsTable.value = await compilerApi.getSymbolsTable(codeId);
     } catch (error) {
       console.error(error);
-      showErrorMessage(`Falha ao fazer o download da table de símbolos: ${error.message}`);
+      showErrorMessage(`${t('error.downloadSymbolsTableError')}: ${error.message}`);
     }
   }
 

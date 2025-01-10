@@ -88,12 +88,6 @@
   let referenceCodeEditorView: EditorView;
 
   const tokens = ref<Token[]>();
-  // const translatedTokens = ref<Token[]>();
-
-  const translateToken = (type) => {
-    console.log("teste");
-    return t(`token.types.${type}`);
-  };
 
   const snackbar = ref({
     show: false,
