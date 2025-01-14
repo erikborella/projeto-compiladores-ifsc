@@ -7,6 +7,7 @@ import { tokenResources } from "./token";
 import { syntaxResources } from "./syntax";
 import { symbolsTableResources } from "./symbolsTable";
 import { llvmIrResources } from "./llvmIr";
+import { assemblyResources } from "./assembly";
 
 export const pt: ResourceValues = {
   projectTitle: "Projeto Compilador",
@@ -18,4 +19,5 @@ export const pt: ResourceValues = {
   syntax: syntaxResources,
   symbolsTable: symbolsTableResources,
   llvmIr: llvmIrResources,
+  assembly: assemblyResources,
 };

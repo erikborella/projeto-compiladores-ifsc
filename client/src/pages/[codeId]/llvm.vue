@@ -73,11 +73,11 @@
 
 <style lang="css" scoped>
 
- .code-editor {
-  height: 100%;
-  overflow: auto;
-  background-color: #282c34;
- }
+  .code-editor {
+    height: 100%;
+    overflow: auto;
+    background-color: #282c34;
+  }
 
 </style>
 

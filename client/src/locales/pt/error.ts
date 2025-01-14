@@ -5,4 +5,5 @@ export const errorResources = {
   downloadSyntaxTreeError: "Falha ao fazer o da arvore sintática",
   downloadSymbolsTableError: "Falha ao fazer o download da tabela de símbolos",
   downloadLlvmIrCodeError: "Falha ao fazer o download do código IR",
+  downloadAssemblyCodeError: "Falha ao fazer o download do código Assembly",
 };

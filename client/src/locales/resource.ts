@@ -7,6 +7,7 @@ export type ResourceValues = {
     downloadSyntaxTreeError: string;
     downloadSymbolsTableError: string;
     downloadLlvmIrCodeError: string;
+    downloadAssemblyCodeError: string;
   };
   index: {
     compile: string;
@@ -172,6 +173,24 @@ export type ResourceValues = {
       oz: string;
     };
   };
+  assembly: {
+    optimization: string;
+    selectOptimizationLevel: string;
+    optimizationLevel: string;
+    optimizationComparizon: string;
+    compareOptimizationLevels: string;
+    activateComparison: string;
+    optimizationLevelToCompare: string;
+    optimizations: {
+      noOpt: string;
+      o0: string;
+      os: string;
+      o1: string;
+      o2: string;
+      o3: string;
+      oz: string;
+    };
+  }
 };
 
 type NestedKeys<T> = T extends object
