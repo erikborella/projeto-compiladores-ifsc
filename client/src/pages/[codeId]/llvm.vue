@@ -5,26 +5,26 @@
       <v-container class="d-flex flex-column ga-2">
         <v-card
           elevation="4"
-          title="Otimização"
-          text="Selecione aqui o nível de otimização do código intermediário do LLVM.">
+          :title="t('llvmIr.optimization')"
+          :text="t('llvmIr.selectOptimizationLevel')">
           <v-select
             variant="outlined"
             class="pa-3"
-            label="Nível de otimização"
+            :label="t('llvmIr.optimizationLevel')"
             v-model="optimizationSelected"
             :items="optimizationLevels"
             item-title="text"
             item-value="value"
             @update:modelValue="changeOptimizationLevel()"
-            ></v-select>
-            
+          ></v-select>
+
           <v-divider />
 
-          <v-card-title>Comparação de otimização</v-card-title>
-          <v-card-text>Compare o código do LLVM IR entre diferentes níveis de otimizações</v-card-text>
+          <v-card-title>{{ t('llvmIr.optimizationComparizon') }}</v-card-title>
+          <v-card-text>{{ t('llvmIr.compareOptimizationLevels') }}</v-card-text>
 
-          <v-checkbox 
-            label="Ativar comparação" 
+          <v-checkbox
+            :label="t('llvmIr.activateComparison')"
             v-model="isMergeEditorVisible"
             @update:modelValue="($value: boolean) => toggleEditorMode($value)"
           ></v-checkbox>
@@ -33,13 +33,13 @@
             v-if="isMergeEditorVisible"
             variant="outlined"
             class="px-3"
-            label="Nível de otimização para comparar"
+            :label="t('llvmIr.optimizationLevelToCompare')"
             v-model="optimizationToCompareSelected"
             :items="getOptimizationLevelsToCompare"
             item-title="text"
             item-value="value"
             @update:modelValue="changeOptimizationLevel()"
-          ></v-select>            
+          ></v-select>
         </v-card>
       </v-container>
     </v-navigation-drawer>
@@ -67,7 +67,7 @@
           @click="snackbar.show = false">Fechar</v-btn>
       </template>
     </v-snackbar>
-    
+
   </v-layout>
 </template>
 
@@ -82,7 +82,7 @@
 </style>
 
 <script lang='ts' setup>
-  import { ref, onMounted, computed, useTemplateRef, nextTick } from 'vue';
+  import { ref, onMounted, computed, useTemplateRef, nextTick, watch } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { EditorView, basicSetup } from 'codemirror';
   import { MergeView } from '@codemirror/merge';
@@ -91,6 +91,9 @@
   import { cppLanguage } from '@codemirror/lang-cpp';
   import { OptimizationLevel } from '../../models/OptimizationLevel';
   import compilerApi from '../../services/compiler/compilerApi';
+  import { useTranslate } from '../../locales';
+
+  const { translate: t, locale } = useTranslate();
 
   const isConfigMenuOpen = defineModel<boolean>('isConfigMenuOpen');
 
@@ -99,19 +102,19 @@
 
   const isLoading = ref(false);
 
-  const optimizationLevels = [
-    { value: OptimizationLevel.no_opt, text: 'Sem otimização' },
-    { value: OptimizationLevel.o0, text: 'Sem otimização (O0, tratado pelo LLVM)' },
-    { value: OptimizationLevel.os, text: 'Padrão (Os)' },
-    { value: OptimizationLevel.o1, text: 'Leve (O1)' },
-    { value: OptimizationLevel.o2, text: 'Média (O2)' },
-    { value: OptimizationLevel.o3, text: 'Pesada (O3)' },
-    { value: OptimizationLevel.oz, text: 'Tamanho (Oz)' },
-  ];
-  const optimizationSelected = ref(optimizationLevels[0].value);
+  const optimizationLevels = computed(() => [
+    { value: OptimizationLevel.no_opt, text: t('llvmIr.optimizations.noOpt') },
+    { value: OptimizationLevel.o0, text: t('llvmIr.optimizations.o0') },
+    { value: OptimizationLevel.os, text: t('llvmIr.optimizations.os') },
+    { value: OptimizationLevel.o1, text: t('llvmIr.optimizations.o1') },
+    { value: OptimizationLevel.o2, text: t('llvmIr.optimizations.o2') },
+    { value: OptimizationLevel.o3, text: t('llvmIr.optimizations.o3') },
+    { value: OptimizationLevel.oz, text: t('llvmIr.optimizations.oz') },
+  ]);
+  const optimizationSelected = ref(optimizationLevels.value[0].value);
 
   const getOptimizationLevelsToCompare = computed(() => {
-    const optimizationLevelsAvailable = [...optimizationLevels]
+    const optimizationLevelsAvailable = [...optimizationLevels.value]
       .filter(el => el.value !== optimizationSelected.value);
 
       return optimizationLevelsAvailable;
@@ -136,7 +139,7 @@
 
     const optimizationLevelConverted = OptimizationLevel[queryOptimizationLevel?.valueOf() as string] as OptimizationLevel | undefined;
     const validOptimizationLevel = optimizationLevelConverted ?? OptimizationLevel.o0;
-    
+
     return validOptimizationLevel;
   }
 
@@ -157,7 +160,7 @@
 
     const optimizationLevelConverted = OptimizationLevel[queryOptimizationLevel?.valueOf() as string] as OptimizationLevel | undefined;
     const validOptimizationLevel = optimizationLevelConverted ?? getOptimizationLevelsToCompare.value[0].value;
-    
+
     return validOptimizationLevel;
   }
 
@@ -179,7 +182,7 @@
 
     updateQueryState(queryStatesToUpdate);
   }
-  
+
   async function changeOptimizationLevel() {
     isLoading.value = true;
 
@@ -200,7 +203,10 @@
     else {
       await showEditorView();
     }
+  });
 
+  watch(locale, () => {
+    changeOptimizationLevel();
   });
 
   function showErrorMessage(message: string) {
@@ -230,8 +236,8 @@
     const aIrCode = await downloadIrCode(optimizationSelected.value);
     const bIrCode = await downloadIrCode(optimizationToCompareSelected.value);
 
-    const aIrCodeWithIdentification = `// Otimização ${optimizationLevels.find(v => v.value === optimizationSelected.value)?.text}\n\n${aIrCode}`;
-    const bIrCodeWithIdentification = `// Otimização ${optimizationLevels.find(v => v.value === optimizationToCompareSelected.value)?.text}\n\n${bIrCode}`;
+    const aIrCodeWithIdentification = `// ${t('llvmIr.optimization')} ${optimizationLevels.value.find(v => v.value === optimizationSelected.value)?.text}\n\n${aIrCode}`;
+    const bIrCodeWithIdentification = `// ${t('llvmIr.optimization')} ${optimizationLevels.value.find(v => v.value === optimizationToCompareSelected.value)?.text}\n\n${bIrCode}`;
 
     llvmIrMergeView = new MergeView({
       parent: llvmIrCodeMergeElement.value!,
@@ -257,7 +263,7 @@
         ],
       }
     });
-   
+
     isLoading.value = false;
   }
 
@@ -290,9 +296,9 @@
       return llvmIrCode;
     } catch (error) {
       console.error(error);
-      showErrorMessage(`Falha ao fazer o download do código IR: ${error.message}`);
+      showErrorMessage(`${t('error.downloadLlvmIrCodeError')}: ${error.message}`);
 
-      return `Falha ao fazer o download do código IR: ${error.message}`;
+      return `${t('error.downloadLlvmIrCodeError')}: ${error.message}`;
     }
   }
 
@@ -321,7 +327,7 @@
       await showMergeView();
       return;
     }
-    
+
     await showEditorView();
   }
 

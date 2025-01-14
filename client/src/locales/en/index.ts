@@ -6,6 +6,7 @@ import { codeIdResources } from "./codeId";
 import { tokenResources } from "./token";
 import { syntaxResources } from "./syntax";
 import { symbolsTableResources } from "./symbolsTable";
+import { llvmIrResources } from "./llvmIr";
 
 export const en: ResourceValues = {
   projectTitle: "Compiler Project",
@@ -16,4 +17,5 @@ export const en: ResourceValues = {
   token: tokenResources,
   syntax: syntaxResources,
   symbolsTable: symbolsTableResources,
+  llvmIr: llvmIrResources,
 };

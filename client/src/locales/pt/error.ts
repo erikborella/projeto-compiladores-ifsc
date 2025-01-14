@@ -4,4 +4,5 @@ export const errorResources = {
   downloadTokenError: "Falha ao fazer o download da lista de tokens",
   downloadSyntaxTreeError: "Falha ao fazer o da arvore sintática",
   downloadSymbolsTableError: "Falha ao fazer o download da tabela de símbolos",
+  downloadLlvmIrCodeError: "Falha ao fazer o download do código IR",
 };

@@ -6,14 +6,16 @@ import { codeIdResources } from "./codeId";
 import { tokenResources } from "./token";
 import { syntaxResources } from "./syntax";
 import { symbolsTableResources } from "./symbolsTable";
+import { llvmIrResources } from "./llvmIr";
 
 export const pt: ResourceValues = {
-    projectTitle: "Projeto Compilador",
-    error: errorResources,
-    index: indexResources,
-    examples: examplesResources,
-    codeId: codeIdResources,
-    token: tokenResources,
-    syntax: syntaxResources,
-    symbolsTable: symbolsTableResources,
+  projectTitle: "Projeto Compilador",
+  error: errorResources,
+  index: indexResources,
+  examples: examplesResources,
+  codeId: codeIdResources,
+  token: tokenResources,
+  syntax: syntaxResources,
+  symbolsTable: symbolsTableResources,
+  llvmIr: llvmIrResources,
 };

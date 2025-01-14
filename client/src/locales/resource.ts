@@ -6,6 +6,7 @@ export type ResourceValues = {
     downloadTokenError: string;
     downloadSyntaxTreeError: string;
     downloadSymbolsTableError: string;
+    downloadLlvmIrCodeError: string;
   };
   index: {
     compile: string;
@@ -152,7 +153,25 @@ export type ResourceValues = {
     name: string;
     scopeDoesNotHaveNewVariables: string;
     insideScopes: string;
-  }
+  };
+  llvmIr: {
+    optimization: string;
+    selectOptimizationLevel: string;
+    optimizationLevel: string;
+    optimizationComparizon: string;
+    compareOptimizationLevels: string;
+    activateComparison: string;
+    optimizationLevelToCompare: string;
+    optimizations: {
+      noOpt: string;
+      o0: string;
+      os: string;
+      o1: string;
+      o2: string;
+      o3: string;
+      oz: string;
+    };
+  };
 };
 
 type NestedKeys<T> = T extends object
