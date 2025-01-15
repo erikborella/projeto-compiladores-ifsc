@@ -1,6 +1,5 @@
 package ifsc.compiladores.projeto.API.features.compiler.runner;
 
-import ifsc.compiladores.projeto.API.configuration.CompilerConfiguration;
 import ifsc.compiladores.projeto.API.features.compiler.domain.LLVMCompilerService;
 import ifsc.compiladores.projeto.API.features.compiler.runner.threads.ProcessExitListenerThread;
 import ifsc.compiladores.projeto.API.features.compiler.runner.threads.ProcessOutputListenerThread;
@@ -32,7 +31,7 @@ public class CompilerRunnerWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         if (session.getUri() == null) {
-            session.sendMessage(new TextMessage("-- Erro no servidor: URI não encontrada"));
+            session.sendMessage(new TextMessage(":-:serverError:uriNotFound"));
             session.close();
             return;
         }
@@ -40,7 +39,7 @@ public class CompilerRunnerWebSocketHandler extends TextWebSocketHandler {
         Optional<String> codeId = this.getCodeIdFromQuery(session.getUri());
 
         if (codeId.isEmpty()) {
-            session.sendMessage(new TextMessage("-- Erro de cliente: codeId não está presente"));
+            session.sendMessage(new TextMessage(":-:clientError:codeIdNotPresent"));
             session.close();
             return;
         }
@@ -48,7 +47,7 @@ public class CompilerRunnerWebSocketHandler extends TextWebSocketHandler {
         Optional<File> executablePath = this.llvmCompilerService.getExecutableCodePath(codeId.get());
 
         if (executablePath.isEmpty()) {
-            session.sendMessage(new TextMessage("-- Erro de cliente: código não encontrado."));
+            session.sendMessage(new TextMessage(":-:clientError:codeNotFound"));
             session.close();
             return;
         }
@@ -108,7 +107,7 @@ public class CompilerRunnerWebSocketHandler extends TextWebSocketHandler {
          new ProcessExitListenerThread(process, processThreadsLatch, (exitCode) -> {
              try {
                  synchronized (session) {
-                     session.sendMessage(new TextMessage("\n\n-- Execução do programa finalizado com código de saida: " + exitCode));
+                     session.sendMessage(new TextMessage(":-:codeFinished:" + exitCode));
                      session.close();
                  }
 
