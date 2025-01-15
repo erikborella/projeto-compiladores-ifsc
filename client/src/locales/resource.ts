@@ -190,6 +190,21 @@ export type ResourceValues = {
       o3: string;
       oz: string;
     };
+  };
+  execution: {
+    title: string;
+    description: string;
+    restart: string;
+    clear: string;
+    output: string;
+    input: string;
+    send: string;
+    startingServerConnection: string;
+    serverConnectionEstablished: string;
+    serverConnectionClosed: string;
+    serverError: string;
+    clientError: string;
+    codeFinished: string;
   }
 };
 

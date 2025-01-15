@@ -8,16 +8,18 @@ import { syntaxResources } from "./syntax";
 import { symbolsTableResources } from "./symbolsTable";
 import { llvmIrResources } from "./llvmIr";
 import { assemblyResources } from "./assembly";
+import { executionResources } from "./execution";
 
 export const pt: ResourceValues = {
-  projectTitle: "Projeto Compilador",
-  error: errorResources,
-  index: indexResources,
-  examples: examplesResources,
-  codeId: codeIdResources,
-  token: tokenResources,
-  syntax: syntaxResources,
-  symbolsTable: symbolsTableResources,
-  llvmIr: llvmIrResources,
-  assembly: assemblyResources,
+    projectTitle: "Projeto Compilador",
+    error: errorResources,
+    index: indexResources,
+    examples: examplesResources,
+    codeId: codeIdResources,
+    token: tokenResources,
+    syntax: syntaxResources,
+    symbolsTable: symbolsTableResources,
+    llvmIr: llvmIrResources,
+    assembly: assemblyResources,
+    execution: executionResources,
 };

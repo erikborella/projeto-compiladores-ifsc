@@ -1,0 +1,18 @@
+export const executionResources = {
+  title: "Execution",
+  description: "Execute your code interactively, receiving program output and sending input in real time.",
+  restart: "Restart",
+  clear: "Clear",
+  output: "Program Output",
+  input: "Input Data",
+  send: "Send",
+  startingServerConnection: "Starting server connection",
+  serverConnectionEstablished: "Server connection established",
+  serverConnectionClosed: "Server connection closed",
+  serverError: "Server error",
+  clientError: "Client error",
+  codeFinished: "Program execution finished with exit code",
+  uriNotFound: "URI not found",
+  codeIdNotPresent: "codeId is not present",
+  codeNotFound: "Code not found.",
+};

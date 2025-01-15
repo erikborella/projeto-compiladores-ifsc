@@ -8,6 +8,7 @@ import { syntaxResources } from "./syntax";
 import { symbolsTableResources } from "./symbolsTable";
 import { llvmIrResources } from "./llvmIr";
 import { assemblyResources } from "./assembly";
+import { executionResources } from "./execution";
 
 export const en: ResourceValues = {
   projectTitle: "Compiler Project",
@@ -20,4 +21,5 @@ export const en: ResourceValues = {
   symbolsTable: symbolsTableResources,
   llvmIr: llvmIrResources,
   assembly: assemblyResources,
+  execution: executionResources,
 };
