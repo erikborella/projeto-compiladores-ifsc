@@ -1,5 +1,6 @@
 export type ResourceValues = {
   projectTitle: string;
+  close: string;
   error: {
     uploadError: string;
     downloadCodeError: string;

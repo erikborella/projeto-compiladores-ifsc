@@ -13,6 +13,7 @@ import { complexityResources } from "./complexity";
 
 export const en: ResourceValues = {
   projectTitle: "Compiler Project",
+  close: "Close",
   error: errorResources,
   index: indexResources,
   examples: examplesResources,

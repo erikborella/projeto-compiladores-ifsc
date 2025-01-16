@@ -42,7 +42,7 @@
         <v-btn
           color="white"
           variant="text"
-          @click="snackbar.show = false">Fechar</v-btn>
+          @click="snackbar.show = false">{{ t('close') }}</v-btn>
       </template>
     </v-snackbar>
 

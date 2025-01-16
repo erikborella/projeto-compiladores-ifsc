@@ -120,7 +120,7 @@
     <v-snackbar variant="flat" color="error" v-model="snackbar.show" :timeout="5000" top>
       {{ snackbar.message }}
       <template v-slot:actions>
-        <v-btn color="white" variant="text" @click="snackbar.show = false">Fechar</v-btn>
+        <v-btn color="white" variant="text" @click="snackbar.show = false">{{ t('close') }}</v-btn>
       </template>
     </v-snackbar>
 
