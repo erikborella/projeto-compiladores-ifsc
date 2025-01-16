@@ -6,4 +6,6 @@ export const errorResources = {
   downloadSymbolsTableError: "Falha ao fazer o download da tabela de símbolos",
   downloadLlvmIrCodeError: "Falha ao fazer o download do código IR",
   downloadAssemblyCodeError: "Falha ao fazer o download do código Assembly",
+  downloadAnalysisComplexityError: "Falha ao fazer o download da análise da complexidade do código",
+  formulaErrorRender: "Ocorreu um erro ao exibir a formula matemática",
 };

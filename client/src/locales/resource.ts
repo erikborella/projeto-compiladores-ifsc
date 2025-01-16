@@ -8,6 +8,8 @@ export type ResourceValues = {
     downloadSymbolsTableError: string;
     downloadLlvmIrCodeError: string;
     downloadAssemblyCodeError: string;
+    downloadAnalysisComplexityError: string;
+    formulaErrorRender: string;
   };
   index: {
     compile: string;
@@ -205,7 +207,26 @@ export type ResourceValues = {
     serverError: string;
     clientError: string;
     codeFinished: string;
-  }
+  };
+  complexity: {
+    title: string;
+    description: string;
+    costDescriptions: {
+      functions: string;
+      functionsReturns: string;
+      variableDeclaration: string;
+      attribuition: string;
+      readWrite: string;
+      ifElse: string;
+      for: string;
+      while: string;
+      functionCall: string;
+    };
+    results: string;
+    simplification: string;
+    asymptoticNotation: string;
+    cost: string;
+  };
 };
 
 type NestedKeys<T> = T extends object

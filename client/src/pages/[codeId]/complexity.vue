@@ -3,41 +3,99 @@
 
     <v-navigation-drawer v-model="isConfigMenuOpen" width="350">
       <v-container class="d-flex flex-column ga-2">
-        <v-card
-          elevation="4"
-          title="Complexidade"
-        >
+        <v-card elevation="4" :title="t('complexity.title')">
           <template v-slot:text>
-            <p>Veja o cálculo da complexidade do programa</p>
+            <p>{{ t('complexity.description') }}</p>
 
             <v-card-text>
               <ul>
-                <li>Definições de funções: <code>T(n) = 0</code>.</li>
-                <li>Retornos de funções: <code>T(n) = 0</code>.</li>
-                <li>Declarações de variáveis: <code>T(n) = 0</code>.</li>
-                <li>Atribuições: <code>T(n) = 1</code>.</li>
-                <li>Escrita e lida de valores: <code>T(n) = 1</code>.</li>
-                <li><code>if</code> e <code>else</code>: Considera <code>T(n)</code> do bloco com maior custo.</li>
-                <li><code>for</code> Realiza o calculo junto da variável marcada como <code>input</code>.</li>
-                <li><code>while</code> é suportado para casos simples das variáveis marcadas como <code>input</code>.</li>
-                <li>Chamadas de funções não tem o calculo do <code>T(n)</code> suportado ainda.</li>
+                <i18n-t keypath="complexity.costDescriptions.functions" tag="li">
+                  <template v-slot:cost>
+                    <code>T(n) = 0</code>
+                  </template>
+                </i18n-t>
+
+                <i18n-t keypath="complexity.costDescriptions.functionsReturns" tag="li">
+                  <template v-slot:cost>
+                    <code>T(n) = 0</code>
+                  </template>
+                </i18n-t>
+
+                <i18n-t keypath="complexity.costDescriptions.variableDeclaration" tag="li">
+                  <template v-slot:cost>
+                    <code>T(n) = 0</code>
+                  </template>
+                </i18n-t>
+
+                <i18n-t keypath="complexity.costDescriptions.attribuition" tag="li">
+                  <template v-slot:cost>
+                    <code>T(n) = 1</code>
+                  </template>
+                </i18n-t>
+
+                <i18n-t keypath="complexity.costDescriptions.readWrite" tag="li">
+                  <template v-slot:cost>
+                    <code>T(n) = 1</code>
+                  </template>
+                </i18n-t>
+
+                <i18n-t keypath="complexity.costDescriptions.ifElse" tag="li">
+                  <template v-slot:if>
+                    <code>if</code>
+                  </template>
+
+                  <template v-slot:else>
+                    <code>else</code>
+                  </template>
+
+                  <template v-slot:tN>
+                    <code>T(n)</code>
+                  </template>
+                </i18n-t>
+
+                <i18n-t keypath="complexity.costDescriptions.for" tag="li">
+                  <template v-slot:for>
+                    <code>for</code>
+                  </template>
+
+                  <template v-slot:input>
+                    <code>input</code>
+                  </template>
+                </i18n-t>
+
+                <i18n-t keypath="complexity.costDescriptions.while" tag="li">
+                  <template v-slot:while>
+                    <code>while</code>
+                  </template>
+
+                  <template v-slot:input>
+                    <code>input</code>
+                  </template>
+                </i18n-t>
+
+                <i18n-t keypath="complexity.costDescriptions.functionCall" tag="li">
+                  <template v-slot:tN>
+                    <code>T(n)</code>
+                  </template>
+                </i18n-t>
               </ul>
             </v-card-text>
           </template>
         </v-card>
 
-        <v-card v-if="!!finalCostsResults && finalCostsResults.length > 0" elevation="4" title="Resultados:">
+        <v-card v-if="!!finalCostsResults && finalCostsResults.length > 0" elevation="4"
+          :title="t('complexity.results')">
           <v-divider></v-divider>
           <div v-for="(finalCost, index) in finalCostsResults" :key="index">
             <v-card-title>{{ finalCost.costId }}</v-card-title>
             <v-card-text>
               <div v-html="renderTex(finalCost.rawExpression)"></div>
               <br>
-              <div v-html="renderTex('\\downarrow \\text{simplificação}')"></div>
+              <div v-html="renderTex(`\\downarrow \\text{${t('complexity.simplification')}}`)"></div>
               <br>
               <div v-html="renderTex(finalCost.finalExpression)"></div>
               <br>
-              <div v-html="renderTex('\\downarrow \\text{notação assintótica}')"></div>
+              <div v-html="renderTex(`\\downarrow \\text{${t('complexity.asymptoticNotation')}}`)"></div>
               <br>
               <div v-html="renderTex(finalCost.bigO)"></div>
             </v-card-text>
@@ -53,21 +111,14 @@
     </v-main>
 
     <v-overlay v-model="isLoading" :opacity="0.8" persistent class="align-center justify-center">
-        <v-progress-circular
-          indeterminate
-          color="primary"
-          width="10"
-          size="100">
-        </v-progress-circular>
+      <v-progress-circular indeterminate color="primary" width="10" size="100">
+      </v-progress-circular>
     </v-overlay>
 
     <v-snackbar variant="flat" color="error" v-model="snackbar.show" :timeout="5000" top>
       {{ snackbar.message }}
       <template v-slot:actions>
-        <v-btn
-          color="white"
-          variant="text"
-          @click="snackbar.show = false">Fechar</v-btn>
+        <v-btn color="white" variant="text" @click="snackbar.show = false">Fechar</v-btn>
       </template>
     </v-snackbar>
 
@@ -85,7 +136,7 @@
 </style>
 
 <script lang="ts" setup>
-  import { ref, useTemplateRef, onMounted, computed } from 'vue';
+  import { ref, useTemplateRef, onMounted, watch } from 'vue';
   import { useRoute } from 'vue-router';
   import compilerApi from '../../services/compiler/compilerApi';
   import { EditorView } from 'codemirror';
@@ -98,6 +149,9 @@
   import katex from 'katex';
   import 'katex/dist/katex.min.css';
   import nerdamer from 'nerdamer/all';
+  import { useTranslate } from '../../locales';
+
+  const { translate: t, locale } = useTranslate();
 
   const route = useRoute();
 
@@ -120,11 +174,22 @@
     try {
       return katex.renderToString(tex);
     } catch (e) {
-      return `Ocorreu um erro ao exibir a formula matemática`;
+      return t('error.formulaErrorRender');
     }
   }
 
+  watch(locale, async () => {
+    referenceCodeEditorView.destroy();
+    finalCostsResults.value = [];
+
+    await downloadAndShowComplexityAnalysis();
+  });
+
   onMounted(async () => {
+    await downloadAndShowComplexityAnalysis();
+  });
+
+  async function downloadAndShowComplexityAnalysis() {
     isLoading.value = true;
 
     const codeId = route.params.codeId as string;
@@ -133,7 +198,7 @@
     await downloadAndShowComplexityCosts(codeId);
 
     isLoading.value = false;
-  });
+  }
 
   async function downloadAndShowReferenceCode(codeId: string) {
     try {
@@ -154,7 +219,7 @@
 
     } catch (error) {
       console.error(error);
-      showErrorMessage(`Falha ao fazer o download do código: ${error.message}`);
+      showErrorMessage(`${t('error.downloadCodeError')}: ${error.message}`);
     }
   }
 
@@ -165,7 +230,7 @@
       costResult.forEach(c => addHintsFromCostResult(c));
     } catch (error) {
       console.error(error);
-      showErrorMessage(`Falha ao fazer o download da análise da complexidade do código: ${error.message}`);
+      showErrorMessage(`${t('error.downloadAnalysisComplexityError')}: ${error.message}`);
     }
   }
 
@@ -173,7 +238,7 @@
     const isTopLevelBlock = isBlockCost(costResult) && costResult.topLevel;
 
     if (costResult.position) {
-      const prefix = (isTopLevelBlock) ? "T(n)" : "Custo";
+      const prefix = (isTopLevelBlock) ? "T(n)" : t('complexity.cost');
       const costValue = (isTopLevelBlock) ?
         simplifyCost(costResult.stringRepresentation)
         : costResult.stringRepresentation;

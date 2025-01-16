@@ -9,6 +9,7 @@ import { symbolsTableResources } from "./symbolsTable";
 import { llvmIrResources } from "./llvmIr";
 import { assemblyResources } from "./assembly";
 import { executionResources } from "./execution";
+import { complexityResources } from "./complexity";
 
 export const pt: ResourceValues = {
     projectTitle: "Projeto Compilador",
@@ -22,4 +23,5 @@ export const pt: ResourceValues = {
     llvmIr: llvmIrResources,
     assembly: assemblyResources,
     execution: executionResources,
+    complexity: complexityResources,
 };
