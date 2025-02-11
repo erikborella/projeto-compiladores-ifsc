@@ -3,12 +3,14 @@ lexer grammar LexerGrammar;
 MAIN : 'main' ;
 SCANF : 'scanf' ;
 PRINTLN : 'println' ;
+PRINT : 'print' ;
 IF : 'if' ;
 ELSE : 'else' ;
 WHILE : 'while' ;
 FOR : 'for' ;
 FUNC : 'func' ;
 RETURN : 'return';
+INPUT : 'input';
 
 TIPO_VOID : 'void' ;
 TIPO_CHAR : 'char' ;

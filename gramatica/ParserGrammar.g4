@@ -2,7 +2,7 @@ parser grammar ParserGrammar;
 options { tokenVocab=LexerGrammar; }
 
 @header {
-    import ifsc.compiladores.projeto.LLVM.definitions.Label;
+    import ifsc.compiladores.projeto.LLVM.translator.definitions.Label;
 }
 
 programa
@@ -34,7 +34,7 @@ dimensao
     ;
 
 parametros
-    : tipo ID (VIRGULA tipo ID)*
+    : (INPUT)? tipo ID (VIRGULA (INPUT)? tipo ID)*
     ;
 
 principal
@@ -55,11 +55,12 @@ comando
     ;
 
 comando_linha
-    : leitura    #ComandoLinhaLeitura
-    | escrita    #ComandoLinhaEscrita
-    | atribuicao #ComandoLinhaAtribuicao
-    | funcao     #ComandoLinhaFuncao
-    | retorno    #ComandoLinhaRetorno
+    : leitura       #ComandoLinhaLeitura
+    | escritaln     #ComandoLinhaEscritaLn
+    | escrita       #ComandoLinhaEscrita
+    | atribuicao    #ComandoLinhaAtribuicao
+    | funcao        #ComandoLinhaFuncao
+    | retorno       #ComandoLinhaRetorno
     ;
 
 comando_bloco
@@ -69,11 +70,7 @@ comando_bloco
     ;
 
 leitura
-    : SCANF PARENTESE_ABRE termoleitura (VIRGULA termoleitura)* PARENTESE_FECHA
-    ;
-
-termoleitura
-    : ID (dimensao2)*
+    : SCANF PARENTESE_ABRE acesso_id PARENTESE_FECHA
     ;
 
 dimensao2
@@ -81,6 +78,10 @@ dimensao2
     ;
 
 escrita
+    : PRINT PARENTESE_ABRE TEXTO (VIRGULA termoescrita)* PARENTESE_FECHA
+    ;
+
+escritaln
     : PRINTLN PARENTESE_ABRE TEXTO (VIRGULA termoescrita)* PARENTESE_FECHA
     ;
 
