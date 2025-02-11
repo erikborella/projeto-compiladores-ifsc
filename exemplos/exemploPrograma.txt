@@ -1,0 +1,38 @@
+float calcularMedia(float[5] notas) {
+  int i;
+  float soma;
+
+  soma = 0;
+
+  for (i = 0; i < 5; i = i + 1) {
+    soma = soma + notas[i];
+  }
+
+  return soma / 5;
+}
+
+main() {
+  float[5] notas;
+  float media;
+
+  int i;
+
+  for (i = 0; i < 5; i = i + 1) {
+    float nota;
+
+    println("Digite a %d nota do aluno:", i + 1);
+    scanf(nota);
+
+    notas[i] = nota;
+  }
+
+  media = func calcularMedia(notas);
+
+  println("A média do aluno foi: %.1f", media);
+
+  if (media < 7) {
+    println("O aluno não atingiu a média 7");
+  } else {
+    println("O aluno atingiu a média 7");
+  }
+}
