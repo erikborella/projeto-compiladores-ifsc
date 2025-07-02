@@ -1,14 +1,14 @@
 # projeto-compiladores-ifsc
 
-## 1. Pré-requisitos
+## 1. Pré-requisitos (outdated)
 
 Compilador Java: JDK 19 ou maior. \
 LLVM: Clang 16.0.0.
 
-## 2. Download
+## 2. Download (outdated)
 Baixe o programa já compilado e pronto para ser executado na ultima versão [aqui](https://github.com/erikborella/projeto-compiladores-ifsc/releases/download/0.1.0-alpha/projeto-compiladores-ifsc_0.1.0-alpha.zip). Veja nas [Releases](https://github.com/erikborella/projeto-compiladores-ifsc/releases) também outras versões disponiveis.
 
-## 3. Utilização
+## 3. Utilização (outdated)
 
 O programa compilado tem como objetivo compilar o código suportado para a [linguagem intermediaria do LLVM](https://llvm.org/docs/LangRef.html) na forma textual, ou seja, ele irá fazer o papel de frontend do compilador gerando uma representação para o backend (LLVM) poder realizar os proximos passos de otimização, geração de código alvo e linkagem em um executavel.
 
